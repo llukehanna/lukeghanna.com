@@ -1,0 +1,51 @@
+export const meta = {
+  title: 'BJS',
+  line: 'A rule-aware blackjack trainer where the numbers have to be right.',
+  status: 'Engine done and tested · app in rebuild',
+  role: 'Design, build',
+  stack: 'Swift 6.2, SwiftUI, SwiftData, Swift Testing, Swift Package Manager',
+  source: 'Public. MIT.',
+  links: [
+    { label: 'Source', handle: 'github', href: 'https://github.com/llukehanna/Blackjack-Strategy' },
+  ],
+  glance: [
+    { label: 'Rule variants', value: 'H17/S17 · DAS · RSA · surrender · decks' },
+    { label: 'Edge baseline', value: '0.43% (8-deck S17 DAS 3:2)' },
+    { label: 'Third-party deps', value: '0' },
+    { label: 'Tests', value: '112' },
+    { label: 'Released', value: 'not yet' },
+  ],
+}
+
+BJS is a native iOS trainer for players who want to get seriously better at blackjack: basic strategy drills, Hi-Lo counting, house-edge analysis, and a full card-counting simulation. It is an educational tool, not a casino, and its credibility rests on one thing: the numbers must be right.
+
+## Why it exists
+
+Every other trainer I tried either taught generic strategy that was wrong for the table you were actually sitting at, or hid the math behind cartoons. BJS is rule-aware. You configure the exact rules of the casino you are playing (dealer hits or stands on soft 17, doubling after a split, resplitting aces, surrender, deck count, penetration) and strategy and edge calculations adjust to match.
+
+## The engine
+
+All of the math lives in a pure Swift package with no UI dependency, so it is tested in isolation and can be reused by any front end. Strategy is resolved against the configured rules rather than looked up from one generic chart. The edge calculator starts from a published baseline for an eight-deck, stand-on-17, double-after-split, 3:2 game and applies per-rule deltas scaled by deck count; its own doc comment claims agreement with the reference values within 0.02%. Randomness is injectable, so shoe shuffles are reproducible in tests.
+
+<Flow
+  n={1}
+  caption="What exists today. The package modules are built and tested; the app above them is a placeholder shell being rebuilt."
+  source="Drawn from BJSCore/Sources/BJSCore and BJS/App in the repository as of 23 September 2026."
+  steps={[
+    [
+      { title: 'Models', detail: 'cards, hands, shoes' },
+      { title: 'Rules', detail: 'the table’s configuration' },
+      { title: 'Strategy', detail: 'rule-variant-aware tables' },
+    ],
+    [
+      { title: 'Counting', detail: 'Hi-Lo, true count' },
+      { title: 'Edge', detail: 'baseline plus per-rule deltas' },
+      { title: 'Explain', detail: 'why a play is correct' },
+    ],
+    { title: 'BJS app', detail: 'a three-tab shell; the trainer, counting, edge and shoe-sim screens are being rebuilt on the package', note: 'in progress' },
+  ]}
+/>
+
+## Status
+
+The engine is done and tested: 112 test cases across the package and the app shell, with no third-party dependencies. The original app layer was discarded on 23 September 2026 and is being rebuilt on the package, in order: engine completion, a design system, then the strategy trainer, counting, edge calculator, progress, shoe simulation, and a TestFlight build last. Nothing has been released, and there are no screenshots here until there is an app to capture.

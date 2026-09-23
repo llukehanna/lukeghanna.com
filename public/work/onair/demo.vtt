@@ -1,0 +1,10 @@
+WEBVTT
+
+00:00.000 --> 00:06.000
+A game is clicked and the fixture stream starts playing.
+
+00:06.000 --> 00:14.000
+A stall is injected into the stream.
+
+00:14.000 --> 00:24.800
+Playback fails over to the second fixture stream with no black frame.

@@ -1,65 +1,131 @@
 export const meta = {
   title: 'BT',
-  line: 'A Kalshi edge bot. The edge is in the pipeline, not the data.',
-  status: 'Running · paper',
+  line: 'A Kalshi weather bot that measured its own edge and found none.',
+  status: 'Paused · research result; scans daily',
   role: 'Design, build, operate',
-  stack: 'Python, systemd, Kalshi REST + WebSocket, Open-Meteo',
-  source: 'Private. Engineering docs public.',
+  stack: 'Python 3.11, httpx, SQLite + JSONL journal, scikit-learn, launchd',
+  source: 'Private. Engineering docs and results public.',
   links: [
-    { label: 'Engineering docs', handle: 'github', href: 'https://github.com/llukehanna/BT-docs' },
+    { label: 'Engineering docs', handle: 'github · BT-docs', href: 'https://github.com/llukehanna/BT-docs' },
   ],
   glance: [
-    { label: 'Fee peak', value: '$0.0175 / contract' },
-    { label: 'Sizing', value: 'fractional Kelly' },
-    { label: 'Gate', value: 'reliability + Brier' },
-    { label: 'Weather', value: 'KXHIGH* markets' },
-    { label: 'Ensemble', value: '31-member GFS' },
+    { label: 'Settled signals', value: '7,440' },
+    { label: 'Period', value: 'May 10 – Aug 13, 2026' },
+    { label: 'Cities', value: '5' },
+    { label: 'Brier, model', value: '0.187' },
+    { label: 'Brier, market', value: '0.120' },
+    { label: 'Orders placed', value: '0' },
   ],
 }
 
-BT identifies systematically mispriced contracts on Kalshi and places automated orders on them, and it will not trade until its own calibration says it can.
+BT tested whether a 31-member GFS ensemble, read as a probability distribution, beats Kalshi's price on daily high-temperature contracts after fees. It ran unattended for four months, settled 7,440 signals against the official NWS climate record, and answered no.
 
 ## What it does
 
-Two market families. Daily high-temperature markets at US airports, where BT compares 31-member GFS ensemble forecasts from Open-Meteo against live contract prices. And NBA and NFL markets, where it compares de-vigged sharp consensus odds, aggregated from multiple books, against Kalshi pricing.
+Every scan window, four per day, for five cities (New York, Chicago Midway, Denver, Miami, Los Angeles):
 
-In both cases the pipeline has the same shape: **predict, compare, threshold, size, place, settle, measure.**
+1. Pull the 31-member GFS ensemble from Open-Meteo for the contract day.
+2. Fetch the live market list from Kalshi and parse each bracket into a temperature interval.
+3. Compute the model probability as the fraction of ensemble members landing in the bracket.
+4. Compute the fee-adjusted edge against the market price.
+5. Persist every bracket evaluation as a signal, edge or not, so calibration sees the full distribution.
+6. After settlement, reconcile each signal against the NWS Daily Climate Report and record the outcome.
+7. Report reliability curves, Brier score, and a paper simulation. Trading is gated on this report.
 
-## Why these markets
+Step 7 is the design. Live trading was never allowed to start on a backtest; it had to pass calibration on settled signals first. It did not pass.
 
-Prediction markets reward engineering discipline over information asymmetry.
+## The result
 
-- **Objective settlement.** Weather settles off the NWS Daily Climate Report; sports settles off the final score. Calibration either works or it doesn't.
-- **Retail-dominated flow.** Pricing inefficiencies persist longer than in equities or FX.
-- **Public data.** GFS ensembles and consensus odds are free and high quality. There is no data moat; **the edge is in the pipeline.**
-- **A quadratic fee structure** that makes edge math sharp and easy to reason about.
+Over 83 contract days and 2,472 distinct contracts, a bracket resolved yes 16.7% of the time. The model was overconfident at both ends.
 
-## Math
+| Predicted bucket | n | Mean predicted | Realized hit rate |
+|---|---|---|---|
+| 0.00 – 0.17 | 5,223 | 0.02 | 0.14 |
+| 0.17 – 0.33 | 661 | 0.26 | 0.21 |
+| 0.33 – 0.50 | 548 | 0.42 | 0.26 |
+| 0.50 – 0.67 | 406 | 0.58 | 0.24 |
+| 0.67 – 0.83 | 272 | 0.74 | 0.19 |
+| 0.83 – 1.00 | 330 | 0.92 | 0.24 |
 
-Kalshi's taker fee is quadratic in contract price. It peaks at $0.0175 per contract at P = 0.50 and falls to zero at the boundaries. Every edge calculation deducts fees per fill before deciding to trade; a net edge below the fee curve is not an edge. Maker orders avoid the fee entirely when filled passively.
+Brackets the model priced near zero hit 14% of the time; brackets it priced above 83% hit 24%. Reading ensemble-member frequency directly as probability ignores that the members share systematic bias on a given day, so the spread understates true uncertainty.
+
+Isotonic calibration, out of fold with one contract day held out at a time, fixes the reliability curve and adds no skill. On the 2,777 signals with a two-sided order book:
+
+| Probabilities | Brier |
+|---|---|
+| Raw model | 0.251 |
+| Calibrated model, out of fold | 0.204 |
+| Kalshi market price | 0.120 |
+
+Calibration makes the model honest by squeezing every forecast into roughly 0.13 to 0.46, so it barely separates brackets. The market price beats both versions by a wide margin. There is no information here the market does not already have. The paper simulation says the same thing in dollars: yes-side trades at the executable ask, one contract per signal, the taker fee deducted.
+
+| Probabilities | Edge threshold | Trades | Net return per $1 staked |
+|---|---|---|---|
+| Raw | 0.05 | 740 | −$0.087 |
+| Raw | 0.10 | 617 | −$0.112 |
+| Raw | 0.20 | 467 | −$0.104 |
+| Calibrated | 0.05 | 1,115 | −$0.420 |
+| Calibrated | 0.10 | 740 | −$0.273 |
+
+Negative everywhere. The calibrated model does worse because it lifts long shots just far enough to clear the threshold.
+
+> A model that says 74% and wins 19% is not edge. It is a bug with a P&L attached.
+
+## Three bugs before the number was real
+
+The first version of this analysis, on 1,299 Chicago-only outcomes, showed a positive simulated return. Every cent of it was an artifact.
+
+1. **Wrong weather station.** The settlement fetcher passed the NWS forecast-office code where the endpoint expects the climate-station code. Four cities never settled at all, and Chicago settled against the wrong office's report. 246 of 1,299 stored outcomes were wrong.
+2. **Phantom market prices.** The stored price was the raw yes ask. On an empty book Kalshi returns 100, so 4,663 of 7,440 signals were recorded as the market saying 100% when the market said nothing. A bot trading against that price looks brilliant on paper and gets no fills.
+3. **Retired forecast model.** Open-Meteo dropped the model id the blend adapter used; the blend had been silently failing and falling back to GFS only.
+
+The fixes: a station-keyed fetch, a backfill that resettles every signal from the IEM archive of NWS climate reports (validated against Kalshi's official results on 2,724 overlapping contracts, with zero disagreements), mid-price capture with a book-validity flag, and the new model id.
+
+## What the pipeline got right
+
+**The settlement-source guard worked.** In August Kalshi changed the resolution text on every series to cite a different source. The bot checks the market's rules text against the expected station on every startup, detected the mismatch, and aborted rather than settle against an unverified source. It stayed halted for six weeks until I updated the expected tokens. The guard was right; the missing alarm on the abort loop was a monitoring gap.
+
+**Four months unattended.** 337 scheduled scans, heartbeat monitoring, log rotation, clock-drift checks and rate-limit backoff, on a laptop.
+
+**Auditable state.** Every evaluation is a row in SQLite and an event in an append-only journal. All of the analysis above was reconstructed from that data after the fact, including catching the bugs.
+
+## Math, briefly
+
+Kalshi's taker fee is quadratic in price and peaks at $0.0175 per contract at even odds. Edge deducts it before anything else.
 
 ```text
 fee  = 0.07 * P * (1 - P)
 edge = p_model - p_market - fee(p_market)
 ```
 
-BT trades only when the absolute edge exceeds a calibrated threshold.
-
-Sizing is fractional Kelly. Full Kelly maximizes long-run log wealth, but the drawdowns are brutal and miscalibration destroys the strategy. Fractional Kelly trades expected growth for survivability. Both the fraction and the position cap are hard-coded in config and cannot be raised without tripping the risk gate.
+Sizing is fractional Kelly with hard caps the strategy cannot raise.
 
 ```text
 kelly_fraction = f * (edge / (price * (1 - price)))
 position_usd   = bankroll * min(kelly_fraction, max_position_pct)
 ```
 
-> A model that says 70% and wins 55% of the time is broken, not edge.
+<Flow
+  n={1}
+  caption="The scan pipeline. The calibration gate sits above the executor and never passed, so no order was ever placed."
+  source="Drawn from the architecture section of the public engineering docs."
+  steps={[
+    { title: 'launchd timers', detail: 'four scan windows a day' },
+    [
+      { title: 'Forecast adapter', detail: 'Open-Meteo GFS, 31-member ensemble' },
+      { title: 'Market adapter', detail: 'Kalshi REST, RSA-PSS signed requests' },
+    ],
+    { title: 'Signal engine', detail: 'bracket parse, probability per bracket' },
+    { title: 'Edge and fee', detail: 'against the mid price, book validity flagged' },
+    { title: 'Risk gate', detail: 'caps, kill file, calibration pass', note: 'never passed; no orders placed' },
+    { title: 'Executor', detail: 'maker-first' },
+    { title: 'SQLite + JSONL journal' },
+    { title: 'Settlement', detail: 'NWS climate report live, IEM archive for backfill; then isotonic calibration and the paper simulation' },
+  ]}
+/>
 
-Live trading is gated on calibration, not on any backtest P&L number. The calibration pipeline buckets historical signals by predicted probability and checks realized hit rate against predicted hit rate with reliability curves and Brier score.
+## What would change the answer
 
-## Architecture
+Not more of the same data. The ensemble alone is dominated by the price. Things that might contain information the market lacks: a multi-model blend with per-station bias correction, intraday observations close to settlement, or station-specific downscaling. Each is a new hypothesis, not a tuning of this one, and the pipeline can test any of them the same way.
 
-Scheduled scans run on systemd timers. They fan out to forecast adapters (Open-Meteo GFS, HRRR, NBM, and METAR), market adapters (Kalshi REST and WebSocket, authenticated with RSA-PSS signing), and an odds adapter (de-vigged sharp consensus). A signal engine handles bracket parsing and thresholds; an odds engine handles de-vigging and averaging. Both feed a single risk gate before anything reaches the order layer.
-
-## Safety
-
-Paper trading is the default. Live trading requires the calibration pipeline to pass. Position size and Kelly fraction are capped in config. Every fill and every skipped signal is logged with the edge, the fee, and the reason, so the measure step of the pipeline is a real dataset rather than a P&L line.
+A second pipeline adapts the same shape to sports moneylines using de-vigged sharp consensus as the model. It is built and tested, ran for a single afternoon, and has no results to report. A maker-side experiment on the same weather books, quoting from the sibling brackets rather than from any forecast, is designed and partly planned; nothing is built or run, and there are no results.

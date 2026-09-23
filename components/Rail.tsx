@@ -4,6 +4,7 @@ import { RailSpecular } from '@/components/RailSpecular'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { SectionNav } from '@/components/SectionNav'
 import { LocalTime } from '@/components/LocalTime'
+import { Mark } from '@/components/Mark'
 import { links, location, siteName, siteTagline, siteBio } from '@/lib/site'
 
 export type RailNavItem = { id: string; label: string; index: string }
@@ -15,6 +16,7 @@ export type RailProps =
       title: string
       line: string
       meta: { label: string; value: string }[]
+      app?: { label: string; href: string }
       links: RailLink[]
       contents: RailNavItem[]
     }
@@ -76,7 +78,8 @@ export function Rail(props: RailProps) {
 
           {props.variant === 'home' ? (
             <>
-              <h1 className="mt-[18px] text-[44px] font-bold leading-none tracking-[-0.04em]">{siteName}</h1>
+              <Mark size={30} className="mt-[2px] text-ink" />
+              <h1 className="mt-[22px] text-[44px] font-bold leading-none tracking-[-0.04em]">{siteName}</h1>
               <p className="mt-[14px] text-[16px] font-medium leading-[1.4]">{siteTagline}</p>
               <p className="mt-[10px] text-[14px] leading-[1.55] text-mute">{siteBio}</p>
               <div className="max-md:hidden">
@@ -90,6 +93,18 @@ export function Rail(props: RailProps) {
               </Link>
               <h1 className="mt-[26px] text-[40px] font-bold leading-none tracking-[-0.04em]">{props.title}</h1>
               <p className="mt-[14px] text-[16px] leading-[1.4] text-mute">{props.line}</p>
+              {props.app && (
+                <a
+                  href={props.app.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  data-testid="open-app"
+                  className="mt-5 inline-flex items-center gap-2 self-start rounded-full border border-line bg-[var(--card)] px-4 py-[8px] text-[13px] font-medium text-ink transition-colors hover:border-accent hover:text-accent"
+                >
+                  Open {props.app.label}
+                  <span aria-hidden>↗</span>
+                </a>
+              )}
               <dl className="mt-7 grid gap-3">
                 {props.meta.map((m) => (
                   <div key={m.label}>

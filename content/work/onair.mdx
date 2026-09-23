@@ -1,0 +1,91 @@
+export const meta = {
+  title: 'OnAir',
+  line: 'A macOS player that keeps a live stream up.',
+  status: 'Works end to end against its fixture source · macOS, unpackaged',
+  role: 'Design, build',
+  stack: 'Electron 34, React 18, TypeScript, hls.js, Playwright, SQLite',
+  source: 'Public. MIT.',
+  links: [
+    { label: 'Source', handle: 'github', href: 'https://github.com/llukehanna/OnAir' },
+  ],
+  glance: [
+    { label: 'Detectors', value: '3' },
+    { label: 'Escalation', value: '4 rungs' },
+    { label: 'Sources shipped', value: '0' },
+    { label: 'Continuity', value: 'program-date-time' },
+    { label: 'Tests', value: '527 + 7 real-decoder' },
+  ],
+}
+
+OnAir turns "click a game" into a live HLS stream that stays up. It collects candidate streams from pluggable source adapters, probes and ranks them, plays the best one, and when that stream stalls, errors, expires or freezes, it fails over to the next candidate without the picture ever going black. The repository ships no sources; the demo runs against two local fixture streams that can be broken on command.
+
+<Figure
+  n={1}
+  src="/work/onair/demo.mp4"
+  poster="/work/onair/player.png"
+  captions="/work/onair/demo.vtt"
+  width={1440}
+  height={900}
+  alt="OnAir playing a fixture stream; a stall is injected and playback fails over to a second stream with no black frame"
+  caption="A game is clicked and plays; a stall is injected and playback fails over to the second fixture stream with no black frame."
+  source="Recorded from the real app against its built-in fixture source: two local HLS streams that can be broken on command."
+/>
+
+## Never black
+
+Two video elements, one visible and one staging. A replacement stream loads out of sight and becomes visible on its first decoded frame. The current picture is torn down only once something better is on screen. A browser test tier runs a real decoder through the swap to prove it: the visible element never drops below the have-current-data ready state, and position only ever moves forward.
+
+## Three detectors, because each failure hides from the other two
+
+- **A stall state machine** catches a starved buffer. Two states, watching and stalled; progress resets the timer.
+- **A fatal-error classifier** tells an expired token, which means re-fetching the URL and staying, apart from a dead source, which means moving on. The same status code means different things before and after the first frame.
+- **An off-air check** catches a stream that returns success on everything while its live edge has stopped moving. The player library sees nothing wrong with that.
+
+## An escalation ladder, not a retry loop
+
+<Flow
+  n={2}
+  caption="What happens after a stream fails. Concurrent triggers from the renderer and the main process collapse into one switch."
+  source="Drawn from docs/FAILOVER.md and src/main/playback/failover-session.ts in the repository."
+  steps={[
+    { title: 'Next candidate', detail: 'the next-ranked probed stream' },
+    { title: 'One fresh extraction', detail: 'ask the adapters again, once' },
+    { title: 'The source’s own embedded player', detail: 'verified by watching its time advance' },
+    { title: 'All sources failed', detail: 'an honest screen, not a spinner' },
+  ]}
+/>
+
+## Continuity
+
+Sources run 45 to 100 seconds apart. When a stream carries wall-clock timestamps, the replacement seeks to the same instant in the broadcast instead of the live edge, so a failover does not skip or repeat play.
+
+## Click to play
+
+<Flow
+  n={3}
+  caption="From a click to a first frame. Candidates are gathered concurrently, matched to the game, probed, and scored before anything is loaded."
+  source="Drawn from docs/ARCHITECTURE.md and src/main/engine in the repository."
+  steps={[
+    { title: 'URL cache', detail: 'fresh under three minutes is used as is; three to eight minutes is head-validated; otherwise extract again' },
+    { title: 'Pick adapters', detail: 'those that support the league and are not broken or blocked' },
+    { title: 'Gather candidates concurrently', detail: 'a two-second grace period once one adapter yields' },
+    { title: 'Match to the game', detail: 'drop anything under 0.5' },
+    { title: 'Probe the playlists' },
+    { title: 'Score', detail: 'reliability 0.50, stability 0.20, quality 0.15, startup 0.10, confidence 0.05, times health' },
+    { title: 'Stage, then swap on the first frame' },
+  ]}
+/>
+
+<Figure
+  n={4}
+  src="/work/onair/diagnostics.png"
+  width={1440}
+  height={900}
+  alt="OnAir diagnostics page listing the Dev Fixture source as healthy and a log of stream-failed and source-switch events with reason: stall"
+  caption="The diagnostics page: source health and confidence, and the recent event log after two injected stalls."
+  source="Screenshot of the app running against its fixture source."
+/>
+
+## Status
+
+Works end to end against the fixture source; the embedded-player rung is covered by unit tests only. macOS only, not packaged or signed for distribution. 527 tests across 32 suites plus seven real-decoder browser tests. Adapters for anything beyond the fixture are the operator's to write, and the repository's own guidance is to add adapters only for streams you are permitted to access.
