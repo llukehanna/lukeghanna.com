@@ -23,7 +23,7 @@ Three sections on one page, plus one article template.
 - v1 ships one: BT, adapted from the existing BT-docs README. CCC is the second, drafted from the GSD build notes, and ships when written.
 - Rail becomes: back link, project name, one line, meta (Status, Role, Stack, Source), links (engineering docs, previous, next).
 - Main: deck paragraph, sections with h2, prose, code blocks, figures with numbered captions, one pull quote. Sticky glass sidebar on the right with Contents (tracks scroll) and At a glance (a small key-value table).
-- Shedquarters and BJS link out (live site, App Store) and have no write-up in v1.
+- Shedquarters and BJS link out (live site, public GitHub repository) and have no write-up in v1.
 
 **Honesty rule.** Every number on the site is a hard, verifiable output or is labeled as a modeled scenario with its assumptions. No "projected," no "estimated," no illustrative logs, no fake charts. Same rule as Luke's resume.
 
@@ -67,9 +67,9 @@ Contrast verified 2026-09-22 (WCAG relative luminance): every text token on its 
 
 **Desktop (≥1100px).** Fixed glass rail on the left, full-height with 24px margins. Main column scrolls independently and fills everything to the right. Nothing is centered in a container; the page uses the width.
 
-**Tablet (700 to 1100px).** Rail narrows to 280px; the four fact tiles go to one column; row descriptions wrap.
+**Tablet (768 to 1024px).** The rail leaves the fixed position and sits in flow as a glass card above the content; the four fact tiles go to one column below 768px; row descriptions wrap.
 
-**Mobile (<700px).** Rail becomes a static header above the content: name, one line, bio, contact links in a row, theme toggle. Section nav becomes a sticky top bar with the three section names. Project rows stack vertically: title, status, description, tags, arrow.
+**Mobile (<700px).** Rail becomes a static header above the content: name, one line, bio, contact links in a row, theme toggle. Section nav becomes a sticky glass bar at the top of the viewport with the three section names, tracking the active section. Project rows stack vertically: title, status, description, tags, arrow.
 
 ## 5. Interaction
 
@@ -78,7 +78,7 @@ Contrast verified 2026-09-22 (WCAG relative luminance): every text token on its 
 **Project rows.**
 - Hover: the row lifts onto a glass panel (fill, border, inner highlight, blur, shadow); the other rows dim to ~50% opacity; the arrow nudges up-right; the title takes the accent color.
 - Screenshot reveal: only for projects that have a curated real capture. On hover, the image slides in beside the row inside a glass frame, offset from the cursor, and follows it within the row's bounds. Rows without a capture show no frame at all. In v1 that is Shedquarters only. CCC gets one when Luke captures it in-season. BJS gets phone frames when Luke takes three screenshots.
-- Click anywhere on the row opens the canonical link (live site, write-up, App Store, or engineering docs).
+- Click anywhere on the row opens the canonical link (live site, write-up, GitHub repository, or engineering docs).
 
 **Theme toggle.** Two-state pill in the rail. Uses `next-themes`, persists to localStorage, no flash on load.
 
