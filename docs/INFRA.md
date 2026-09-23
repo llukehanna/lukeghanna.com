@@ -26,7 +26,7 @@ The site's contact address is Luke's existing `luke@zhannas.com`. No Email Routi
 
 ## 4. After the domain is live
 - Update `siteUrl` in `lib/site.ts` only if the domain differs from `https://lukeghanna.com`.
-- Point the GitHub profile README's project links at `ccc.lukeghanna.com` and `shed.lukeghanna.com`.
+- Point the GitHub profile README's project links at `clippers.lukeghanna.com` and `shed.lukeghanna.com`.
 - Add the site to the LinkedIn profile's website field.
 
 ## 5. Pending content (any time)
