@@ -9,7 +9,7 @@ export type Project = {
   hrefLabel: string
   description: string
   tags: string[]
-  screenshot?: { src: string; width: number; height: number; alt: string }
+  screenshot?: { src: string; width: number; height: number }
   writeup?: string
 }
 
@@ -46,7 +46,7 @@ export const projects: Project[] = [
     hrefLabel: 'shed.lukeghanna.com',
     description: 'Beer die rankings for the Shed. Elo ratings, streaks, and a leaderboard nobody agrees with.',
     tags: ['Next.js'],
-    screenshot: { src: '/shots/shed.png', width: 1440, height: 900, alt: 'Shedquarters power rankings' },
+    screenshot: { src: '/shots/shed.png', width: 1440, height: 900 },
   },
   {
     slug: 'bjs',
