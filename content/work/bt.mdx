@@ -1,0 +1,65 @@
+export const meta = {
+  title: 'BT',
+  line: 'A Kalshi edge bot. The edge is in the pipeline, not the data.',
+  status: 'Running · paper',
+  role: 'Design, build, operate',
+  stack: 'Python, systemd, Kalshi REST + WebSocket, Open-Meteo',
+  source: 'Private. Engineering docs public.',
+  links: [
+    { label: 'Engineering docs', handle: 'github', href: 'https://github.com/llukehanna/BT-docs' },
+  ],
+  glance: [
+    { label: 'Fee peak', value: '$0.0175 / contract' },
+    { label: 'Sizing', value: 'fractional Kelly' },
+    { label: 'Gate', value: 'reliability + Brier' },
+    { label: 'Weather', value: 'KXHIGH* markets' },
+    { label: 'Ensemble', value: '31-member GFS' },
+  ],
+}
+
+BT identifies systematically mispriced contracts on Kalshi and places automated orders on them, and it will not trade until its own calibration says it can.
+
+## What it does
+
+Two market families. Daily high-temperature markets at US airports, where BT compares 31-member GFS ensemble forecasts from Open-Meteo against live contract prices. And NBA and NFL markets, where it compares de-vigged sharp consensus odds, aggregated from multiple books, against Kalshi pricing.
+
+In both cases the pipeline has the same shape: **predict, compare, threshold, size, place, settle, measure.**
+
+## Why these markets
+
+Prediction markets reward engineering discipline over information asymmetry.
+
+- **Objective settlement.** Weather settles off the NWS Daily Climate Report; sports settles off the final score. Calibration either works or it doesn't.
+- **Retail-dominated flow.** Pricing inefficiencies persist longer than in equities or FX.
+- **Public data.** GFS ensembles and consensus odds are free and high quality. There is no data moat; **the edge is in the pipeline.**
+- **A quadratic fee structure** that makes edge math sharp and easy to reason about.
+
+## Math
+
+Kalshi's taker fee is quadratic in contract price. It peaks at $0.0175 per contract at P = 0.50 and falls to zero at the boundaries. Every edge calculation deducts fees per fill before deciding to trade; a net edge below the fee curve is not an edge. Maker orders avoid the fee entirely when filled passively.
+
+```text
+fee  = 0.07 * P * (1 - P)
+edge = p_model - p_market - fee(p_market)
+```
+
+BT trades only when the absolute edge exceeds a calibrated threshold.
+
+Sizing is fractional Kelly. Full Kelly maximizes long-run log wealth, but the drawdowns are brutal and miscalibration destroys the strategy. Fractional Kelly trades expected growth for survivability. Both the fraction and the position cap are hard-coded in config and cannot be raised without tripping the risk gate.
+
+```text
+kelly_fraction = f * (edge / (price * (1 - price)))
+position_usd   = bankroll * min(kelly_fraction, max_position_pct)
+```
+
+> A model that says 70% and wins 55% of the time is broken, not edge.
+
+Live trading is gated on calibration, not on any backtest P&L number. The calibration pipeline buckets historical signals by predicted probability and checks realized hit rate against predicted hit rate with reliability curves and Brier score.
+
+## Architecture
+
+Scheduled scans run on systemd timers. They fan out to forecast adapters (Open-Meteo GFS, HRRR, NBM, and METAR), market adapters (Kalshi REST and WebSocket, authenticated with RSA-PSS signing), and an odds adapter (de-vigged sharp consensus). A signal engine handles bracket parsing and thresholds; an odds engine handles de-vigging and averaging. Both feed a single risk gate before anything reaches the order layer.
+
+## Safety
+
+Paper trading is the default. Live trading requires the calibration pipeline to pass. Position size and Kelly fraction are capped in config. Every fill and every skipped signal is logged with the edge, the fee, and the reason, so the measure step of the pipeline is a real dataset rather than a P&L line.
