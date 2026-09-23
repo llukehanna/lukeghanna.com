@@ -19,6 +19,9 @@ describe('projects', () => {
   it('in v1 only Shedquarters has a screenshot', () => {
     expect(projects.filter((p) => p.screenshot).map((p) => p.slug)).toEqual(['shed'])
   })
+  it('links a project to its write-up whenever one exists', () => {
+    for (const p of projects) if (p.writeup) expect(p.href).toBe(p.writeup)
+  })
   it('never uses projection language', () => {
     for (const p of projects) expect(p.description).not.toMatch(/projected|estimated|targeting/i)
   })

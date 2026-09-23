@@ -1,0 +1,56 @@
+export const meta = {
+  title: 'Clippers Command Center',
+  line: 'A live Clippers dashboard that only says what it can prove.',
+  status: 'Live · desktop only',
+  role: 'Design, build, operate',
+  stack: 'Next.js 16, React 19, Neon Postgres, SWR, Recharts',
+  source: 'Public. MIT.',
+  links: [
+    { label: 'Live site', handle: 'clippers.lukeghanna.com', href: 'https://clippers.lukeghanna.com' },
+    { label: 'Source', handle: 'github', href: 'https://github.com/llukehanna/Clippers-Command-Center' },
+  ],
+  glance: [
+    { label: 'Live poll', value: 'every 12 s' },
+    { label: 'Insight rule', value: 'proof or nothing' },
+    { label: 'History', value: '3 seasons' },
+    { label: 'Live states', value: 'live · delayed · idle' },
+    { label: 'Jobs', value: '7 scripts, no queue' },
+  ],
+}
+
+Clippers Command Center is a desktop dashboard for watching Clippers games with statistical context. Every headline it shows was verified against its own database before it rendered.
+
+## What it does
+
+Three modes in one app. During a Clippers game: scoreboard, a dense box score, four key metrics computed on the fly from the newest snapshot (effective field goal percentage, turnover margin, rebound margin, pace), rotating insights, and a side panel for the other games that night. Between games: a team snapshot, the upcoming schedule with Vegas odds, player trends, and macro insights. A historical explorer covers three seasons of game-by-game data with drill-through to box scores and trend charts.
+
+## Provable insights
+
+The product rule is simple: **if a claim cannot be verified from stored data, it does not display.** Each insight row stores the parameterized SQL that supports it, the parameters it ran with, the rows it returned, and a hash of all three.
+
+```text
+proof_sql     parameterized SQL that supports the headline
+proof_params  the ids and dates it ran with
+proof_result  the rows it returned; empty means the insight is rejected
+proof_hash    sha256(proof_sql | proof_params | proof_result)
+```
+
+A generator whose proof comes back empty is dropped before the upsert. The hash is a unique index, so re-running the engine updates an existing insight instead of duplicating it. Batch categories run in dependency order: scoring and shooting streaks, season milestones, rare events (top-5% performances), opponent context, and league comparisons. Importance is a base score per category plus rarity and recency boosts, capped at 100, and the client rotates the top of the pool.
+
+Live insights are different. They are pure functions over the latest snapshot and the rolling ten-game context, and they are never written to the table. Two detectors: a scoring run of eight or more unanswered points in the last two minutes of play-by-play, and a clutch flag for the last five minutes of the fourth quarter or overtime with a margin of eight or less.
+
+> If it can't prove it from the database, it doesn't show it.
+
+## Live without flicker
+
+On game night a poller hits the NBA CDN every twelve seconds and appends a snapshot to an append-only table: score, clock, both box scores, and the last two minutes of scoring. When the game goes final it writes the box scores, retrying when the player rows lag behind the team totals.
+
+The live page never calls the CDN. It reads the newest snapshot through one endpoint that returns one of three states: no active game, data delayed, or live. The client polls that endpoint with SWR at the same twelve-second cadence. When the newest snapshot is more than a minute old, the endpoint reports delayed and the page shows last-known numbers under an amber "Data delayed" banner with the age of the snapshot, instead of silently serving them as current.
+
+## Pipeline
+
+Separate scripts, one job each: sync the schedule, sync the odds, poll live, finalize games, compute stats (possessions, pace, offensive and defensive rating, shooting efficiency, five- and ten-game rolling windows), generate insights, and backfill a season. Every write is an idempotent upsert, so any script can be re-run. The live poll also exists as a stateless HTTP route that does one fetch and one write per call, so a scheduler can drive it. No queue, no workflow engine.
+
+## What it is not
+
+Desktop only; the layout assumes at least 1024 pixels. No accounts and no personalization. Odds are for display and insight context, not betting. And the engine can only prove what is in the database, which holds three seasons, so its claims are scoped to those seasons rather than to franchise history.

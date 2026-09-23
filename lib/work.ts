@@ -13,7 +13,7 @@ export type WorkMeta = {
   glance: { label: string; value: string }[]
 }
 
-export const workSlugs = ['bt'] as const
+export const workSlugs = ['ccc', 'bt'] as const
 export type WorkSlug = (typeof workSlugs)[number]
 
 export function isWorkSlug(s: string): s is WorkSlug {
@@ -25,6 +25,7 @@ export function readWorkSource(slug: WorkSlug): string {
 }
 
 const loaders = {
+  ccc: () => import('@/content/work/ccc.mdx'),
   bt: () => import('@/content/work/bt.mdx'),
 } satisfies Record<WorkSlug, () => Promise<{ default: ComponentType; meta: WorkMeta }>>
 
