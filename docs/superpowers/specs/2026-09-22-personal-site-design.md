@@ -39,12 +39,12 @@ Three sections on one page, plus one article template.
 | bg-2 (cards) | #1a1715 | #f3f1ec |
 | ink | #f0ebe3 | #151412 |
 | mute | #a39d94 | #5f5b55 |
-| dim | #6f6a63 | #8d887f |
+| dim | #8a847b | #6b675f |
 | line | rgba(255,255,255,.09) | rgba(0,0,0,.10) |
-| accent | #f2c14e (amber) | #b8860b (amber, darkened for contrast) |
-| accent-soft | rgba(242,193,78,.14) | rgba(184,134,11,.14) |
+| accent | #f2c14e (amber) | #7a5a00 (amber, darkened for contrast) |
+| accent-soft | rgba(242,193,78,.14) | rgba(122,90,0,.14) |
 
-Light-mode accent is darkened so tag text passes contrast on stone. Verify with a contrast checker during build.
+Contrast verified 2026-09-22 (WCAG relative luminance): every text token on its background is at least 4.5:1. dim is 5.1 (dark) and 4.5 (light); accent is 11.2 (dark) and 5.1 (light). A unit test guards these ratios so the tokens can't drift below AA.
 
 **Material: glass.** The identifying element. Used for the rail, the hover state of project rows, the write-up sidebar, and code blocks.
 - Fill: linear gradient from ~7% white to ~2% white (dark); ~70% to ~40% white (light).
