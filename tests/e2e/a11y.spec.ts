@@ -13,10 +13,19 @@ for (const path of ['/', '/work/bt']) {
   }
 }
 
-test('every project row is reachable by keyboard and shows focus', async ({ page }) => {
+test('every project row is reachable by keyboard and shows a visible focus ring', async ({ page }) => {
   await page.goto('/')
-  await page.getByTestId('project-ccc').focus()
-  await expect(page.getByTestId('project-ccc')).toBeFocused()
+  const row = page.getByTestId('project-ccc')
+  await row.focus()
+  await page.keyboard.press('Shift+Tab')
+  await page.keyboard.press('Tab')
+  await expect(row).toBeFocused()
+  const outline = await row.evaluate((el) => {
+    const s = getComputedStyle(el)
+    return { style: s.outlineStyle, width: parseFloat(s.outlineWidth), color: s.outlineColor }
+  })
+  expect(outline.style).not.toBe('none')
+  expect(outline.width).toBeGreaterThanOrEqual(2)
   await page.keyboard.press('Tab')
   await expect(page.getByTestId('project-bt')).toBeFocused()
 })
