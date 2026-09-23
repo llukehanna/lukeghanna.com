@@ -34,13 +34,9 @@ Expected: `HTTP/2 200` on both. Set `www` to redirect to the apex in Vercel → 
 
 Note: the Vercel project for this site (`lukeghanna-com`) and the GitHub repo (`llukehanna/lukeghanna.com`) don't exist yet either — those are separate publish steps being handled outside this pass. The `domains add lukeghanna.com` / `www.lukeghanna.com` commands above assume the `lukeghanna-com` project has already been created and linked.
 
-## 3. Email (Cloudflare Email Routing) — NOT done
-No MX records exist yet for `lukeghanna.com`.
+## 3. Email — not needed
 
-1. Cloudflare → lukeghanna.com → Email → Email Routing → Get started. Cloudflare adds the MX and TXT records itself.
-2. Destination address: your Gmail address (verify the confirmation email).
-3. Custom address: `luke@lukeghanna.com` → forward to the destination.
-4. Send-as from Gmail: Gmail → Settings → Accounts and Import → Send mail as → Add another email address → `luke@lukeghanna.com`, SMTP server `smtp.gmail.com`, port 587, username your Gmail address, password = a Google App Password (Google Account → Security → 2-Step Verification → App passwords). Verify with the code Gmail sends to the new address.
+The site's contact address is Luke's existing `luke@zhannas.com`. No Email Routing on lukeghanna.com is planned.
 
 ## 4. After the domain is live
 - Update `siteUrl` in `lib/site.ts` only if the domain differs from `https://lukeghanna.com`.

@@ -19,7 +19,7 @@ test.describe('home', () => {
 
   test('contact shows the email and a build-time colophon', async ({ page }) => {
     await page.goto('/')
-    await expect(page.locator('#contact')).toContainText('luke@lukeghanna.com')
+    await expect(page.locator('#contact')).toContainText('luke@zhannas.com')
     await expect(page.locator('#contact')).toContainText(/last updated [A-Z][a-z]+ \d{4}/)
   })
 })

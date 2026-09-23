@@ -7,7 +7,7 @@ test.describe('rail', () => {
     await expect(rail.getByRole('heading', { level: 1, name: 'Luke Hanna' })).toBeVisible()
     await expect(rail.getByText('Builds things end-to-end to understand them.')).toBeVisible()
     await expect(rail.getByRole('link', { name: /GitHub/ })).toHaveAttribute('href', 'https://github.com/llukehanna')
-    await expect(rail.getByRole('link', { name: /Email/ })).toHaveAttribute('href', 'mailto:luke@lukeghanna.com')
+    await expect(rail.getByRole('link', { name: /Email/ })).toHaveAttribute('href', 'mailto:luke@zhannas.com')
   })
 
   test('theme toggle switches the html class and persists', async ({ page }) => {

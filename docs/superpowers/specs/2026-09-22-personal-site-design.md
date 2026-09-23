@@ -121,7 +121,7 @@ Projects are plain data in `content/projects.ts`; write-ups are MDX with frontma
 ## 7. Infrastructure
 
 - **Domain:** lukeghanna.com, registered by Luke at Cloudflare (at-cost pricing, free email routing). DNS stays at Cloudflare in DNS-only mode pointing at Vercel. Backorder lukehanna.com separately; it expires 2026-11-26 and has been held since 2005, so odds are low.
-- **Email:** Cloudflare Email Routing forwards luke@lukeghanna.com to Gmail. Gmail "send as" configured so replies come from the domain.
+- **Email:** the contact address is Luke's existing luke@zhannas.com; no mail routing on the new domain.
 - **Subdomains:** ccc.lukeghanna.com → the existing `clippers-command-center` Vercel project. shed.lukeghanna.com → the existing `house-ladder` project. Both are custom-domain additions to the existing projects; nothing moves.
 - **Hosting:** new Vercel project `lukeghanna-com` on the Hobby plan, connected to a new GitHub repo `llukehanna/lukeghanna.com`. Main deploys to production; every PR gets a preview URL.
 - **Not built:** resume route, go/ redirects, tools subdomain.
@@ -143,7 +143,7 @@ Notes index. Live data on the rows (CCC record, Shedquarters leader) via each pr
 ## 10. What Luke supplies
 
 1. Buy lukeghanna.com and set up Cloudflare (I'll give exact steps; I can't enter payment details).
-2. Set up Email Routing and Gmail "send as."
+2. (Dropped: the site uses luke@zhannas.com directly.)
 3. Read the BT write-up draft and correct anything that's wrong or reveals strategy.
 4. One curated CCC screenshot when the season starts.
 5. Three BJS phone screenshots, whenever.
