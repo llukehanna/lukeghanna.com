@@ -7,6 +7,6 @@ export const siteBio = 'Computer science and business at USC. Corporate developm
 export const links = {
   github: { label: 'GitHub', handle: 'llukehanna', href: 'https://github.com/llukehanna' },
   linkedin: { label: 'LinkedIn', handle: 'lukehanna2', href: 'https://www.linkedin.com/in/lukehanna2' },
-  email: { label: 'Email', handle: 'luke@lukeghanna.com', href: 'mailto:luke@lukeghanna.com' },
+  email: { label: 'Email', handle: 'luke@zhannas.com', href: 'mailto:luke@zhannas.com' },
 } as const
 export const location = { city: 'Los Angeles', timeZone: 'America/Los_Angeles' } as const
