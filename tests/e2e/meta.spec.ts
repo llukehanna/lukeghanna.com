@@ -1,11 +1,14 @@
 import { test, expect } from '@playwright/test'
 
-test('sitemap lists home and the BT write-up', async ({ request }) => {
+test('sitemap lists home and both write-ups, without a fake lastmod', async ({ request }) => {
   const res = await request.get('/sitemap.xml')
   expect(res.ok()).toBeTruthy()
   const xml = await res.text()
   expect(xml).toContain('https://lukeghanna.com</loc>')
+  expect(xml).toContain('https://lukeghanna.com/work/ccc</loc>')
   expect(xml).toContain('https://lukeghanna.com/work/bt</loc>')
+  // The only date available at build time is the build date, which is not a modification date.
+  expect(xml).not.toContain('<lastmod>')
 })
 
 test('robots allows crawling and points at the sitemap', async ({ request }) => {

@@ -4,8 +4,10 @@ test.describe('home', () => {
   test('lists the four projects with canonical links', async ({ page }) => {
     await page.goto('/')
     for (const slug of ['ccc', 'bt', 'shed', 'bjs']) await expect(page.getByTestId(`project-${slug}`)).toBeVisible()
-    await expect(page.getByTestId('project-ccc')).toHaveAttribute('href', 'https://clippers.lukeghanna.com')
+    // Projects with a write-up link to it; the write-up's rail carries the live-site link.
+    await expect(page.getByTestId('project-ccc')).toHaveAttribute('href', '/work/ccc')
     await expect(page.getByTestId('project-bt')).toHaveAttribute('href', '/work/bt')
+    await expect(page.getByTestId('project-shed')).toHaveAttribute('href', 'https://shed.lukeghanna.com')
   })
 
   test('only Shedquarters has a screenshot reveal, shown on hover', async ({ page, isMobile }) => {

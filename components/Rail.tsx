@@ -57,8 +57,11 @@ function ContactRow({ contactLinks }: { contactLinks: RailLink[] }) {
   )
 }
 
+// At lg+ the rail is fixed to the viewport, so when its content is taller than the viewport
+// (a long write-up title plus contents plus links on a short screen) it scrolls internally
+// instead of spilling past the card; the scrollbar itself is hidden (see .scroll-quiet).
 const shell =
-  'lg:fixed lg:left-6 lg:top-6 lg:bottom-6 lg:w-[340px] flex flex-col px-[34px] pb-7 pt-9 max-lg:m-4 max-lg:mb-0'
+  'lg:fixed lg:left-6 lg:top-6 lg:bottom-6 lg:w-[340px] lg:overflow-y-auto scroll-quiet flex flex-col px-[34px] pb-7 pt-9 max-lg:m-4 max-lg:mb-0'
 
 export function Rail(props: RailProps) {
   const homeLinks: RailLink[] = [links.github, links.linkedin, links.email]

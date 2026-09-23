@@ -30,5 +30,6 @@ The site's contact address is Luke's existing `luke@zhannas.com`. No Email Routi
 - Add the site to the LinkedIn profile's website field.
 
 ## 5. Pending content (any time)
-- One curated CCC screenshot from a game day → `public/shots/ccc.png` (1440×900) → add `screenshot` to the `ccc` entry in `content/projects.ts` → update the "only Shedquarters" assertion in `tests/unit/projects.test.ts`.
+- One curated CCC screenshot from a game day → `public/shots/ccc.png` (1440×900) → add `screenshot` to the `ccc` entry in `content/projects.ts` → update the "only Shedquarters" assertion in `tests/unit/projects.test.ts` and the matching `home.spec.ts` test.
 - Three BJS phone screenshots → same pattern.
+- The CCC write-up (`content/work/ccc.mdx`, live at `/work/ccc`) was drafted from the CCC repository's docs and code on 2026-09-23; review the prose once and adjust anything that reads differently from how Luke would say it.

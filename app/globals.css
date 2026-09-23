@@ -53,6 +53,10 @@
   color-scheme: dark;
 }
 
+/* Height of the sticky mobile section bar. Sections use the same value as their
+   scroll-margin-top so an anchor jump never lands a heading underneath the bar. */
+:root { --nav-bar-h: 48px; }
+
 html { background: var(--bg); }
 body {
   background: var(--bg);
@@ -78,6 +82,10 @@ body {
   backdrop-filter: blur(20px) saturate(1.2);
   -webkit-backdrop-filter: blur(20px) saturate(1.2);
 }
+
+/* a scroll container with no visible scrollbar (wheel, touch and keyboard still scroll it) */
+.scroll-quiet { scrollbar-width: none; }
+.scroll-quiet::-webkit-scrollbar { display: none; }
 
 /* mono labels */
 .label {

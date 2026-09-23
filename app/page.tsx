@@ -1,4 +1,5 @@
 import { Rail, type RailNavItem } from '@/components/Rail'
+import { ActiveSectionProvider } from '@/components/ActiveSection'
 import { Section } from '@/components/Section'
 import { ProjectList } from '@/components/ProjectList'
 import { projects } from '@/content/projects'
@@ -22,7 +23,7 @@ const built = buildLabel()
 
 export default function Home() {
   return (
-    <>
+    <ActiveSectionProvider items={nav}>
       <Rail variant="home" nav={nav} />
       <main className="px-6 pb-20 pt-12 lg:pl-[400px] lg:pr-12">
         <Section id="about" title="About" index="01">
@@ -61,6 +62,6 @@ export default function Home() {
           <p className="mt-4 text-[13px] text-dim">Built with Next.js, deployed on Vercel, last updated {built}.</p>
         </Section>
       </main>
-    </>
+    </ActiveSectionProvider>
   )
 }

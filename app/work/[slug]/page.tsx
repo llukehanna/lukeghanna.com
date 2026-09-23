@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { Rail, type RailNavItem } from '@/components/Rail'
+import { Rail, type RailLink, type RailNavItem } from '@/components/Rail'
+import { ActiveSectionProvider } from '@/components/ActiveSection'
 import { ArticleSidebar } from '@/components/ArticleSidebar'
 import { extractToc } from '@/lib/toc'
 import { isWorkSlug, loadWork, readWorkSource, workSlugs } from '@/lib/work'
@@ -30,8 +31,17 @@ export default async function WorkPage({ params }: { params: Promise<{ slug: str
     index: String(i + 1).padStart(2, '0'),
   }))
 
+  // Previous / next write-up, in workSlugs order, appended to the article's own links.
+  const at = workSlugs.indexOf(slug)
+  const neighbors: RailLink[] = []
+  for (const [label, s] of [['Previous', workSlugs[at - 1]], ['Next', workSlugs[at + 1]]] as const) {
+    if (!s) continue
+    const { meta: m } = await loadWork(s)
+    neighbors.push({ label, handle: m.title, href: `/work/${s}` })
+  }
+
   return (
-    <>
+    <ActiveSectionProvider items={contents}>
       <Rail
         variant="article"
         title={meta.title}
@@ -42,7 +52,7 @@ export default async function WorkPage({ params }: { params: Promise<{ slug: str
           { label: 'Stack', value: meta.stack },
           { label: 'Source', value: meta.source },
         ]}
-        links={meta.links}
+        links={[...meta.links, ...neighbors]}
         contents={contents}
       />
       <main className="px-6 pb-20 pt-12 lg:pl-[400px] lg:pr-12">
@@ -53,6 +63,6 @@ export default async function WorkPage({ params }: { params: Promise<{ slug: str
           <ArticleSidebar contents={contents} glance={meta.glance} />
         </div>
       </main>
-    </>
+    </ActiveSectionProvider>
   )
 }
