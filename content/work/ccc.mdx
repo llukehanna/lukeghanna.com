@@ -5,8 +5,8 @@ export const meta = {
   role: 'Design, build, operate',
   stack: 'Next.js 16, React 19, Neon Postgres, SWR, Recharts',
   source: 'Public. MIT.',
+  app: { label: 'clippers.lukeghanna.com', href: 'https://clippers.lukeghanna.com' },
   links: [
-    { label: 'Live site', handle: 'clippers.lukeghanna.com', href: 'https://clippers.lukeghanna.com' },
     { label: 'Source', handle: 'github', href: 'https://github.com/llukehanna/Clippers-Command-Center' },
   ],
   glance: [
@@ -49,7 +49,29 @@ The live page never calls the CDN. It reads the newest snapshot through one endp
 
 ## Pipeline
 
-Separate scripts, one job each: sync the schedule, sync the odds, poll live, finalize games, compute stats (possessions, pace, offensive and defensive rating, shooting efficiency, five- and ten-game rolling windows), generate insights, and backfill a season. Every write is an idempotent upsert, so any script can be re-run. The live poll also exists as a stateless HTTP route that does one fetch and one write per call, so a scheduler can drive it. No queue, no workflow engine.
+Separate scripts, one job each: sync the schedule, sync the odds, poll live, finalize games, compute stats (possessions, pace, offensive and defensive rating, shooting efficiency, five- and ten-game rolling windows), generate insights, and backfill a season. Every write is an idempotent upsert, so any script can be re-run. GitHub Actions cron drives them: the schedule daily, odds every six hours, a post-game job that finalizes, computes and generates, and a five-minute poll that calls a stateless route doing one fetch and one write per call. No queue, no workflow engine.
+
+<Flow
+  n={1}
+  caption="The two pipelines. Live snapshots are appended on game night; everything derived is recomputed after each final."
+  source="Drawn from scripts/, app/api and Docs/DB_SCHEMA.sql in the repository."
+  steps={[
+    [
+      { title: 'NBA CDN', detail: 'live scoreboard, box score, play-by-play' },
+      { title: 'balldontlie', detail: 'schedule, teams, players' },
+      { title: 'the-odds-api', detail: 'spreads, moneylines, totals; display only' },
+    ],
+    [
+      { title: 'poll-live', detail: 'every 12 s on game night; appends a snapshot' },
+      { title: 'sync-schedule · sync-odds', detail: 'daily · every 6 h' },
+    ],
+    { title: 'finalize-games', detail: 'box scores locked once the game is final' },
+    { title: 'compute-stats', detail: 'possessions, pace, ratings, rolling 5 and 10' },
+    { title: 'generate-insights', detail: 'proof_sql, proof_params, proof_result, proof_hash; empty proof is rejected' },
+    { title: 'Page-shaped API', detail: '/api/live, /api/home, /api/schedule, /api/history, /api/players; staleness in every envelope' },
+    { title: 'SWR pages', detail: 'live, home, schedule, history, players' },
+  ]}
+/>
 
 ## What it is not
 

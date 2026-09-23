@@ -64,3 +64,27 @@ The five minors deferred from the v1 review, plus the CCC write-up.
 - **Playwright in sandboxes.** `playwright.config.ts` honours `PW_CHROMIUM=<path>` to launch a pre-installed Chromium instead of the downloaded one. Local runs are unchanged.
 
 Gate re-run after these changes: `npm run lint`, `npm run typecheck`, `npm run test:unit` (34 passed), `npx playwright test` (61 passed, 9 intentional skips, desktop + mobile, axe clean on `/`, `/work/ccc`, `/work/bt` in both themes), `npm run build` (all routes static; `/work/ccc` SSG).
+
+## 2026-09-23 write-ups v2, seven projects, About, monogram
+
+Spec amendment: `docs/superpowers/specs/2026-09-23-write-ups-v2.md`.
+
+**Source material.** Four research passes over local checkouts of the project repositories (`bt`, `BT-docs`, `beacon`, `PFC-docs`, `Shedquarters`, `OnAir`, `Blackjack-Strategy`, `clippers-command-center`, and the GitHub profile README). Findings that changed the site:
+
+- BT was not renamed (the `kwx` package name is internal); the public docs now lead with a negative result over 7,440 settled signals, three data bugs, and a settlement guard that halted the bot for six weeks. The old write-up ("Running · paper", "trading bot for weather and sports") was wrong on every status claim and was rewritten from the public docs. The market-maker experiment is a design and a partial plan with nothing built or run, and the write-up says exactly that.
+- PFC is presented as **Hurdle**; the docs keep their name and the write-up says so. No screenshots by design: every screen shows real balances.
+- Beacon's repository sanitizer forbids the employer, vendor and real firm names; the write-up follows the same rule and names only the fellowship (Palantir's American Tech Fellowship, Frontiers, May to July 2026, per Luke). The `api/` layer and seed are absent from the repo, so there are no captures until it runs.
+- CCC's scheduler is GitHub Actions cron, not Vercel Cron as its README says; the write-up now says so. Its `vercel.json` is empty.
+- OnAir ships no third-party sources and its demo runs against local fixture streams; the write-up describes the failover engineering and nothing else. Its captures show the fixture source (colour bars) and public schedule data only.
+- BJS's README status is stale: the app layer was discarded on 2026-09-23 and is being rebuilt on the tested engine. The write-up says so, and the row reads "engine done, app in rebuild".
+- Shedquarters's home-row blurb said Elo; it is OpenSkill. Fixed.
+
+**Template.** Figures: `Figure` (image or muted looping video with a poster and a captions track; reduced motion pauses it and shows controls), `Flow` (a vertical sequence of steps drawn from the code, each node a real module, table or state), and Markdown tables via `remark-gfm` inside a scroll box that is focusable only when it overflows. Every figure has a number, a caption and a provenance line. Figures fade in on scroll (`Reveal`); nothing is hidden without JavaScript, and reduced motion disables the effect. Every home row links to its write-up; the write-up rail carries an "Open" link for live destinations plus Previous / Next.
+
+**Media provenance.** `public/work/shed/*` and `public/work/onair/*` are copied from those repositories' `docs/media/`, recorded from the real apps against made-up players and a fixture source respectively. `public/shots/onair.png` is OnAir's home screen from the same set.
+
+**Monogram.** `app/icon.svg` is "LH" in Inter ExtraBold tracked at −0.07em, converted to a path from the font file (no runtime font), theme-aware through a `prefers-color-scheme` rule inside the SVG. `app/apple-icon.tsx` renders the same path on the dark charcoal at 180px. The OG image carries it top-left and the home rail shows it above the name (`components/Mark.tsx`). The Vercel-default `favicon.ico` is gone. Candidates compared: Inter ExtraBold, Inter SemiBold, Geist Mono Bold, Inter lowercase; two serif options were dropped because they sit outside the site's type system.
+
+**Visual check** at 1440×900 (light and dark) and 390×844 (`next start -p 3100`, throwaway script): home with seven rows and four tiles; Hurdle's diagram and tables; Shedquarters with the phone video in a glass frame; OnAir's desktop capture; BT's three results tables; Beacon's rule loop. `scrollWidth` equals the viewport on every page and width. One nit found and fixed: Beacon's "Rule support" glance value collided with its label.
+
+Gate: `npm run lint`, `npm run typecheck`, `npm run test:unit` (33 passed), `npx playwright test` (91 passed, 9 intentional skips; axe clean on `/` and all seven write-ups in both themes on desktop and mobile), `npm run build` (all routes static; seven SSG write-ups).

@@ -1,12 +1,11 @@
 import { test, expect } from '@playwright/test'
 
-test('sitemap lists home and both write-ups, without a fake lastmod', async ({ request }) => {
+test('sitemap lists home and every write-up, without a fake lastmod', async ({ request }) => {
   const res = await request.get('/sitemap.xml')
   expect(res.ok()).toBeTruthy()
   const xml = await res.text()
   expect(xml).toContain('https://lukeghanna.com</loc>')
-  expect(xml).toContain('https://lukeghanna.com/work/ccc</loc>')
-  expect(xml).toContain('https://lukeghanna.com/work/bt</loc>')
+  for (const slug of ['hurdle', 'beacon', 'ccc', 'bt', 'onair', 'shed', 'bjs']) expect(xml).toContain(`https://lukeghanna.com/work/${slug}</loc>`)
   // The only date available at build time is the build date, which is not a modification date.
   expect(xml).not.toContain('<lastmod>')
 })
@@ -27,4 +26,17 @@ test('home has og:image and a description', async ({ page }) => {
   await page.goto('/')
   await expect(page.locator('meta[property="og:image"]')).toHaveCount(1)
   await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /Houlihan Lokey/)
+})
+
+test('the icon is the LH monogram as an SVG, with an apple icon rendered as a PNG', async ({ page, request }) => {
+  const svg = await request.get('/icon.svg')
+  expect(svg.ok()).toBeTruthy()
+  expect(svg.headers()['content-type']).toContain('image/svg+xml')
+  expect(await svg.text()).toContain('prefers-color-scheme:dark')
+  const apple = await request.get('/apple-icon')
+  expect(apple.ok()).toBeTruthy()
+  expect(apple.headers()['content-type']).toContain('image/png')
+  await page.goto('/')
+  await expect(page.locator('link[rel="icon"][href*="icon.svg"]')).toHaveCount(1)
+  await expect(page.locator('link[rel="icon"][href*="favicon.ico"]')).toHaveCount(0)
 })

@@ -1,0 +1,94 @@
+export const meta = {
+  title: 'Shedquarters',
+  line: 'A skill-rating ladder for a house league, scored from a phone at the table.',
+  status: 'Live and in use',
+  role: 'Design, build, operate',
+  stack: 'Next.js 16, React 19, Postgres on Neon, OpenSkill, Tailwind 4',
+  source: 'Public. MIT.',
+  app: { label: 'shed.lukeghanna.com', href: 'https://shed.lukeghanna.com' },
+  links: [
+    { label: 'Source', handle: 'github', href: 'https://github.com/llukehanna/Shedquarters' },
+  ],
+  glance: [
+    { label: 'Ratings', value: 'OpenSkill, replayed' },
+    { label: 'Games table', value: 'append-only' },
+    { label: 'Provisional until', value: '10 games' },
+    { label: 'PIN guesses', value: '20 a day, global' },
+    { label: 'Tests', value: '561 across 39 files' },
+  ],
+}
+
+The game is beer die: 2v2 or 3v3, first to 21, win by 2, and the winners stay on. Someone at the table taps who won and what the losers finished on. Everyone else's phone shows the rankings, a game log, head-to-heads and badges. Ratings are OpenSkill, replayed from the full game history on every change.
+
+<Figure
+  n={1}
+  src="/work/shed/demo.mp4"
+  poster="/work/shed/table.png"
+  captions="/work/shed/demo.vtt"
+  width={390}
+  height={844}
+  frame="phone"
+  alt="Logging a game at the table: pick the winners, tap the losing score, pick the next challengers, and the rankings update"
+  caption="Logging a game at the table: pick the winners, tap the losing score, pick the next challengers, and the rankings update."
+  source="Recorded from the real app against a local database of made-up players."
+/>
+
+## Built for bad party wifi
+
+Every game is written to a queue in local storage first and shown immediately, then flushed to the server in order. Each game carries a client-generated id and the write path is idempotent on it, so a retry after an ambiguous failure cannot record a game twice.
+
+The queue tells a transient failure (a database cold start, a dropped connection: keep it and retry) from a permanent one (a malformed or refused game: set it aside and say so), because retrying a permanent failure forever blocks every game behind it. The server maps errors to status codes through an explicit allowlist, so anything unexpected is retryable by default. A stuck queue can be recovered. A discarded game cannot.
+
+<Flow
+  n={2}
+  caption="The offline write path. The phone never waits on the network to show a result."
+  source="Drawn from lib/client/queue.ts, app/api/games and docs/OFFLINE.md in the repository."
+  steps={[
+    { title: 'Tap the result', detail: 'the game gets a client-generated id' },
+    { title: 'Local queue', detail: 'written to local storage first; the UI updates immediately' },
+    { title: 'Serialized drain', detail: 'one game at a time, in order' },
+    { title: 'POST the game', detail: 'passcode checked, payload validated, insert idempotent on the id' },
+    [
+      { title: 'Transient failure', detail: 'keep it and retry' },
+      { title: 'Permanent failure', detail: 'set it aside and say so' },
+    ],
+  ]}
+/>
+
+## Ratings are a pure function of history
+
+The games table is append-only apart from a voided flag. Ratings, per-game rating changes, rank movement, streaks and badges are all derived by replaying it in order. An undo is just a void, a tuning change is just a replay, and there is no stored rating that can drift out of sync with the games it came from. The replay is cached against a fingerprint of the table (row count, highest ordinal, voided count), which only ever grows, so a stale cache is always detected and rebuilt.
+
+Margin of victory counts, but only past a point. A win within five points is an ordinary win; beyond that the extra weight grows logarithmically, so a skunk counts for more without dominating a season. New players are provisional until ten games, and the rankings say so instead of hiding them.
+
+<Figure
+  n={3}
+  src="/work/shed/rankings.png"
+  width={780}
+  height={1688}
+  frame="phone"
+  alt="Power rankings screen: rank, name, record, streak, rating, and weekly movement for each player"
+  caption="Power rankings with rating, record, streak and weekly movement."
+  source="Screenshot of the app against a local database of made-up players."
+/>
+
+## A four-digit PIN that stays safe on the open internet
+
+The house wanted a PIN, not accounts. With ten thousand possibilities, the design limits guessing to one place and makes it slow. The PIN is checked only at the gate, which is rate limited in Postgres (serverless instances share no memory) under a transaction-scoped advisory lock, so a hundred parallel guesses cannot all read zero failures. A global cap of twenty wrong guesses a day works out to about 250 days to find the PIN on average.
+
+The session cookie holds a signature, never the PIN, so hammering the write API with every possible cookie value earns ten thousand rejections and learns nothing. Changing the PIN or resetting the invite link signs out every device at once, because both are inside every signature.
+
+<Figure
+  n={4}
+  src="/work/shed/game-log.png"
+  width={780}
+  height={1688}
+  frame="phone"
+  alt="Game log screen grouped by night, each game showing the teams, the score, and the rating change per player"
+  caption="The game log, grouped by night, with per-game rating changes."
+  source="Screenshot of the app against a local database of made-up players."
+/>
+
+## Status
+
+Live and in use. Rankings, the game log and player pages are public; changing anything needs the house PIN or an invite link. A nightly job writes a JSON backup to blob storage. Known gaps: 2v2 and 3v3 only, and no rating decay, so a badge marks inactive players instead. 561 tests across 39 files run in CI against Postgres 17.

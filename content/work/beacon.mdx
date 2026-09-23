@@ -1,0 +1,109 @@
+export const meta = {
+  title: 'Beacon',
+  line: 'A deal-sourcing workbench that learns its screening rules from the analysts who reject firms.',
+  status: 'In progress · porting off Foundry',
+  role: 'Design, build',
+  stack: 'React 18, TypeScript, Postgres (PGlite locally), TanStack Query, Blueprint',
+  source: 'Private. Sanitized: no employer, vendor, or real firm names.',
+  links: [],
+  glance: [
+    { label: 'Object types', value: '11 · 17 actions' },
+    { label: 'Rubric', value: '9 axes, 18 points' },
+    { label: 'Providers', value: '4, ranked by trust' },
+    { label: 'Rule support', value: '≥ 4 rejections' },
+    { label: 'Tests', value: '186 cases' },
+  ],
+}
+
+Beacon was the capstone of Palantir's American Tech Fellowship (Frontiers), May to July 2026, built on Foundry. It is a workbench for sourcing boutique advisory firms as acquisition targets, and it is being ported to Postgres and React so it can run anywhere.
+
+## What it does
+
+A mandate states an intent: a kind of firm, a geography, an industry, a size cap. On the search page the analyst's facet picks become the interpretation of that intent, and the search yields a candidate universe of firms. Each firm then moves through a six-stage funnel: Discovered, In Review, Outreach, In Talks, and the terminal states Qualified and Rejected.
+
+Between Discovered and a decision sits the enrichment desk. An agent fills in facts about each firm from ranked data sources; the analyst verifies or overrides them, reads the rubric score they imply, and makes the call. Rejections need a written rationale, and those rationales are where the system learns.
+
+The home page is a start-of-day operations page rather than a dashboard: every card and number on it links to the surface that does the work, and it never promises work the linked page does not show.
+
+## Enrichment that abstains
+
+Four providers observe each firm, each with its own coverage and error rate, ordered from most to least trusted. The reconciliation step has three outcomes and never picks a winner in a conflict.
+
+| Providers agree | Result |
+|---|---|
+| No source knows | An abstained finding: the axis stays unknown |
+| One value, from one or more sources | A proposed finding, marked high confidence when corroborated or at least 0.8 confident |
+| Two or more values | A conflict pair: the two most trusted positions, both low confidence, sharing a conflict group |
+
+An axis a human has already verified is never re-enriched. When the analyst overrides a finding, the agent's finding is marked rejected and the analyst's is inserted as verified, so the accuracy page can compute agreement, override and abstention rates per provider and per axis from the record rather than from memory.
+
+<Flow
+  n={1}
+  caption="From observations to a rubric input. The reconciler abstains, corroborates, or surfaces a conflict; the analyst confirms, overrides, or resolves."
+  source="Drawn from server/enrichment/reconcile.ts and server/actions/findings.ts in the repository."
+  steps={[
+    [
+      { title: 'beacondb', detail: 'most trusted' },
+      { title: 'dealdb' },
+      { title: 'filings' },
+      { title: 'websearch', detail: 'least trusted' },
+    ],
+    { title: 'Sort by trust, group by value' },
+    [
+      { title: 'Abstain', detail: 'no observations' },
+      { title: 'Propose', detail: 'one value; high confidence if corroborated' },
+      { title: 'Conflict pair', detail: 'two values; both low confidence' },
+    ],
+    { title: 'Analyst', detail: 'verify, override, or resolve the conflict' },
+    { title: 'Normalized score', detail: 'feeds the nine-axis rubric' },
+  ]}
+/>
+
+## The rubric
+
+Nine axes, each scored 0 to 2, for a maximum of 18. Two models share six axes and differ on three: corporate-finance firms are read on coverage model, services and managing-director experience; capital-solutions firms on balance sheet, services fit and managing-director experience. Tiers are A, B, C or Rejected; an A goes to outreach, a strong B goes to outreach, a C is followed, and a score-based reject goes back to enrichment. Two hard rejects sit above the score: a generalist coverage model or conflicted services on one side, an advisory conflict or a firm that invests its own balance sheet on the other.
+
+One function computes the score. The server persists snapshots with it and the desk previews with it, so the two cannot drift.
+
+## Rules grounded in rejections
+
+A rejection carries a rationale. Rationales for firms still in Rejected are clustered into candidate rules of the form axis, operator, threshold, by Claude when it is available and by a keyword heuristic when it is not. A candidate only counts a rejection as support if that firm actually satisfies the predicate, and it needs at least four grounded supporters. Existing rules, including dismissed ones, are never re-proposed. The result is a pending proposed rule that also reports how many firms on the desk it would screen.
+
+<Flow
+  n={2}
+  caption="The loop from an analyst's written rationale to a versioned screening rule, and back to the desk."
+  source="Drawn from server/actions/rules.ts, server/clustering/heuristic.ts and src/desk/activeScreening.ts in the repository."
+  steps={[
+    { title: 'Reject a firm', detail: 'rationale required; decision logged' },
+    { title: 'Cluster rationales', detail: 'Claude, or the keyword heuristic as fallback' },
+    { title: 'Ground each candidate', detail: 'the firm must satisfy the predicate; at least four supporters; not an existing rule' },
+    { title: 'Proposed rule', detail: 'pending, with the count of firms it would screen' },
+    [
+      { title: 'Approve', detail: 'active config, version 1' },
+      { title: 'Amend', detail: 'new version; old one deactivated' },
+      { title: 'Dismiss', detail: 'reason required' },
+    ],
+    { title: 'Screen the desk queue', note: 'a firm missing the property is never screened' },
+  ]}
+/>
+
+> Unknown is not a failure. It is the reason the firm is on the desk at all.
+
+## Drift
+
+Every terminal decision snapshots the score it was made on. New evidence rescores the firm. A qualified firm drifts on any tier change; a rejected firm drifts only when it improves, because the reason for passing may no longer hold. A rejected firm later acquired by a competitor raises a diverged-outcome event. Review resolves each event by re-engaging the firm, which moves it to Outreach, or by keeping it passed, with a rationale.
+
+## The port
+
+| On Foundry | Now |
+|---|---|
+| Ontology Manager | One schema declaration; the DDL, the repository, API validation and the typed hooks all derive from it |
+| Generated SDK and its React hooks | Drop-in hooks with the same names over TanStack Query, so page code changed only its imports |
+| Actions | Named actions, each validated and run inside a single transaction |
+| Backend | Postgres: in-process PGlite for tests and local work, hosted Postgres in production |
+
+The frontend already calls a small HTTP API and expects a seed; neither exists in the repository yet, so the app does not run end to end today. The Claude clusterer is a type with a heuristic fallback, not a wired client. A pre-publish check fails the build if any file mentions the original employer, the licensed data vendors, the training stack's hosts, or the real firm names from the original data.
+
+## Status
+
+The port began on 22 September 2026: fourteen commits so far, fifteen test files with 186 cases running against in-memory Postgres. There are no captures here until the API and seed land and the app runs. When it does, every screenshot will be of generic seed data.

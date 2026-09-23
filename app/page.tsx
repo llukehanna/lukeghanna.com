@@ -13,10 +13,10 @@ const nav: RailNavItem[] = [
 ]
 
 const facts = [
-  ['Now', 'Senior year, USC'],
+  ['Now', 'Senior year, USC · CS + Business'],
   ['Summer 2026', 'Corp dev, Houlihan Lokey'],
-  ['Builds with', 'Next.js, Postgres, Swift, Python'],
-  ['Based in', 'Los Angeles'],
+  ['Palantir', 'American Tech Fellowship, Frontiers · May–Jul 2026'],
+  ['Builds with', 'TypeScript, Python, Swift, Postgres'],
 ] as const
 
 const built = buildLabel()
@@ -29,10 +29,12 @@ export default function Home() {
         <Section id="about" title="About" index="01">
           <div className="grid gap-12 lg:grid-cols-[1.3fr_1fr]">
             <p className="text-[17px] leading-[1.6] text-mute">
-              I&apos;m a senior at USC studying <b className="font-medium text-ink">computer science and business</b>, and I spent summer 2026 in
-              corporate development at <b className="font-medium text-ink">Houlihan Lokey</b>. I build software on the side because it&apos;s the
-              fastest way I know to understand how something works: the product shape, the systems behind it, the data, and getting it deployed.
-              Everything on this page is self-initiated and running.
+              I&apos;m a senior at USC studying <b className="font-medium text-ink">computer science and business</b>. I&apos;m fascinated by what
+              AI makes possible, and I build software end-to-end because it&apos;s the fastest way I know to understand how something works: the
+              product shape, the systems behind it, the data, the interface, and getting it deployed. Summer 2026 was corporate development at{' '}
+              <b className="font-medium text-ink">Houlihan Lokey</b>; from May to July I was also a fellow in{' '}
+              <b className="font-medium text-ink">Palantir&apos;s American Tech Fellowship</b>, where the capstone became Beacon. Every project
+              below has a write-up that says exactly what state it is in.
             </p>
             <dl className="grid grid-cols-2 gap-[10px] content-start max-md:grid-cols-1">
               {facts.map(([k, v]) => (

@@ -1,0 +1,118 @@
+export const meta = {
+  title: 'Hurdle',
+  line: 'A personal-finance system that never misses a gate.',
+  status: 'Live · private, syncing daily',
+  role: 'Design, build, operate',
+  stack: 'TypeScript on Node 24, SQLite + Drizzle, zod, Plaid, SimpleFIN, MCP, Next.js 16',
+  source: 'Private by design, no git remote. Engineering docs public as PFC.',
+  links: [
+    { label: 'Engineering docs', handle: 'github · PFC-docs', href: 'https://github.com/llukehanna/PFC-docs' },
+  ],
+  glance: [
+    { label: 'Rules', value: '20, in 7 families' },
+    { label: 'Ledger', value: 'append-only SQLite' },
+    { label: 'Money', value: 'integer cents' },
+    { label: 'Interface', value: 'Claude, over MCP' },
+    { label: 'Tests', value: '3,144 unit · 352 UI' },
+  ],
+}
+
+Hurdle holds the full state of my finances, checks every action against the plan's gates before it happens, and ranks every dollar's next-best use in one queue. The engineering docs are public under the project's working name, PFC. The source and the ledger never leave the machine.
+
+## What it does
+
+It is not a budgeting app. Budgeting is the solved part. The hard part is the credit-card meta-game and the sequencing decisions that no existing tool covers alongside a real financial model.
+
+- **Gates.** Chase's 5/24 rule, per-card utilization at statement close, sign-up-bonus windows, annual-fee calendars, minimum account ages. Every action is checked against every gate before it happens.
+- **Points.** Which card to use at which merchant, right now, given category caps already partly consumed this quarter.
+- **Opportunity cost.** Every dollar has a next-best use. Idle cash, an unclaimed employer match, an uninvested contribution, a fee that should not exist: each is ranked in the same queue, in the same unit, as the card actions.
+- **Trajectory.** A tax-aware five-year projection, frozen monthly and scored against what actually happens.
+
+> The one thing that cannot fail: never miss a gate. Everything else can degrade; this cannot.
+
+## Three constraints that shaped it
+
+**Plaid returns no merchant category code.** The MCC is what determines points earned, and no consumer-accessible aggregator exposes it. So the merchant-to-bonus-category map is a table the system owns and improves, seeded from research and corrected from reconciliation drift. It is the single most valuable asset in the system; the bank connections are a commodity.
+
+**Fidelity is unreachable through Plaid.** It shares data only through Akoya, which Plaid declines to integrate. Fidelity arrives through SimpleFIN Bridge instead, whose holdings support is undocumented. I verified it against my own account before building on it, and the ingest boundary re-validates the shape on every sync.
+
+**Nothing needs to be on the public internet.** Poll on a timer instead of webhooks, request read-only products and never Plaid's `auth` product, and delegate access control to Cloudflare Access at the edge. A total token compromise reads history and cannot move money.
+
+<Flow
+  n={1}
+  caption="Read-only sources enter through a validated boundary into an append-only ledger. One function derives everything else, and four surfaces read the result behind a zero-open-port tunnel."
+  source="Drawn from the architecture section of the public engineering docs."
+  steps={[
+    [
+      { title: 'Plaid', detail: 'transactions, liabilities, investments; no webhooks' },
+      { title: 'SimpleFIN Bridge', detail: 'Fidelity, including holdings' },
+      { title: 'Deterministic parsers', detail: 'issuer statements, credit reports, positions CSV' },
+    ],
+    { title: 'zod-validated ingest boundary', detail: 'every payload validated before it can enter; decimal strings become integer cents with no intermediate float' },
+    { title: 'Append-only raw ledger', detail: 'SQLite in WAL mode. RAISE(ABORT) triggers forbid UPDATE and DELETE on every raw table.' },
+    { title: 'recompute()', detail: 'the sole writer of derived state: credit file, 5/24 calendar, utilization vs close, SUBs, caps, merchant map, allocation, comparator, tax envelope, projection, decision queue, staleness ladder' },
+    { title: 'Derived tables', detail: 'never hand-edited, never exported' },
+    [
+      { title: 'MCP server', detail: 'Claude is the primary interface' },
+      { title: 'CLI', detail: 'sync, import, recompute, export, backup' },
+      { title: 'Next.js UI', detail: 'mobile-first, read path only' },
+      { title: 'Notify', detail: 'daily digest, push, dead-man’s switch' },
+    ],
+    { title: 'Cloudflare Tunnel + Access', detail: 'zero open ports; the Access JWT is verified at the origin' },
+  ]}
+/>
+
+## How it decides
+
+The first engine was a rules layer: derive the credit file, check the gates, project the points, alert. The second replaced the objective function with opportunity cost across every dollar, evaluated over a versioned vector of assumptions.
+
+Assumptions are first-class data. Hurdle rate, expected returns, future marginal tax outlook, value of time, risk posture: each is declared as a range rather than a point, stored append-only, and every derivation reruns when one changes. That is how the plan stays dynamic without a scraping loop or a chat history.
+
+Every proposed action is compared against the alternative use of the same dollar across the whole declared range:
+
+| Outcome | Behaviour |
+|---|---|
+| The difference has one sign across the entire range | Propose it |
+| The sign flips inside the range | Escalate with both paths and the assumption that decides, naming the indifference point |
+| The difference is under the materiality floor everywhere | Take the default silently and log it as immaterial |
+
+> Never pick silently on a close call.
+
+The comparator bisects the assumption axis to find the indifference point rather than sampling it, and a narrowing step reports how much of the range the verdict depends on.
+
+Twenty rules feed it, each a pure function over the derived state, each producing a ranked queue item in one unit: dollars of opportunity cost per year.
+
+| Family | Rules |
+|---|---|
+| Card plan | SUB at risk · wrong card used · utilization before statement close · action breaks a gate · authorized-user tradeline closure |
+| Cash | cash below the available rate · money-market fund vs invested |
+| Employer | employer match unclaimed |
+| Investments | expense-ratio alternative · uninvested contribution |
+| Leakage | revolving interest · late fee · FX fee · maintenance fee · ATM or overdraft fee |
+| Anomaly | outflow above baseline · new recurring charge · duplicate or unknown counterparty |
+| Model health | assumption stale · tax-envelope breach |
+
+The last family exists because the model's own inputs decay. Card terms change mid-plan without warning (one card in the plan was discontinued; another's annual fee roughly doubled over its lifetime), and tax parameters are indexed annually. Re-verification is a scheduled job with a provenance trail, not a memory.
+
+## Custody and safety
+
+The failure mode is a financial mistake I cannot undo, so this is the part that got the most time.
+
+- **Writes are gated by provenance, not by surface.** Three surfaces can propose a change. Every mutation carries an actor, and only four validated write tools exist on the MCP side. A model session can propose; it can never recompute or apply.
+- **The system of record is one SQLite file** on an always-on VM, reached only through the tunnel. A startup assertion refuses to open a database inside a synced folder, because that failure mode is silent.
+- **The offsite backup is written with a key the host cannot use to delete.** A compromised host can stop backups; it cannot destroy them. The restore drill is a CLI command that runs the same import-and-recompute path the fallback ingest exercises every day.
+- **Staleness is surfaced, not hidden.** Every response carries an as-of time and the last successful sync. A freshness ladder fires per source, and a dead-man's switch fires when the timers stop.
+
+## What it taught me
+
+**Verification, not construction, is the binding constraint.** The first five phases took six days. A 5/24-window bug then survived eleven plans and 446 passing tests, because every test encoded the same wrong assumption. Every phase now has to answer "how would I know this is wrong?" before it is planned, and the tax and projection engines are tested against a workbook built independently as a ground-truth oracle.
+
+**Patch rounds don't converge; redesigns do.** One five-branch function needed four gap-closure rounds, each fix causing the next regression. What closed it was one consolidated pass with a total classification over the input space and a 125-cell enumerated acceptance table. That is now a repo hook: a third unpatched repair round on a phase is blocked at plan-write time.
+
+**"Missing capability" is usually a missing reader.** Six of ten backlog items in one burn-down turned out to be capabilities that already existed: a ranked queue every reader discarded, a column no one read, a balance table with a writer and no reader.
+
+## Status
+
+Milestone v1.0 shipped in August 2026: foundation, credit derivation and gates, the MCP server, statement and credit-report backfill, the merchant map, the live Plaid feed. Milestone v2.0, the wealth model, opened 13 August 2026 and shipped: versioned assumptions, the comparator, the twenty rules, the tax engine and projection. Three Plaid production items and one SimpleFIN connection sync daily on the host; the first frozen projection snapshot is in the production ledger, and its monthly scoring cannot be evaluated until snapshotted months elapse.
+
+As of the public docs: 1,400+ commits since 6 August 2026, 37 migrations, 285 test files, 3,144 unit tests and 352 Playwright checks across four viewports. There are no screenshots here on purpose: every screen of this app shows real balances.

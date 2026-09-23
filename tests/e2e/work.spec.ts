@@ -1,31 +1,53 @@
 import { test, expect } from '@playwright/test'
 
+const slugs = ['hurdle', 'beacon', 'ccc', 'bt', 'onair', 'shed', 'bjs']
+
 test.describe('write-up', () => {
   test('renders BT with headings that have ids matching the contents', async ({ page }) => {
     await page.goto('/work/bt')
     await expect(page.getByRole('heading', { level: 1, name: 'BT' })).toBeVisible()
     await expect(page.locator('h2#what-it-does')).toBeVisible()
-    await expect(page.locator('h2#math')).toBeVisible()
+    await expect(page.locator('h2#the-result')).toBeVisible()
     await expect(page.getByTestId('rail').getByTestId('nav-what-it-does')).toBeVisible()
   })
 
-  test('contains the fee formula and no projection language', async ({ page }) => {
+  test('BT states the negative result, the fee formula, and no projection language', async ({ page }) => {
     await page.goto('/work/bt')
     const text = await page.getByTestId('article').innerText()
     expect(text).toContain('fee  = 0.07 * P * (1 - P)')
+    expect(text).toContain('7,440')
+    expect(text).toMatch(/no orders? (was ever |were )?placed/i)
     expect(text).not.toMatch(/projected|estimated|illustrative/i)
   })
 
-  test('renders CCC with the live-site link and a Next link to BT', async ({ page }) => {
+  test('renders CCC with an Open link to the live site and Previous / Next neighbours', async ({ page }) => {
     await page.goto('/work/ccc')
     await expect(page.getByRole('heading', { level: 1, name: 'Clippers Command Center' })).toBeVisible()
     await expect(page.locator('h2#provable-insights')).toBeVisible()
     const rail = page.getByTestId('rail')
-    await expect(rail.getByRole('link', { name: /Live site/ })).toHaveAttribute('href', 'https://clippers.lukeghanna.com')
+    await expect(rail.getByTestId('open-app')).toHaveAttribute('href', 'https://clippers.lukeghanna.com')
+    await expect(rail.getByRole('link', { name: /Previous/ })).toHaveAttribute('href', '/work/beacon')
     await expect(rail.getByRole('link', { name: /Next/ })).toHaveAttribute('href', '/work/bt')
+  })
+
+  test('the first and last write-ups have only one neighbour', async ({ page }) => {
+    await page.goto('/work/hurdle')
+    let rail = page.getByTestId('rail')
     await expect(rail.getByRole('link', { name: /Previous/ })).toHaveCount(0)
-    const text = await page.getByTestId('article').innerText()
-    expect(text).not.toMatch(/projected|estimated|illustrative/i)
+    await expect(rail.getByRole('link', { name: /Next/ })).toHaveAttribute('href', '/work/beacon')
+    await page.goto('/work/bjs')
+    rail = page.getByTestId('rail')
+    await expect(rail.getByRole('link', { name: /Previous/ })).toHaveAttribute('href', '/work/shed')
+    await expect(rail.getByRole('link', { name: /Next/ })).toHaveCount(0)
+  })
+
+  test('every write-up renders, names its state, and avoids projection language', async ({ page }) => {
+    for (const slug of slugs) {
+      await page.goto(`/work/${slug}`)
+      await expect(page.getByTestId('rail').getByRole('term').filter({ hasText: 'Status' })).toHaveCount(1)
+      const text = await page.getByTestId('article').innerText()
+      expect(text, slug).not.toMatch(/projected|estimated|illustrative/i)
+    }
   })
 
   test('the fixed rail scrolls internally when its content is taller than the viewport', async ({ page, isMobile }) => {
@@ -47,11 +69,33 @@ test.describe('write-up', () => {
     await expect(rail.getByRole('link', { name: /Next/ })).toBeInViewport()
   })
 
-  test('BT links back to CCC as Previous', async ({ page }) => {
+  test('figures carry a number, a caption and a provenance line', async ({ page }) => {
+    await page.goto('/work/shed')
+    const figures = page.getByTestId('article').locator('figure')
+    expect(await figures.count()).toBeGreaterThanOrEqual(3)
+    const first = figures.first()
+    await expect(first.locator('figcaption')).toContainText('Fig. 1')
+    await expect(first.locator('figcaption')).toContainText('Recorded from the real app')
+    const video = first.locator('video')
+    await expect(video).toHaveAttribute('poster', '/work/shed/table.png')
+    await expect(video.locator('track[kind="captions"]')).toHaveCount(1)
+    // A flow diagram is a figure too, drawn from the code.
+    await expect(page.getByTestId('article').locator('figure', { hasText: 'Serialized drain' })).toHaveCount(1)
+  })
+
+  test('Hurdle has no captures, because every screen would show real balances', async ({ page }) => {
+    await page.goto('/work/hurdle')
+    const article = page.getByTestId('article')
+    await expect(article.locator('img, video')).toHaveCount(0)
+    await expect(article.locator('figure')).toHaveCount(1)
+    await expect(article.locator('table')).toHaveCount(2)
+  })
+
+  test('results tables scroll inside their own box instead of widening the page', async ({ page }) => {
     await page.goto('/work/bt')
-    const rail = page.getByTestId('rail')
-    await expect(rail.getByRole('link', { name: /Previous/ })).toHaveAttribute('href', '/work/ccc')
-    await expect(rail.getByRole('link', { name: /Next/ })).toHaveCount(0)
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)
+    expect(overflow).toBe(false)
+    expect(await page.getByTestId('article').locator('table').count()).toBeGreaterThanOrEqual(3)
   })
 
   test('a code block that fits its container is not a tab stop; one that overflows is', async ({ page, isMobile }) => {

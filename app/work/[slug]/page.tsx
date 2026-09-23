@@ -52,6 +52,7 @@ export default async function WorkPage({ params }: { params: Promise<{ slug: str
           { label: 'Stack', value: meta.stack },
           { label: 'Source', value: meta.source },
         ]}
+        app={meta.app}
         links={[...meta.links, ...neighbors]}
         contents={contents}
       />
