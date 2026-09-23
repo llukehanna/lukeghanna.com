@@ -7,32 +7,18 @@ Status as of 2026-09-23. Steps the agent can run are done or noted below; the re
 
 Optional, still open: backorder `lukehanna.com` at a backorder service (it expires 2026-11-26 and has been held since 2005; low odds).
 
-## 2. DNS records (Cloudflare → lukeghanna.com → DNS → Records)
+## 2. DNS records — DONE (2026-09-23)
 
-`shed.lukeghanna.com` is already attached to the Vercel project `house-ladder` via a Vercel-managed CNAME, verified, and serving Shedquarters over HTTPS — no action needed there.
+All records live at Cloudflare, DNS-only:
 
-The records below are still missing. Set every record's proxy status to **DNS only** (grey cloud), not proxied.
+| Type  | Name     | Content                      | Serves |
+|-------|----------|------------------------------|--------|
+| A     | @        | 76.76.21.21                  | lukeghanna.com (Vercel project `lukeghanna-com`) |
+| CNAME | www      | cname.vercel-dns.com         | 308 redirect to the apex |
+| CNAME | clippers | (Vercel-managed CNAME)       | Clippers Command Center (project `clippers-command-center`) |
+| CNAME | shed     | (Vercel-managed CNAME)       | Shedquarters (project `house-ladder`) |
 
-| Type  | Name | Content                | Purpose |
-|-------|------|------------------------|---------|
-| A     | @    | 76.76.21.21            | apex → Vercel |
-| CNAME | www  | cname.vercel-dns.com   | www → Vercel |
-| CNAME | ccc  | cname.vercel-dns.com   | Clippers Command Center |
-
-Then, from this repo:
-
-    npx vercel@latest domains add lukeghanna.com
-    npx vercel@latest domains add www.lukeghanna.com
-    npx vercel@latest domains add ccc.lukeghanna.com clippers-command-center
-
-Vercel issues certificates automatically once the records resolve (usually under 10 minutes). Verify:
-
-    curl -sI https://lukeghanna.com | head -1
-    curl -sI https://ccc.lukeghanna.com | head -1
-
-Expected: `HTTP/2 200` on both. Set `www` to redirect to the apex in Vercel → Project → Settings → Domains.
-
-Note: the Vercel project for this site (`lukeghanna-com`) and the GitHub repo (`llukehanna/lukeghanna.com`) don't exist yet either — those are separate publish steps being handled outside this pass. The `domains add lukeghanna.com` / `www.lukeghanna.com` commands above assume the `lukeghanna-com` project has already been created and linked.
+Verified with `curl -sI https://<host>`: apex 200, www 308, clippers 307 to /home, shed 200. A stray `ccc.lukeghanna.com` is also attached to `clippers-command-center` with no DNS record; remove it in Vercel → Project → Settings → Domains whenever convenient.
 
 ## 3. Email — not needed
 

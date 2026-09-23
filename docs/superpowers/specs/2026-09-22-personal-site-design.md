@@ -122,7 +122,7 @@ Projects are plain data in `content/projects.ts`; write-ups are MDX with frontma
 
 - **Domain:** lukeghanna.com, registered by Luke at Cloudflare (at-cost pricing, free email routing). DNS stays at Cloudflare in DNS-only mode pointing at Vercel. Backorder lukehanna.com separately; it expires 2026-11-26 and has been held since 2005, so odds are low.
 - **Email:** the contact address is Luke's existing luke@zhannas.com; no mail routing on the new domain.
-- **Subdomains:** ccc.lukeghanna.com → the existing `clippers-command-center` Vercel project. shed.lukeghanna.com → the existing `house-ladder` project. Both are custom-domain additions to the existing projects; nothing moves.
+- **Subdomains:** clippers.lukeghanna.com → the existing `clippers-command-center` Vercel project. shed.lukeghanna.com → the existing `house-ladder` project. Both are custom-domain additions to the existing projects; nothing moves.
 - **Hosting:** new Vercel project `lukeghanna-com` on the Hobby plan, connected to a new GitHub repo `llukehanna/lukeghanna.com`. Main deploys to production; every PR gets a preview URL.
 - **Not built:** resume route, go/ redirects, tools subdomain.
 
