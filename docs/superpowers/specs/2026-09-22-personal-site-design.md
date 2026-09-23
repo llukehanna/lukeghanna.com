@@ -69,7 +69,7 @@ Contrast verified 2026-09-22 (WCAG relative luminance): every text token on its 
 
 **Tablet (768 to 1024px).** The rail leaves the fixed position and sits in flow as a glass card above the content; the four fact tiles go to one column below 768px; row descriptions wrap.
 
-**Mobile (<700px).** Rail becomes a static header above the content: name, one line, bio, contact links in a row, theme toggle. Section nav becomes a sticky glass bar at the top of the viewport with the three section names, tracking the active section. Project rows stack vertically: title, status, description, tags, arrow.
+**Mobile (<768px).** Rail becomes a static header above the content: name, one line, bio, contact links in a row, theme toggle. Section nav becomes a sticky glass bar at the top of the viewport with the three section names, tracking the active section. Project rows stack vertically: title, status, description, tags, arrow.
 
 ## 5. Interaction
 
