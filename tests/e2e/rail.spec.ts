@@ -25,4 +25,15 @@ test.describe('rail', () => {
     await page.locator('#contact').scrollIntoViewIfNeeded()
     await expect(page.getByTestId('nav-contact')).toHaveAttribute('aria-current', 'true')
   })
+
+  test('specular overlay covers the rail', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'desktop-only: rail is lg:fixed, where the overlay bug manifested')
+    await page.goto('/')
+    const railBox = await page.getByTestId('rail').boundingBox()
+    const specularBox = await page.getByTestId('rail-specular').boundingBox()
+    expect(railBox).not.toBeNull()
+    expect(specularBox).not.toBeNull()
+    expect(Math.abs(specularBox!.width - railBox!.width)).toBeLessThanOrEqual(1)
+    expect(Math.abs(specularBox!.height - railBox!.height)).toBeLessThanOrEqual(1)
+  })
 })

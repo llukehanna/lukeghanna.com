@@ -1,10 +1,15 @@
 'use client'
 
-import { useEffect, useRef, type ReactNode } from 'react'
+import { useEffect, useRef, type ComponentPropsWithoutRef } from 'react'
+import { Glass } from '@/components/Glass'
 import { isHoverCapable, prefersReducedMotion } from '@/lib/motion'
 
-export function RailSpecular({ children, className = '' }: { children: ReactNode; className?: string }) {
-  const ref = useRef<HTMLDivElement>(null)
+type RailSpecularProps = Omit<ComponentPropsWithoutRef<'aside'>, 'className'> & {
+  className?: string
+}
+
+export function RailSpecular({ children, className = '', ...rest }: RailSpecularProps) {
+  const ref = useRef<HTMLElement>(null)
   useEffect(() => {
     if (prefersReducedMotion() || !isHoverCapable()) return
     const el = ref.current
@@ -18,13 +23,14 @@ export function RailSpecular({ children, className = '' }: { children: ReactNode
     return () => window.removeEventListener('pointermove', onMove)
   }, [])
   return (
-    <div ref={ref} className={`relative ${className}`}>
+    <Glass as="aside" ref={ref} className={`relative ${className}`} {...rest}>
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 rounded-[16px]"
+        data-testid="rail-specular"
+        className="pointer-events-none absolute -inset-px rounded-[16px]"
         style={{ background: 'radial-gradient(320px circle at var(--rx, 20%) var(--ry, 10%), rgba(255,255,255,0.09), transparent 60%)' }}
       />
       {children}
-    </div>
+    </Glass>
   )
 }
