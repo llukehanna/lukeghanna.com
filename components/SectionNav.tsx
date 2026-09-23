@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { RailNavItem } from '@/components/Rail'
 
-export function SectionNav({ items }: { items: RailNavItem[] }) {
+export function SectionNav({ items, layout = 'vertical' }: { items: RailNavItem[]; layout?: 'vertical' | 'bar' }) {
   const [active, setActive] = useState(items[0]?.id)
   const activeRef = useRef(active)
 
@@ -18,7 +18,11 @@ export function SectionNav({ items }: { items: RailNavItem[] }) {
     // the observer's band once the page has scrolled as far as it goes, so once the user
     // has reached the bottom of the page the last item wins regardless of ratio.
     const last = items[items.length - 1]
-    const isAtBottom = () => window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 1
+    // Only the last item can win on "at bottom" grounds when the document actually scrolls;
+    // on a short page (nothing to scroll) this must never short-circuit the ratio comparison.
+    const isAtBottom = () =>
+      document.documentElement.scrollHeight > window.innerHeight &&
+      window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 1
 
     const io = new IntersectionObserver(
       (entries) => {
@@ -47,6 +51,24 @@ export function SectionNav({ items }: { items: RailNavItem[] }) {
       window.removeEventListener('scroll', onScroll)
     }
   }, [items])
+
+  if (layout === 'bar') {
+    return (
+      <nav aria-label="Sections (mobile)" className="glass sticky top-0 z-20 flex items-center justify-around px-4 py-[10px] md:hidden">
+        {items.map((i) => (
+          <a
+            key={i.id}
+            href={`#${i.id}`}
+            data-testid={`navbar-${i.id}`}
+            aria-current={active === i.id ? 'true' : undefined}
+            className={`text-[13px] font-medium transition-colors ${active === i.id ? 'text-ink' : 'text-mute hover:text-ink'}`}
+          >
+            {i.label}
+          </a>
+        ))}
+      </nav>
+    )
+  }
 
   return (
     <nav aria-label="Sections" className="mt-11 flex flex-col gap-1">
