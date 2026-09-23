@@ -14,9 +14,19 @@ export function SectionNav({ items }: { items: RailNavItem[] }) {
   useEffect(() => {
     const sections = items.map((i) => document.getElementById(i.id)).filter((el): el is HTMLElement => !!el)
     const visible = new Map<string, number>()
+    // A short final section can be outscored by a taller earlier section that still spans
+    // the observer's band once the page has scrolled as far as it goes, so once the user
+    // has reached the bottom of the page the last item wins regardless of ratio.
+    const last = items[items.length - 1]
+    const isAtBottom = () => window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 1
+
     const io = new IntersectionObserver(
       (entries) => {
         for (const e of entries) visible.set(e.target.id, e.isIntersecting ? e.intersectionRatio : 0)
+        if (last && isAtBottom()) {
+          setActive(last.id)
+          return
+        }
         let best = activeRef.current
         let bestRatio = 0
         for (const [id, r] of visible) if (r > bestRatio) { best = id; bestRatio = r }
@@ -25,7 +35,17 @@ export function SectionNav({ items }: { items: RailNavItem[] }) {
       { rootMargin: '-20% 0px -60% 0px', threshold: [0, 0.1, 0.25, 0.5, 0.75, 1] },
     )
     sections.forEach((s) => io.observe(s))
-    return () => io.disconnect()
+
+    const onScroll = () => {
+      if (last && isAtBottom()) setActive(last.id)
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    onScroll()
+
+    return () => {
+      io.disconnect()
+      window.removeEventListener('scroll', onScroll)
+    }
   }, [items])
 
   return (
