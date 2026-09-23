@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter, Geist_Mono } from 'next/font/google'
 import { ThemeProvider } from '@/components/ThemeProvider'
+import { Spotlight } from '@/components/Spotlight'
 import { siteName, siteDescription, siteUrl, siteTagline } from '@/lib/site'
 import './globals.css'
 
@@ -19,7 +20,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning className={`${inter.variable} ${geistMono.variable}`}>
       <body className="min-h-dvh bg-bg text-ink font-sans">
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <Spotlight />
+          <div className="relative z-10">{children}</div>
+        </ThemeProvider>
       </body>
     </html>
   )
