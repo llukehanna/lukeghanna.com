@@ -47,7 +47,7 @@ export default async function WorkPage({ params }: { params: Promise<{ slug: str
       />
       <main className="px-6 pb-20 pt-12 lg:pl-[400px] lg:pr-12">
         <div className="grid gap-14 xl:grid-cols-[minmax(0,720px)_280px]">
-          <article data-testid="article" className="prose-none [&>p:first-of-type]:mb-7 [&>p:first-of-type]:text-[22px] [&>p:first-of-type]:leading-[1.45] [&>p:first-of-type]:tracking-[-0.01em] [&>p:first-of-type]:text-ink">
+          <article data-testid="article" className="min-w-0 prose-none [&>p:first-of-type]:mb-7 [&>p:first-of-type]:text-[22px] [&>p:first-of-type]:leading-[1.45] [&>p:first-of-type]:tracking-[-0.01em] [&>p:first-of-type]:text-ink">
             <Post />
           </article>
           <ArticleSidebar contents={contents} glance={meta.glance} />
