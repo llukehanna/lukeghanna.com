@@ -25,7 +25,7 @@ test('open graph image is served as a PNG', async ({ request }) => {
 test('home has og:image and a description', async ({ page }) => {
   await page.goto('/')
   await expect(page.locator('meta[property="og:image"]')).toHaveCount(1)
-  await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /Houlihan Lokey/)
+  await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /business administration at USC/)
 })
 
 test('the icon is the LH monogram as an SVG, with an apple icon rendered as a PNG', async ({ page, request }) => {

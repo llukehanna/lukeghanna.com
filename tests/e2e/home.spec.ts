@@ -26,7 +26,9 @@ test.describe('home', () => {
     await page.goto('/')
     const about = page.locator('#about')
     await expect(about).toContainText('American Tech Fellowship')
-    for (const tile of ['Now', 'Summer 2026', 'Palantir', 'Builds with']) await expect(about.getByRole('term').filter({ hasText: tile })).toHaveCount(1)
+    for (const tile of ['Now', 'Palantir', 'Builds with', 'Shipped']) await expect(about.getByRole('term').filter({ hasText: tile })).toHaveCount(1)
+    await expect(about).toContainText('7 projects · 2 live sites')
+    await expect(page.locator('body')).not.toContainText(/Houlihan/)
   })
 
   test('contact shows the email and a build-time colophon', async ({ page }) => {
