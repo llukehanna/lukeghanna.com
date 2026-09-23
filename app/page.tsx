@@ -12,11 +12,14 @@ const nav: RailNavItem[] = [
   { id: 'contact', label: 'Contact', index: '03' },
 ]
 
+// Derived from the project list so the tile can never go stale.
+const liveSites = projects.filter((p) => p.where.includes('lukeghanna.com')).length
+
 const facts = [
-  ['Now', 'Senior year, USC · CS + Business'],
-  ['Summer 2026', 'Corp dev, Houlihan Lokey'],
+  ['Now', 'Senior year, USC · CS + Business Administration'],
   ['Palantir', 'American Tech Fellowship, Frontiers · May–Jul 2026'],
   ['Builds with', 'TypeScript, Python, Swift, Postgres'],
+  ['Shipped', `${projects.length} projects · ${liveSites} live sites`],
 ] as const
 
 const built = buildLabel()
@@ -29,12 +32,11 @@ export default function Home() {
         <Section id="about" title="About" index="01">
           <div className="grid gap-12 lg:grid-cols-[1.3fr_1fr]">
             <p className="text-[17px] leading-[1.6] text-mute">
-              I&apos;m a senior at USC studying <b className="font-medium text-ink">computer science and business</b>. I&apos;m fascinated by what
-              AI makes possible, and I build software end-to-end because it&apos;s the fastest way I know to understand how something works: the
-              product shape, the systems behind it, the data, the interface, and getting it deployed. Summer 2026 was corporate development at{' '}
-              <b className="font-medium text-ink">Houlihan Lokey</b>; from May to July I was also a fellow in{' '}
-              <b className="font-medium text-ink">Palantir&apos;s American Tech Fellowship</b>, where the capstone became Beacon. Every project
-              below has a write-up that says exactly what state it is in.
+              I&apos;m a senior at USC studying <b className="font-medium text-ink">computer science and business administration</b>. I&apos;m
+              fascinated by what AI makes possible, and I build software end-to-end because it&apos;s the fastest way I know to understand how
+              something works: the product shape, the systems behind it, the data, the interface, and getting it deployed. From May to July 2026 I
+              was a fellow in <b className="font-medium text-ink">Palantir&apos;s American Tech Fellowship</b>, where the capstone became Beacon.
+              Every project below has a write-up that says exactly what state it is in.
             </p>
             <dl className="grid grid-cols-2 gap-[10px] content-start max-md:grid-cols-1">
               {facts.map(([k, v]) => (
