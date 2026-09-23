@@ -38,9 +38,9 @@ Note: the Vercel project for this site (`lukeghanna-com`) and the GitHub repo (`
 No MX records exist yet for `lukeghanna.com`.
 
 1. Cloudflare → lukeghanna.com → Email → Email Routing → Get started. Cloudflare adds the MX and TXT records itself.
-2. Destination address: lllukehanna@gmail.com (verify the confirmation email).
+2. Destination address: your Gmail address (verify the confirmation email).
 3. Custom address: `luke@lukeghanna.com` → forward to the destination.
-4. Send-as from Gmail: Gmail → Settings → Accounts and Import → Send mail as → Add another email address → `luke@lukeghanna.com`, SMTP server `smtp.gmail.com`, port 587, username lllukehanna@gmail.com, password = a Google App Password (Google Account → Security → 2-Step Verification → App passwords). Verify with the code Gmail sends to the new address.
+4. Send-as from Gmail: Gmail → Settings → Accounts and Import → Send mail as → Add another email address → `luke@lukeghanna.com`, SMTP server `smtp.gmail.com`, port 587, username your Gmail address, password = a Google App Password (Google Account → Security → 2-Step Verification → App passwords). Verify with the code Gmail sends to the new address.
 
 ## 4. After the domain is live
 - Update `siteUrl` in `lib/site.ts` only if the domain differs from `https://lukeghanna.com`.

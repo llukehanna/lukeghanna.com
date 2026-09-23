@@ -1,7 +1,17 @@
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import type { ComponentType } from 'react'
-import type { WorkMeta } from '@/content/work/bt.mdx'
+
+export type WorkMeta = {
+  title: string
+  line: string
+  status: string
+  role: string
+  stack: string
+  source: string
+  links: { label: string; handle: string; href: string }[]
+  glance: { label: string; value: string }[]
+}
 
 export const workSlugs = ['bt'] as const
 export type WorkSlug = (typeof workSlugs)[number]
