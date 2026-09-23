@@ -19,8 +19,8 @@ export const projects: Project[] = [
     title: 'Clippers Command Center',
     status: 'live',
     statusLabel: 'Live',
-    href: 'https://ccc.lukeghanna.com',
-    hrefLabel: 'ccc.lukeghanna.com',
+    href: 'https://clippers.lukeghanna.com',
+    hrefLabel: 'clippers.lukeghanna.com',
     description:
       'Live NBA analytics for Clippers fans. A provable-insights engine verifies every claim against source data before it renders. Next.js 16, Neon Postgres, and a two-pipeline architecture for live and historical data.',
     tags: ['Next.js', 'Postgres', 'NBA CDN'],
