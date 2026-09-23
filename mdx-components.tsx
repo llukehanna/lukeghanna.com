@@ -5,7 +5,11 @@ const components: MDXComponents = {
   p: (props) => <p className="mb-4 text-[16px] leading-[1.65] text-mute" {...props} />,
   strong: (props) => <strong className="font-medium text-ink" {...props} />,
   pre: (props) => (
-    <pre className="glass my-5 overflow-x-auto rounded-[12px] p-5 font-mono text-[13px] leading-[1.65] text-ink" {...props} />
+    <pre
+      tabIndex={0}
+      className="glass my-5 overflow-x-auto rounded-[12px] p-5 font-mono text-[13px] leading-[1.65] text-ink"
+      {...props}
+    />
   ),
   code: (props) => <code className="font-mono text-[0.95em]" {...props} />,
   blockquote: (props) => (
