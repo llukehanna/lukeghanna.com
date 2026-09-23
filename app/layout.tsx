@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter, Geist_Mono } from 'next/font/google'
+import { Analytics } from '@vercel/analytics/next'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 import { ThemeProvider } from '@/components/ThemeProvider'
 import { Spotlight } from '@/components/Spotlight'
 import { siteName, siteDescription, siteUrl, siteTagline } from '@/lib/site'
@@ -24,6 +26,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Spotlight />
           <div className="relative z-10">{children}</div>
         </ThemeProvider>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   )
