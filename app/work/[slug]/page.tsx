@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import { Rail, type RailNavItem } from '@/components/Rail'
 import { ArticleSidebar } from '@/components/ArticleSidebar'
 import { extractToc } from '@/lib/toc'
-import { isWorkSlug, readWorkSource, workSlugs } from '@/lib/work'
+import { isWorkSlug, loadWork, readWorkSource, workSlugs } from '@/lib/work'
 import { siteName } from '@/lib/site'
 
 export const dynamicParams = false
@@ -15,7 +15,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
   if (!isWorkSlug(slug)) return {}
-  const { meta } = await import(`@/content/work/${slug}.mdx`)
+  const { meta } = await loadWork(slug)
   return { title: meta.title, description: meta.line, openGraph: { title: `${meta.title} · ${siteName}`, description: meta.line } }
 }
 
@@ -23,7 +23,7 @@ export default async function WorkPage({ params }: { params: Promise<{ slug: str
   const { slug } = await params
   if (!isWorkSlug(slug)) notFound()
 
-  const { default: Post, meta } = await import(`@/content/work/${slug}.mdx`)
+  const { default: Post, meta } = await loadWork(slug)
   const contents: RailNavItem[] = extractToc(readWorkSource(slug)).map((h, i) => ({
     id: h.id,
     label: h.text,
