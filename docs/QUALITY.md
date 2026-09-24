@@ -118,3 +118,7 @@ Every checkout was refreshed and four research passes diffed each repository aga
 - OnAir, PFC-docs and the profile README did not change.
 
 Gate before merge: lint, typecheck, unit, the full Playwright suite on desktop and mobile with axe on every page in both themes, and the production build.
+
+## 2026-09-24 Shedquarters captures refreshed
+
+The Shedquarters repository had no new commits after the second pass, but its captures on the site predated spikeball. To refresh them honestly, the app was run here: Postgres 16 started locally under the `postgres` user, `npm run migrate` applied the schema, a throwaway seed (`scripts/seed-demo.ts`, not committed anywhere) created twelve made-up players and 59 games across three beer-die nights, one finished spikeball night and one open spikeball night, and `next start` served the production build on port 3200. Captures at 390×844 at 2× (780×1688, matching Luke's originals) after passing the gate with the example PIN: the beer-die ladder with the Die / Spike pill and live dot, spikeball table mode with the 25 / 15 / 11 picker, and the spikeball game log. Their provenance lines say exactly that. The demo video and its poster are still Luke's own recordings from before spikeball and still say so. The desktop hover capture on the home row is unchanged.

@@ -64,13 +64,24 @@ Margin of victory counts, but only past a point, and the point scales with the t
 
 <Figure
   n={3}
-  src="/work/shed/rankings.png"
+  src="/work/shed/ranks-die.png"
   width={780}
   height={1688}
   frame="phone"
-  alt="Power rankings screen: rank, name, record, streak, rating, and weekly movement for each player"
-  caption="Power rankings with rating, record, streak and weekly movement."
-  source="Screenshot of the app against a local database of made-up players, before spikeball was added."
+  alt="Beer die power rankings: rank, name, record, streak and rating for each player, with a Die / Spike pill in the top bar and a live dot on Spike"
+  caption="The beer die ladder. The pill in the top bar switches sport; the dot on Spike means a spikeball night is live right now."
+  source="Screenshot of the app running locally against a database of made-up players, 24 September 2026."
+/>
+
+<Figure
+  n={4}
+  src="/work/shed/player-spike.png"
+  width={780}
+  height={1688}
+  frame="phone"
+  alt="A player page with two cards, one per sport: beer die rating, rank, record, win percentage, streak and point differential, then the same for spikeball marked provisional, followed by badges and a head-to-head table with a column per sport"
+  caption="One player, two ladders. A beer die rating says nothing about someone's spikeball, so each sport gets its own card, its own badges and its own head-to-head column."
+  source="Screenshot of the app running locally against a database of made-up players, 24 September 2026."
 />
 
 ## A four-digit PIN that stays safe on the open internet
@@ -80,14 +91,25 @@ The house wanted a PIN, not accounts. With ten thousand possibilities, the desig
 The session cookie holds a signature, never the PIN, so hammering the write API with every possible cookie value earns ten thousand rejections and learns nothing. Changing the PIN or resetting the invite link signs out every device at once, because both are inside every signature.
 
 <Figure
-  n={4}
-  src="/work/shed/game-log.png"
+  n={5}
+  src="/work/shed/table-spike.png"
   width={780}
   height={1688}
   frame="phone"
-  alt="Game log screen grouped by night, each game showing the teams, the score, and the rating change per player"
-  caption="The game log, grouped by night, with per-game rating changes."
-  source="Screenshot of the app against a local database of made-up players, before spikeball was added."
+  alt="Spikeball table mode: a Game To picker with 25, 15 and 11, the pair holding the net with a one-game run, the challengers, and undo and change-teams buttons"
+  caption="Table mode on a spikeball night: pick what this game is played to, tap who won, and the winners hold the net."
+  source="Screenshot of the app running locally against a database of made-up players, 24 September 2026."
+/>
+
+<Figure
+  n={6}
+  src="/work/shed/games-spike.png"
+  width={780}
+  height={1688}
+  frame="phone"
+  alt="Spikeball game log grouped by night: each game shows the winning pair, the losing pair, the score, and each side's rating change"
+  caption="The spikeball game log, grouped by night, with per-game rating changes. Games to 25 and to 11 sit in the same night."
+  source="Screenshot of the app running locally against a database of made-up players, 24 September 2026."
 />
 
 ## Status
