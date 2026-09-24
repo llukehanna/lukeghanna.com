@@ -4,7 +4,7 @@ import { projects } from '@/content/projects'
 
 describe('projects', () => {
   it('has exactly the seven projects in order', () => {
-    expect(projects.map((p) => p.slug)).toEqual(['hurdle', 'beacon', 'ccc', 'bt', 'onair', 'shed', 'bjs'])
+    expect(projects.map((p) => p.slug)).toEqual(['pfc', 'beacon', 'ccc', 'bt', 'onair', 'shed', 'bjs'])
   })
   it('has unique slugs and every row goes to its own write-up', () => {
     const slugs = new Set(projects.map((p) => p.slug))

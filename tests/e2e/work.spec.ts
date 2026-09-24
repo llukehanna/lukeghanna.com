@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 
-const slugs = ['hurdle', 'beacon', 'ccc', 'bt', 'onair', 'shed', 'bjs']
+const slugs = ['pfc', 'beacon', 'ccc', 'bt', 'onair', 'shed', 'bjs']
 
 test.describe('write-up', () => {
   test('renders BT with headings that have ids matching the contents', async ({ page }) => {
@@ -31,7 +31,7 @@ test.describe('write-up', () => {
   })
 
   test('the first and last write-ups have only one neighbour', async ({ page }) => {
-    await page.goto('/work/hurdle')
+    await page.goto('/work/pfc')
     let rail = page.getByTestId('rail')
     await expect(rail.getByRole('link', { name: /Previous/ })).toHaveCount(0)
     await expect(rail.getByRole('link', { name: /Next/ })).toHaveAttribute('href', '/work/beacon')
@@ -83,8 +83,8 @@ test.describe('write-up', () => {
     await expect(page.getByTestId('article').locator('figure', { hasText: 'Serialized drain' })).toHaveCount(1)
   })
 
-  test('Hurdle has no captures, because every screen would show real balances', async ({ page }) => {
-    await page.goto('/work/hurdle')
+  test('PFC has no captures, because every screen would show real balances', async ({ page }) => {
+    await page.goto('/work/pfc')
     const article = page.getByTestId('article')
     await expect(article.locator('img, video')).toHaveCount(0)
     await expect(article.locator('figure')).toHaveCount(1)

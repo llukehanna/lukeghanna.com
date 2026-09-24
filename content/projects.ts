@@ -1,5 +1,5 @@
 export type Project = {
-  slug: 'hurdle' | 'beacon' | 'ccc' | 'bt' | 'onair' | 'shed' | 'bjs'
+  slug: 'pfc' | 'beacon' | 'ccc' | 'bt' | 'onair' | 'shed' | 'bjs'
   title: string
   /** One or two words on the project's state: Live, In progress, Paused, macOS, iOS. */
   statusLabel: string
@@ -15,11 +15,11 @@ export type Project = {
 
 export const projects: Project[] = [
   {
-    slug: 'hurdle',
-    title: 'Hurdle',
+    slug: 'pfc',
+    title: 'Personal Finance Coach',
     statusLabel: 'Live',
     where: 'private, syncing daily',
-    href: '/work/hurdle',
+    href: '/work/pfc',
     description:
       'A single-user personal-finance system that holds the full state of my finances, checks every action against the credit-card plan’s gates before it happens, and ranks every dollar’s next-best use in one queue. Append-only SQLite ledger, a 20-rule opportunity-cost comparator over assumption ranges, Claude as the primary interface over MCP.',
     tags: ['TypeScript', 'SQLite', 'MCP'],

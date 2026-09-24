@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
 
 test.describe('home', () => {
-  const slugs = ['hurdle', 'beacon', 'ccc', 'bt', 'onair', 'shed', 'bjs']
+  const slugs = ['pfc', 'beacon', 'ccc', 'bt', 'onair', 'shed', 'bjs']
 
   test('lists the seven projects, each linking to its write-up', async ({ page }) => {
     await page.goto('/')
@@ -17,7 +17,7 @@ test.describe('home', () => {
     await page.goto('/')
     await expect(page.getByTestId('reveal-shed')).toHaveCount(1)
     await expect(page.getByTestId('reveal-onair')).toHaveCount(1)
-    for (const slug of ['hurdle', 'beacon', 'ccc', 'bt', 'bjs']) await expect(page.getByTestId(`reveal-${slug}`)).toHaveCount(0)
+    for (const slug of ['pfc', 'beacon', 'ccc', 'bt', 'bjs']) await expect(page.getByTestId(`reveal-${slug}`)).toHaveCount(0)
     await page.getByTestId('project-shed').hover()
     await expect(page.getByTestId('reveal-shed')).toHaveAttribute('data-open', 'true')
   })
