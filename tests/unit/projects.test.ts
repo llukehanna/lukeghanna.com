@@ -4,7 +4,7 @@ import { projects } from '@/content/projects'
 
 describe('projects', () => {
   it('has exactly the seven projects in order', () => {
-    expect(projects.map((p) => p.slug)).toEqual(['pfc', 'beacon', 'ccc', 'bt', 'onair', 'shed', 'bjs'])
+    expect(projects.map((p) => p.slug)).toEqual(['pfc', 'beacon', 'ccc', 'kwx', 'onair', 'shed', 'bjs'])
   })
   it('has unique slugs and every row goes to its own write-up', () => {
     const slugs = new Set(projects.map((p) => p.slug))
@@ -17,7 +17,7 @@ describe('projects', () => {
     }
   })
   it('only projects with a real capture have a hover screenshot', () => {
-    expect(projects.filter((p) => p.screenshot).map((p) => p.slug)).toEqual(['onair', 'shed'])
+    expect(projects.filter((p) => p.screenshot).map((p) => p.slug)).toEqual(['beacon', 'onair', 'shed'])
   })
   it('never uses projection language', () => {
     for (const p of projects) expect(p.description).not.toMatch(/projected|estimated|targeting/i)

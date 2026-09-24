@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
 
-for (const path of ['/', '/work/pfc', '/work/beacon', '/work/ccc', '/work/bt', '/work/onair', '/work/shed', '/work/bjs']) {
+for (const path of ['/', '/work/pfc', '/work/beacon', '/work/ccc', '/work/kwx', '/work/onair', '/work/shed', '/work/bjs']) {
   for (const theme of ['dark', 'light'] as const) {
     test(`${path} has no axe violations in ${theme}`, async ({ page }) => {
       await page.goto(path)
@@ -27,7 +27,7 @@ test('every project row is reachable by keyboard and shows a visible focus ring'
   expect(outline.style).not.toBe('none')
   expect(outline.width).toBeGreaterThanOrEqual(2)
   await page.keyboard.press('Tab')
-  await expect(page.getByTestId('project-bt')).toBeFocused()
+  await expect(page.getByTestId('project-kwx')).toBeFocused()
 })
 
 test('keyboard focus does not override an element\'s own border radius', async ({ page }) => {

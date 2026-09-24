@@ -1,5 +1,5 @@
 export type Project = {
-  slug: 'pfc' | 'beacon' | 'ccc' | 'bt' | 'onair' | 'shed' | 'bjs'
+  slug: 'pfc' | 'beacon' | 'ccc' | 'kwx' | 'onair' | 'shed' | 'bjs'
   title: string
   /** One or two words on the project's state: Live, In progress, Paused, macOS, iOS. */
   statusLabel: string
@@ -27,12 +27,13 @@ export const projects: Project[] = [
   {
     slug: 'beacon',
     title: 'Beacon',
-    statusLabel: 'In progress',
-    where: 'porting off Foundry',
+    statusLabel: 'Live',
+    where: 'beacon.lukeghanna.com · synthetic data',
     href: '/work/beacon',
     description:
-      'Deal-sourcing workbench for boutique advisory targets: mandates become searches, an enrichment agent fills in facts from ranked sources and abstains when they conflict, analysts qualify or reject, and rejection rationales cluster into proposed screening rules. Built on Foundry as my Palantir fellowship capstone; now being ported to Postgres and React.',
-    tags: ['React', 'Postgres', 'Foundry'],
+      'Deal-sourcing workbench for boutique advisory targets: mandates become searches, an enrichment agent fills in facts from ranked sources and abstains when they conflict, analysts qualify or reject, and rejection rationales cluster into proposed screening rules. Built on Foundry as my Palantir fellowship capstone, ported to Postgres and React, and live on a 700-firm synthetic universe that resets nightly.',
+    tags: ['React', 'Postgres', 'Claude'],
+    screenshot: { src: '/shots/beacon.png', width: 1440, height: 900 },
   },
   {
     slug: 'ccc',
@@ -41,17 +42,17 @@ export const projects: Project[] = [
     where: 'clippers.lukeghanna.com',
     href: '/work/ccc',
     description:
-      'Live NBA analytics for Clippers fans. A provable-insights engine verifies every claim against source data before it renders. Next.js 16, Neon Postgres, and a two-pipeline architecture for live and historical data.',
+      'Live NBA analytics for Clippers fans. A provable-insights engine verifies every claim against source data before it renders, then re-verifies every proof nightly. Next.js 16, Neon Postgres, league-wide box scores, and a two-pipeline architecture for live and historical data.',
     tags: ['Next.js', 'Postgres', 'NBA CDN'],
   },
   {
-    slug: 'bt',
-    title: 'BT',
-    statusLabel: 'Paused',
-    where: 'research result',
-    href: '/work/bt',
+    slug: 'kwx',
+    title: 'Kalshi Weather Edge',
+    statusLabel: 'Research',
+    where: 'market maker built, demo pending',
+    href: '/work/kwx',
     description:
-      'A Kalshi weather bot that ran unattended for four months and settled 7,440 signals to test whether a GFS ensemble beats the market price. It does not: the market out-predicts the model and the calibration gate never let it trade. That was the design working.',
+      'A Kalshi weather bot that ran unattended for four months and settled 7,440 signals to test whether a GFS ensemble beats the market price. It does not: the market out-predicts the model and the calibration gate never let it trade. A market maker for the other side of the same books is now built and waiting on its demo run.',
     tags: ['Python', 'Kalshi API', 'Open-Meteo'],
   },
   {
@@ -72,7 +73,7 @@ export const projects: Project[] = [
     where: 'shed.lukeghanna.com',
     href: '/work/shed',
     description:
-      'Skill-rating ladder for a house beer-die league, scored from a phone at the table. An offline-first idempotent write queue, OpenSkill ratings replayed from an append-only game history, and a four-digit house PIN made safe by a Postgres-backed rate limiter.',
+      'Skill-rating ladders for a house beer-die and spikeball league, scored from a phone at the table. An offline-first idempotent write queue, OpenSkill ratings replayed per sport from an append-only game history, and a four-digit house PIN made safe by a Postgres-backed rate limiter.',
     tags: ['Next.js', 'Postgres', 'OpenSkill'],
     screenshot: { src: '/shots/shed.png', width: 1440, height: 900 },
   },
@@ -80,10 +81,10 @@ export const projects: Project[] = [
     slug: 'bjs',
     title: 'BJS',
     statusLabel: 'iOS',
-    where: 'engine done, app in rebuild',
+    where: 'trainer built, counting next',
     href: '/work/bjs',
     description:
-      'Native iOS blackjack trainer. Rule-aware basic strategy, Hi-Lo counting and a house-edge calculator live in a tested Swift package with no dependencies; the app around it is being rebuilt.',
+      'Native iOS blackjack trainer. Rule-aware basic strategy, Hi-Lo counting and a house-edge calculator live in a tested Swift package with no dependencies; the app is being rebuilt on it, and the strategy trainer is the first screen done.',
     tags: ['Swift 6', 'SwiftUI', 'SwiftData'],
   },
 ]
