@@ -9,9 +9,12 @@ import { Tag } from '@/components/Tag'
 function RowBody({ p, index, open, pos }: { p: Project; index: number; open: boolean; pos: { x: number; y: number } }) {
   return (
     <>
-      <span className="font-mono text-[12px] text-dim">{String(index + 1).padStart(2, '0')}</span>
+      <span className="font-mono text-[12px] text-dim max-md:hidden">{String(index + 1).padStart(2, '0')}</span>
       <div>
-        <div className="text-[22px] font-semibold leading-[1.15] tracking-[-0.02em] text-ink transition-colors group-hover:text-accent">{p.title}</div>
+        <div className="text-[22px] font-semibold leading-[1.15] tracking-[-0.02em] text-ink transition-colors group-hover:text-accent">
+          <span className="mr-[10px] font-mono text-[12px] font-normal text-dim md:hidden">{String(index + 1).padStart(2, '0')}</span>
+          {p.title}
+        </div>
         <div className="mt-[6px] font-mono text-[10.5px] uppercase tracking-[0.08em] text-accent">
           {p.statusLabel} · {p.where}
         </div>
@@ -20,7 +23,7 @@ function RowBody({ p, index, open, pos }: { p: Project; index: number; open: boo
       <div className="flex flex-wrap justify-end gap-[6px] max-md:justify-start">
         {p.tags.map((t) => <Tag key={t}>{t}</Tag>)}
       </div>
-      <span aria-hidden className="text-right text-[16px] text-dim transition-transform group-hover:translate-x-[3px] group-hover:text-accent">→</span>
+      <span aria-hidden className="text-right text-[16px] text-dim transition-transform group-hover:translate-x-[3px] group-hover:text-accent max-md:hidden">→</span>
 
       {p.screenshot && (
         <div
@@ -57,7 +60,7 @@ function Row({ p, index, dimmed, onEnter, onLeave }: { p: Project; index: number
     onLeave()
   }
 
-  const className = `group relative -mx-[22px] grid grid-cols-[48px_1.1fr_1.6fr_auto_40px] items-center gap-6 rounded-[14px] border border-transparent px-[22px] py-[26px] transition-[opacity,background,border-color,box-shadow] duration-300 ease-out hover:glass max-md:grid-cols-1 max-md:gap-3 ${dimmed ? 'opacity-50' : 'opacity-100'}`
+  const className = `group relative -mx-[22px] grid grid-cols-[48px_1.1fr_1.6fr_auto_40px] items-center gap-6 rounded-[14px] border border-transparent px-[22px] py-[26px] transition-[opacity,background,border-color,box-shadow] duration-300 ease-out hover:glass max-md:grid-cols-1 max-md:gap-3 max-md:py-[22px] ${dimmed ? 'opacity-50' : 'opacity-100'}`
 
   return (
     <Link

@@ -5,6 +5,7 @@ import { ThemeToggle } from '@/components/ThemeToggle'
 import { SectionNav } from '@/components/SectionNav'
 import { LocalTime } from '@/components/LocalTime'
 import { Mark } from '@/components/Mark'
+import { ArticleBar } from '@/components/ArticleBar'
 import { links, location, siteName, siteTagline, siteBio } from '@/lib/site'
 
 export type RailNavItem = { id: string; label: string; index: string }
@@ -105,7 +106,7 @@ export function Rail(props: RailProps) {
                   <span aria-hidden>↗</span>
                 </a>
               )}
-              <dl className="mt-7 grid gap-3">
+              <dl className="mt-7 grid gap-3 max-md:grid-cols-2 max-md:gap-x-4">
                 {props.meta.map((m) => (
                   <div key={m.label}>
                     <dt className="label">{m.label}</dt>
@@ -113,13 +114,15 @@ export function Rail(props: RailProps) {
                   </div>
                 ))}
               </dl>
-              <SectionNav items={props.contents} />
+              <div className="max-md:hidden">
+                <SectionNav items={props.contents} />
+              </div>
             </>
           )}
 
           <div className="mt-auto pt-6">
             {props.variant === 'home' && <ContactRow contactLinks={homeLinks} />}
-            <div className={props.variant === 'home' ? 'max-md:hidden' : ''}>
+            <div className="max-md:hidden">
               {(props.variant === 'home' ? homeLinks : props.links).map((l) => (
                 <LinkRow key={l.href} l={l} />
               ))}
@@ -131,7 +134,7 @@ export function Rail(props: RailProps) {
           </div>
         </RailSpecular>
       </ViewTransition>
-      {props.variant === 'home' && <SectionNav items={props.nav} layout="bar" />}
+      {props.variant === 'home' ? <SectionNav items={props.nav} layout="bar" /> : <ArticleBar items={props.contents} />}
     </>
   )
 }

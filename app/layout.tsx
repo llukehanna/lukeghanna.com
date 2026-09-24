@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Inter, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
@@ -16,6 +16,16 @@ export const metadata: Metadata = {
   description: siteDescription,
   openGraph: { title: siteName, description: siteTagline, url: siteUrl, siteName, type: 'website' },
   twitter: { card: 'summary_large_image', title: siteName, description: siteTagline },
+}
+
+// Browser chrome matches the page in either theme; viewport-fit lets the glass rail run into
+// the safe area on notched phones.
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: dark)', color: '#131110' },
+    { media: '(prefers-color-scheme: light)', color: '#e9e6e0' },
+  ],
+  viewportFit: 'cover',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

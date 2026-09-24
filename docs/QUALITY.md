@@ -88,3 +88,20 @@ Spec amendment: `docs/superpowers/specs/2026-09-23-write-ups-v2.md`.
 **Visual check** at 1440×900 (light and dark) and 390×844 (`next start -p 3100`, throwaway script): home with seven rows and four tiles; PFC's diagram and tables; Shedquarters with the phone video in a glass frame; OnAir's desktop capture; BT's three results tables; Beacon's rule loop. `scrollWidth` equals the viewport on every page and width. One nit found and fixed: Beacon's "Rule support" glance value collided with its label.
 
 Gate: `npm run lint`, `npm run typecheck`, `npm run test:unit` (33 passed), `npx playwright test` (91 passed, 9 intentional skips; axe clean on `/` and all seven write-ups in both themes on desktop and mobile), `npm run build` (all routes static; seven SSG write-ups).
+
+## 2026-09-24 mobile version
+
+The site reflowed on phones before, but a write-up put about 1,000px of rail (title, meta, the full contents list, links, location) between the top of the page and the first paragraph, project rows spent a line on their number and another on an arrow, the four tiles stacked into four cards, and a Flow row of four parallel nodes squeezed into 358px. Measured with a throwaway script against `next start -p 3100` at iPhone 13 (390) and Pixel 7 (412): the article's top edge sat at y≈1003 (BT), 1046 (Beacon), 1014 (Shedquarters).
+
+Changes, all below `md` (768px) unless noted:
+
+- **Write-up rail** keeps the back link, title, one line, the Open link and the four meta rows (now a 2×2 grid); the contents list and the link list are hidden. The article's top edge is now at y≈566 (BT), 588 (Beacon), 609 (Shedquarters). `tests/e2e/mobile.spec.ts` asserts it stays under 720.
+- **Article bar** (`components/ArticleBar.tsx`): a sticky glass bar with "← Work", the current section as "02/06 · The result", and a disclosure button that opens the full contents list (Escape or an outside tap closes it; `aria-expanded` and `aria-controls` wired). Reads the same `ActiveSectionProvider` as every other nav, so it adds no observer.
+- **Article footer** (`components/ArticleFooter.tsx`): the rail's links (docs or source, Previous, Next) close the article instead. **At a glance** (`components/Glance.tsx`, extracted from the sidebar) renders inline after the article below `xl`, where the sidebar is hidden, so a phone reader gets the key-value table too.
+- **Project rows**: the number sits inline before the title and the arrow is hidden; row padding tightens.
+- **About tiles** collapse into one divided key-value card.
+- **Flow rows** of parallel nodes use two columns below `sm` (`.flow-row`, `--cols`) and one column per node above.
+- **Home bar** links fill the bar's full height for a larger tap target.
+- **Viewport and manifest**: `theme-color` for both schemes, `viewport-fit=cover`, and `app/manifest.ts` (name, monogram icons, standalone display) so "Add to Home Screen" works properly.
+
+Gate: `npm run lint`, `npm run typecheck`, `npm run test:unit` (33), `npx playwright test` (98 passed, 9 intentional skips; the neighbour tests read the footer on the mobile project and the rail on desktop), `npm run build` (all routes static, plus `/manifest.webmanifest`). `scrollWidth` equals the viewport on `/`, `/work/bt` and `/work/shed` at both phone widths. A note for future captures: kill any earlier `next start` before rebuilding, or the running server keeps serving HTML whose CSS chunks the rebuild has deleted, which looks like a broken layout and is not one.
