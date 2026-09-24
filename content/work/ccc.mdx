@@ -3,18 +3,19 @@ export const meta = {
   line: 'A live Clippers dashboard that only says what it can prove.',
   status: 'Live · desktop only',
   role: 'Design, build, operate',
-  stack: 'Next.js 16, React 19, Neon Postgres, SWR, Recharts',
+  stack: 'Next.js 16, React 19, Neon Postgres, SWR, Recharts, Vitest, GitHub Actions',
   source: 'Public. MIT.',
   app: { label: 'clippers.lukeghanna.com', href: 'https://clippers.lukeghanna.com' },
   links: [
     { label: 'Source', handle: 'github', href: 'https://github.com/llukehanna/Clippers-Command-Center' },
   ],
   glance: [
-    { label: 'Live poll', value: 'every 12 s' },
-    { label: 'Insight rule', value: 'proof or nothing' },
-    { label: 'History', value: '3 seasons' },
+    { label: 'Live poll', value: 'every 5 min · page 12 s' },
+    { label: 'Insight rule', value: 'proof, re-verified nightly' },
+    { label: 'History', value: 'league-wide, by season' },
     { label: 'Live states', value: 'live · delayed · idle' },
-    { label: 'Jobs', value: '7 scripts, no queue' },
+    { label: 'Jobs', value: '10 scripts, no queue' },
+    { label: 'Tests', value: '227' },
   ],
 }
 
@@ -22,20 +23,20 @@ Clippers Command Center is a desktop dashboard for watching Clippers games with 
 
 ## What it does
 
-Three modes in one app. During a Clippers game: scoreboard, a dense box score, four key metrics computed on the fly from the newest snapshot (effective field goal percentage, turnover margin, rebound margin, pace), rotating insights, and a side panel for the other games that night. Between games: a team snapshot, the upcoming schedule with Vegas odds, player trends, and macro insights. A historical explorer covers three seasons of game-by-game data with drill-through to box scores and trend charts.
+Three modes in one app. During a Clippers game: scoreboard, a dense box score, four key metrics computed on the fly from the newest snapshot (effective field goal percentage, turnover margin, rebound margin, pace), rotating insights, and a side panel for the other games that night. Between games: a team snapshot, the upcoming schedule with Vegas odds, player trends, and macro insights. A historical explorer covers every season in the database with a final Clippers game, game by game, with drill-through to box scores and trend charts.
 
 ## Provable insights
 
-The product rule is simple: **if a claim cannot be verified from stored data, it does not display.** Each insight row stores the parameterized SQL that supports it, the parameters it ran with, the rows it returned, and a hash of all three.
+The product rule is simple: **if a claim cannot be verified from stored data, it does not display.** Each insight row stores the parameterized SQL that supports it, the parameters it ran with, the rows that SQL actually returned when it was executed, and a stable identity key.
 
 ```text
 proof_sql     parameterized SQL that supports the headline
 proof_params  the ids and dates it ran with
-proof_result  the rows it returned; empty means the insight is rejected
-proof_hash    sha256(proof_sql | proof_params | proof_result)
+proof_result  the rows proof_sql returned; empty means the insight is rejected
+proof_hash    sha256(category | team | player | game | season | metric): identity, not proof
 ```
 
-A generator whose proof comes back empty is dropped before the upsert. The hash is a unique index, so re-running the engine updates an existing insight instead of duplicating it. Batch categories run in dependency order: scoring and shooting streaks, season milestones, rare events (top-5% performances), opponent context, and league comparisons. Importance is a base score per category plus rarity and recency boosts, capped at 100, and the client rotates the top of the pool.
+A generator whose proof comes back empty is dropped before the upsert. The identity key is a unique index, so re-running the engine updates an existing insight instead of duplicating it, and any insight a run does not re-emit is deactivated. Every night a verify step re-runs every active proof and fails the job if the stored rows no longer come back. Batch categories run in dependency order: scoring and shooting streaks, season milestones, rare events (the top 1% of every NBA player-game that season), opponent context, league comparisons, and year over year. Claims are scoped to one stats season, the latest with at least ten Clippers games, regular season only, for players who finished the season with the Clippers. Importance is a base score per category plus rarity and recency boosts, capped at 100, and the client rotates the top of the pool.
 
 Live insights are different. They are pure functions over the latest snapshot and the rolling ten-game context, and they are never written to the table. Two detectors: a scoring run of eight or more unanswered points in the last two minutes of play-by-play, and a clutch flag for the last five minutes of the fourth quarter or overtime with a margin of eight or less.
 
@@ -43,31 +44,32 @@ Live insights are different. They are pure functions over the latest snapshot an
 
 ## Live without flicker
 
-On game night a poller hits the NBA CDN every twelve seconds and appends a snapshot to an append-only table: score, clock, both box scores, and the last two minutes of scoring. When the game goes final it writes the box scores, retrying when the player rows lag behind the team totals.
+In production a GitHub Actions cron calls a stateless route every five minutes. Each call fetches the scoreboard, box score and play-by-play from the NBA CDN and appends one snapshot to an append-only table: score, clock, both box scores, and the last two minutes of scoring. When the game goes final the route only marks it so; the nightly job writes the box scores. An operator loop that polls every twelve seconds exists for game nights at the keyboard.
 
-The live page never calls the CDN. It reads the newest snapshot through one endpoint that returns one of three states: no active game, data delayed, or live. The client polls that endpoint with SWR at the same twelve-second cadence. When the newest snapshot is more than a minute old, the endpoint reports delayed and the page shows last-known numbers under an amber "Data delayed" banner with the age of the snapshot, instead of silently serving them as current.
+The live page never calls the CDN. It reads the newest snapshot through one endpoint that returns one of three states: no active game, data delayed, or live. The client polls that endpoint with SWR every twelve seconds while a game is live or possible and every five minutes when nothing is on. When the newest snapshot is more than seven minutes old, the endpoint reports delayed and the page shows last-known numbers under an amber "Data delayed" banner with the age of the snapshot, instead of silently serving them as current.
 
 ## Pipeline
 
-Separate scripts, one job each: sync the schedule, sync the odds, poll live, finalize games, compute stats (possessions, pace, offensive and defensive rating, shooting efficiency, five- and ten-game rolling windows), generate insights, and backfill a season. Every write is an idempotent upsert, so any script can be re-run. GitHub Actions cron drives them: the schedule daily, odds every six hours, a post-game job that finalizes, computes and generates, and a five-minute poll that calls a stateless route doing one fetch and one write per call. No queue, no workflow engine.
+Separate scripts, one job each: sync the schedule and attach NBA game ids, sync the odds, poll live, sync every NBA game's box scores league-wide (the last three days nightly, or a whole season on demand), finalize games, compute stats incrementally (possessions, pace, offensive and defensive rating, shooting efficiency, five- and ten-game rolling windows), generate insights, verify insights, and backfill. Every write is an idempotent upsert, so any script can be re-run. GitHub Actions cron drives them: the schedule daily, odds every six hours, a five-minute poll that calls the stateless route, and a post-game job that syncs, finalizes, computes, generates and verifies in that order. No queue, no workflow engine. Cron authentication fails closed with a constant-time compare, failures return real error codes instead of a quiet 200, and CI runs typecheck, lint and 227 Vitest cases against a Postgres service.
 
 <Flow
   n={1}
-  caption="The two pipelines. Live snapshots are appended on game night; everything derived is recomputed after each final."
-  source="Drawn from scripts/, app/api and Docs/DB_SCHEMA.sql in the repository."
+  caption="The two pipelines. Live snapshots are appended every five minutes during a game; everything derived is recomputed nightly and incrementally."
+  source="Drawn from scripts/, app/api, .github/workflows and Docs/DB_SCHEMA.sql in the repository."
   steps={[
     [
-      { title: 'NBA CDN', detail: 'live scoreboard, box score, play-by-play' },
+      { title: 'NBA CDN', detail: 'live scoreboard, box score, play-by-play; league-wide box scores and game ids' },
       { title: 'balldontlie', detail: 'schedule, teams, players' },
       { title: 'the-odds-api', detail: 'spreads, moneylines, totals; display only' },
     ],
     [
-      { title: 'poll-live', detail: 'every 12 s on game night; appends a snapshot' },
-      { title: 'sync-schedule · sync-odds', detail: 'daily · every 6 h' },
+      { title: 'poll-live', detail: 'every 5 min via GitHub Actions; appends a snapshot' },
+      { title: 'sync-schedule · sync-odds', detail: 'daily, with NBA ids · every 6 h' },
     ],
+    { title: 'sync-league-games', detail: 'every NBA game, last three days nightly' },
     { title: 'finalize-games', detail: 'box scores locked once the game is final' },
-    { title: 'compute-stats', detail: 'possessions, pace, ratings, rolling 5 and 10' },
-    { title: 'generate-insights', detail: 'proof_sql, proof_params, proof_result, proof_hash; empty proof is rejected' },
+    { title: 'compute-stats', detail: 'possessions, pace, ratings, rolling 5 and 10; incremental' },
+    { title: 'generate-insights · verify-insights', detail: 'proof_sql, proof_params, proof_result, identity key; empty proof rejected; every active proof re-run' },
     { title: 'Page-shaped API', detail: '/api/live, /api/home, /api/schedule, /api/history, /api/players; staleness in every envelope' },
     { title: 'SWR pages', detail: 'live, home, schedule, history, players' },
   ]}
@@ -75,4 +77,4 @@ Separate scripts, one job each: sync the schedule, sync the odds, poll live, fin
 
 ## What it is not
 
-Desktop only; the layout assumes at least 1024 pixels. No accounts and no personalization. Odds are for display and insight context, not betting. And the engine can only prove what is in the database, which holds three seasons, so its claims are scoped to those seasons rather than to franchise history.
+Desktop only; the layout assumes at least 1024 pixels. No accounts and no personalization. Odds are for display and insight context, not betting. And the engine can only prove what is in the database, which holds league-wide box scores by season rather than franchise history, so a batch claim is scoped to one stats season and the one before it, regular season only.

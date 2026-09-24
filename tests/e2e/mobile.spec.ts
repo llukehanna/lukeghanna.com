@@ -50,7 +50,7 @@ test.describe('mobile', () => {
   })
 
   test('a write-up reaches its article quickly: compact rail, sticky bar with a contents menu', async ({ page }) => {
-    await page.goto('/work/bt')
+    await page.goto('/work/kwx')
     // The rail's contents and link lists are hidden below md; the article starts well within two screens.
     await expect(page.getByTestId('rail').getByTestId('nav-what-it-does')).toBeHidden()
     const top = await page.getByTestId('article').evaluate((el) => el.getBoundingClientRect().top + window.scrollY)
@@ -79,7 +79,7 @@ test.describe('mobile', () => {
     const footer = page.getByTestId('article-footer')
     await footer.scrollIntoViewIfNeeded()
     await expect(footer.getByRole('link', { name: /Source/ })).toBeVisible()
-    await expect(footer.getByRole('link', { name: /Next/ })).toHaveAttribute('href', '/work/bt')
+    await expect(footer.getByRole('link', { name: /Next/ })).toHaveAttribute('href', '/work/kwx')
   })
 
   test('project rows put the number inline with the title and the tiles collapse to one card', async ({ page }) => {

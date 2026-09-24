@@ -2,15 +2,15 @@ import { test, expect } from '@playwright/test'
 
 import type { Page } from '@playwright/test'
 
-const slugs = ['pfc', 'beacon', 'ccc', 'bt', 'onair', 'shed', 'bjs']
+const slugs = ['pfc', 'beacon', 'ccc', 'kwx', 'onair', 'shed', 'bjs']
 
 // Below md the rail hides its link list and the same links close the article instead.
 const linksOf = (page: Page, isMobile: boolean) => (isMobile ? page.getByTestId('article-footer') : page.getByTestId('rail'))
 
 test.describe('write-up', () => {
-  test('renders BT with headings that have ids matching the contents', async ({ page, isMobile }) => {
-    await page.goto('/work/bt')
-    await expect(page.getByRole('heading', { level: 1, name: 'BT' })).toBeVisible()
+  test('renders Kalshi Weather Edge with headings that have ids matching the contents', async ({ page, isMobile }) => {
+    await page.goto('/work/kwx')
+    await expect(page.getByRole('heading', { level: 1, name: 'Kalshi Weather Edge' })).toBeVisible()
     await expect(page.locator('h2#what-it-does')).toBeVisible()
     await expect(page.locator('h2#the-result')).toBeVisible()
     // Desktop: the rail lists the sections. Phone: the sticky bar's menu does (mobile.spec covers opening it).
@@ -18,12 +18,13 @@ test.describe('write-up', () => {
     else await expect(page.getByTestId('rail').getByTestId('nav-what-it-does')).toBeVisible()
   })
 
-  test('BT states the negative result, the fee formula, and no projection language', async ({ page }) => {
-    await page.goto('/work/bt')
+  test('Kalshi Weather Edge states the negative result, the fee formula, the unrun market maker, and no projection language', async ({ page }) => {
+    await page.goto('/work/kwx')
     const text = await page.getByTestId('article').innerText()
     expect(text).toContain('fee  = 0.07 * P * (1 - P)')
     expect(text).toContain('7,440')
     expect(text).toMatch(/no orders? (was ever |were )?placed/i)
+    expect(text).toMatch(/zero orders on demo or live/i)
     expect(text).not.toMatch(/projected|estimated|illustrative/i)
   })
 
@@ -34,7 +35,7 @@ test.describe('write-up', () => {
     await expect(page.getByTestId('rail').getByTestId('open-app')).toHaveAttribute('href', 'https://clippers.lukeghanna.com')
     const links = linksOf(page, isMobile)
     await expect(links.getByRole('link', { name: /Previous/ })).toHaveAttribute('href', '/work/beacon')
-    await expect(links.getByRole('link', { name: /Next/ })).toHaveAttribute('href', '/work/bt')
+    await expect(links.getByRole('link', { name: /Next/ })).toHaveAttribute('href', '/work/kwx')
   })
 
   test('the first and last write-ups have only one neighbour', async ({ page, isMobile }) => {
@@ -90,6 +91,15 @@ test.describe('write-up', () => {
     await expect(page.getByTestId('article').locator('figure', { hasText: 'Serialized drain' })).toHaveCount(1)
   })
 
+  test('Beacon shows four production captures of synthetic data, each with provenance', async ({ page }) => {
+    await page.goto('/work/beacon')
+    const article = page.getByTestId('article')
+    await expect(article.locator('figure img')).toHaveCount(4)
+    const captions = await article.locator('figure:has(img) figcaption').allInnerTexts()
+    for (const c of captions) expect(c).toMatch(/live demo|synthetic/i)
+    await expect(page.getByTestId('rail').getByTestId('open-app')).toHaveAttribute('href', 'https://beacon.lukeghanna.com')
+  })
+
   test('PFC has no captures, because every screen would show real balances', async ({ page }) => {
     await page.goto('/work/pfc')
     const article = page.getByTestId('article')
@@ -99,14 +109,14 @@ test.describe('write-up', () => {
   })
 
   test('results tables scroll inside their own box instead of widening the page', async ({ page }) => {
-    await page.goto('/work/bt')
+    await page.goto('/work/kwx')
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)
     expect(overflow).toBe(false)
     expect(await page.getByTestId('article').locator('table').count()).toBeGreaterThanOrEqual(3)
   })
 
   test('a code block that fits its container is not a tab stop; one that overflows is', async ({ page, isMobile }) => {
-    await page.goto('/work/bt')
+    await page.goto('/work/kwx')
     const blocks = page.getByTestId('article').locator('pre')
     const read = () =>
       blocks.evaluateAll((els) => els.map((el) => ({ overflows: el.scrollWidth > el.clientWidth, focusable: el.tabIndex === 0 })))
@@ -114,7 +124,7 @@ test.describe('write-up', () => {
     await expect.poll(async () => (await read()).every((s) => s.focusable === s.overflows)).toBe(true)
     const states = await read()
     expect(states.length).toBeGreaterThan(0)
-    // The BT article's longest code line overflows a phone-width column and fits a desktop one.
+    // The article's longest code line overflows a phone-width column and fits a desktop one.
     expect(states.some((s) => s.overflows)).toBe(isMobile)
   })
 

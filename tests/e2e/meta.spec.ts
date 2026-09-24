@@ -5,7 +5,7 @@ test('sitemap lists home and every write-up, without a fake lastmod', async ({ r
   expect(res.ok()).toBeTruthy()
   const xml = await res.text()
   expect(xml).toContain('https://lukeghanna.com</loc>')
-  for (const slug of ['pfc', 'beacon', 'ccc', 'bt', 'onair', 'shed', 'bjs']) expect(xml).toContain(`https://lukeghanna.com/work/${slug}</loc>`)
+  for (const slug of ['pfc', 'beacon', 'ccc', 'kwx', 'onair', 'shed', 'bjs']) expect(xml).toContain(`https://lukeghanna.com/work/${slug}</loc>`)
   // The only date available at build time is the build date, which is not a modification date.
   expect(xml).not.toContain('<lastmod>')
 })

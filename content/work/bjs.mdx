@@ -1,9 +1,9 @@
 export const meta = {
   title: 'BJS',
   line: 'A rule-aware blackjack trainer where the numbers have to be right.',
-  status: 'Engine done and tested · app in rebuild',
+  status: 'Engine done · strategy trainer built on a working branch · counting next',
   role: 'Design, build',
-  stack: 'Swift 6.2, SwiftUI, SwiftData, Swift Testing, Swift Package Manager',
+  stack: 'Swift 6.2, SwiftUI, SwiftData, Swift Testing, XCTest UI tests, GitHub Actions',
   source: 'Public. MIT.',
   links: [
     { label: 'Source', handle: 'github', href: 'https://github.com/llukehanna/Blackjack-Strategy' },
@@ -12,7 +12,8 @@ export const meta = {
     { label: 'Rule variants', value: 'H17/S17 · DAS · RSA · surrender · decks' },
     { label: 'Edge baseline', value: '0.43% (8-deck S17 DAS 3:2)' },
     { label: 'Third-party deps', value: '0' },
-    { label: 'Tests', value: '112' },
+    { label: 'Tests', value: '328 · 4 UI' },
+    { label: 'Rebuild', value: '3 of 8 steps' },
     { label: 'Released', value: 'not yet' },
   ],
 }
@@ -29,8 +30,8 @@ All of the math lives in a pure Swift package with no UI dependency, so it is te
 
 <Flow
   n={1}
-  caption="What exists today. The package modules are built and tested; the app above them is a placeholder shell being rebuilt."
-  source="Drawn from BJSCore/Sources/BJSCore and BJS/App in the repository as of 23 September 2026."
+  caption="What exists today. The package modules are built and tested; above them, the hub, settings and strategy trainer are built and the rest are placeholders."
+  source="Drawn from BJSCore/Sources/BJSCore and BJS/App on the working branch as of 24 September 2026; not yet merged to main."
   steps={[
     [
       { title: 'Models', detail: 'cards, hands, shoes' },
@@ -42,10 +43,14 @@ All of the math lives in a pure Swift package with no UI dependency, so it is te
       { title: 'Edge', detail: 'baseline plus per-rule deltas' },
       { title: 'Explain', detail: 'why a play is correct' },
     ],
-    { title: 'BJS app', detail: 'a three-tab shell; the trainer, counting, edge and shoe-sim screens are being rebuilt on the package', note: 'in progress' },
+    [
+      { title: 'Hub and Settings', detail: 'built on the Felt design system' },
+      { title: 'Strategy trainer', detail: 'session state machine, graded decisions, the Why sheet, saved sessions' },
+    ],
+    { title: 'Counting · Edge · Shoe sim · Progress', detail: 'placeholder screens; counting is next, edge can run alongside it', note: 'not started' },
   ]}
 />
 
 ## Status
 
-The engine is done and tested: 112 test cases across the package and the app shell, with no third-party dependencies. The original app layer was discarded on 23 September 2026 and is being rebuilt on the package, in order: engine completion, a design system, then the strategy trainer, counting, edge calculator, progress, shoe simulation, and a TestFlight build last. Nothing has been released, and there are no screenshots here until there is an app to capture.
+The original app layer was discarded on 23 September 2026 and is being rebuilt on the package, in eight steps: engine completion, a design system, the strategy trainer, counting, the edge calculator, progress, shoe simulation, and a TestFlight build last. The first three are done on a working branch that is not yet merged: the engine gained a round engine with splits, surrender and peek, property tests over a hundred thousand seeded rounds, and two corrected strategy cells (hard 16 against a ten without surrender, and hard 15 against a ten when the dealer hits soft 17); the design system is built with its freeze still pending review; the strategy trainer works end to end. 231 engine tests and 97 app tests plus four UI tests are green in CI on two iPhone sizes, with no third-party dependencies. Nothing has been released, and there are no screenshots here until the app is worth capturing.

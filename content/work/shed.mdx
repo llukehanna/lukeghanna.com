@@ -1,6 +1,6 @@
 export const meta = {
   title: 'Shedquarters',
-  line: 'A skill-rating ladder for a house league, scored from a phone at the table.',
+  line: 'Skill-rating ladders for a house league, scored from a phone at the table.',
   status: 'Live and in use',
   role: 'Design, build, operate',
   stack: 'Next.js 16, React 19, Postgres on Neon, OpenSkill, Tailwind 4',
@@ -14,11 +14,12 @@ export const meta = {
     { label: 'Games table', value: 'append-only' },
     { label: 'Provisional until', value: '10 games' },
     { label: 'PIN guesses', value: '20 a day, global' },
-    { label: 'Tests', value: '561 across 39 files' },
+    { label: 'Sports', value: 'beer die · spikeball' },
+    { label: 'Tests', value: '683 across 49 files' },
   ],
 }
 
-The game is beer die: 2v2 or 3v3, first to 21, win by 2, and the winners stay on. Someone at the table taps who won and what the losers finished on. Everyone else's phone shows the rankings, a game log, head-to-heads and badges. Ratings are OpenSkill, replayed from the full game history on every change.
+Two games, two ladders. Beer die is 2v2 or 3v3, first to 21; spikeball is 2v2 to 25, 15 or 11, picked game by game. Both are win by 2 and the winners stay on. Someone at the table taps who won and what the losers finished on. Everyone else's phone shows the rankings, a game log, head-to-heads and badges, and a pill in the top bar switches sport, each with its own colours and its own live night. Ratings are OpenSkill, replayed per sport from that sport's game history on every change.
 
 <Figure
   n={1}
@@ -30,7 +31,7 @@ The game is beer die: 2v2 or 3v3, first to 21, win by 2, and the winners stay on
   frame="phone"
   alt="Logging a game at the table: pick the winners, tap the losing score, pick the next challengers, and the rankings update"
   caption="Logging a game at the table: pick the winners, tap the losing score, pick the next challengers, and the rankings update."
-  source="Recorded from the real app against a local database of made-up players."
+  source="Recorded from the real app against a local database of made-up players, before spikeball was added."
 />
 
 ## Built for bad party wifi
@@ -57,9 +58,9 @@ The queue tells a transient failure (a database cold start, a dropped connection
 
 ## Ratings are a pure function of history
 
-The games table is append-only apart from a voided flag. Ratings, per-game rating changes, rank movement, streaks and badges are all derived by replaying it in order. An undo is just a void, a tuning change is just a replay, and there is no stored rating that can drift out of sync with the games it came from. The replay is cached against a fingerprint of the table (row count, highest ordinal, voided count), which only ever grows, so a stale cache is always detected and rebuilt.
+The games table is append-only apart from a voided flag. Ratings, per-game rating changes, rank movement, streaks and badges are all derived by replaying it in order, one ladder per sport. An undo is just a void, a tuning change is just a replay, and there is no stored rating that can drift out of sync with the games it came from. Each sport's replay is cached against a fingerprint of its own games (row count, highest ordinal, voided count), which only ever grows, so a stale cache is always detected and rebuilt.
 
-Margin of victory counts, but only past a point. A win within five points is an ordinary win; beyond that the extra weight grows logarithmically, so a skunk counts for more without dominating a season. New players are provisional until ten games, and the rankings say so instead of hiding them.
+Margin of victory counts, but only past a point, and the point scales with the target: five for a game to 21, six to 25, four to 15, three to 11. Inside that margin a win is an ordinary win; beyond it the extra weight grows logarithmically, so a skunk counts for more without dominating a season. New players are provisional until ten games, and the rankings say so instead of hiding them.
 
 <Figure
   n={3}
@@ -69,7 +70,7 @@ Margin of victory counts, but only past a point. A win within five points is an 
   frame="phone"
   alt="Power rankings screen: rank, name, record, streak, rating, and weekly movement for each player"
   caption="Power rankings with rating, record, streak and weekly movement."
-  source="Screenshot of the app against a local database of made-up players."
+  source="Screenshot of the app against a local database of made-up players, before spikeball was added."
 />
 
 ## A four-digit PIN that stays safe on the open internet
@@ -86,9 +87,9 @@ The session cookie holds a signature, never the PIN, so hammering the write API 
   frame="phone"
   alt="Game log screen grouped by night, each game showing the teams, the score, and the rating change per player"
   caption="The game log, grouped by night, with per-game rating changes."
-  source="Screenshot of the app against a local database of made-up players."
+  source="Screenshot of the app against a local database of made-up players, before spikeball was added."
 />
 
 ## Status
 
-Live and in use. Rankings, the game log and player pages are public; changing anything needs the house PIN or an invite link. A nightly job writes a JSON backup to blob storage. Known gaps: 2v2 and 3v3 only, and no rating decay, so a badge marks inactive players instead. 561 tests across 39 files run in CI against Postgres 17.
+Live and in use. Rankings, the game log and player pages are public; changing anything needs the house PIN or an invite link. Merging to main deploys to production, with schema migrations run in the build, and there are no preview deploys. A nightly job writes a JSON backup to blob storage. Known gaps: beer die (2v2, 3v3) and spikeball (2v2) only, each rated separately, and no rating decay, so a badge marks inactive players instead. 683 tests across 49 files run in CI against Postgres 17, including component tests in jsdom.

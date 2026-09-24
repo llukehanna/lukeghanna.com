@@ -1,21 +1,35 @@
 export const meta = {
   title: 'Beacon',
   line: 'A deal-sourcing workbench that learns its screening rules from the analysts who reject firms.',
-  status: 'In progress · porting off Foundry',
-  role: 'Design, build',
-  stack: 'React 18, TypeScript, Postgres (PGlite locally), TanStack Query, Blueprint',
-  source: 'Private. Sanitized: no employer, vendor, or real firm names.',
-  links: [],
+  status: 'Live · synthetic data, resets daily',
+  role: 'Design, build, operate',
+  stack: 'React 18, TypeScript, Postgres on Neon (PGlite locally), Vercel Functions, TanStack Query, Claude',
+  source: 'Public. MIT. Sanitized: no employer, vendor, or real firm names.',
+  app: { label: 'beacon.lukeghanna.com', href: 'https://beacon.lukeghanna.com' },
+  links: [
+    { label: 'Source', handle: 'github · beacon-demo', href: 'https://github.com/llukehanna/beacon-demo' },
+  ],
   glance: [
     { label: 'Object types', value: '11 · 17 actions' },
     { label: 'Rubric', value: '9 axes, 18 points' },
     { label: 'Providers', value: '4, ranked by trust' },
-    { label: 'Rule support', value: '≥ 4 rejections' },
-    { label: 'Tests', value: '186 cases' },
+    { label: 'Rule support', value: '≥ 4 distinct firms' },
+    { label: 'Demo universe', value: '700 synthetic firms' },
+    { label: 'Tests', value: '214 cases' },
   ],
 }
 
-Beacon was the capstone of Palantir's American Tech Fellowship (Frontiers), May to July 2026, built on Foundry. It is a workbench for sourcing boutique advisory firms as acquisition targets, and it is being ported to Postgres and React so it can run anywhere.
+Beacon was the capstone of Palantir's American Tech Fellowship (Frontiers), May to July 2026, built on Foundry. It is a workbench for sourcing boutique advisory firms as acquisition targets. It has since been ported to Postgres and React and runs live on a synthetic universe of 700 firms that resets every night.
+
+<Figure
+  n={1}
+  src="/work/beacon/desk.png"
+  width={1440}
+  height={900}
+  alt="Beacon's enrichment desk: a conflict between Web search and Deal DB on deals per managing director, five proposed findings with their source excerpts, four axes with no source, and the analyst's call panel"
+  caption="The enrichment desk. One axis is in conflict between two sources, five findings are proposed with the excerpt that supports each, and four axes have no source at all, which is the analyst's job to fill."
+  source="Screenshot of the live demo at beacon.lukeghanna.com. Every firm name is invented; every source is a mock."
+/>
 
 ## What it does
 
@@ -25,9 +39,26 @@ Between Discovered and a decision sits the enrichment desk. An agent fills in fa
 
 The home page is a start-of-day operations page rather than a dashboard: every card and number on it links to the surface that does the work, and it never promises work the linked page does not show.
 
+<Figure
+  n={2}
+  src="/work/beacon/home.png"
+  width={1440}
+  height={900}
+  alt="Beacon's home page: a triage count, three mandates with their scoped firm counts, the pipeline funnel from Discovered to Qualified and Rejected, an abstention rate, an agreement rate, and observed outcomes"
+  caption="Home after a reset: what needs the analyst today, the three seeded mandates, the funnel, and the trust rail with the agent's abstention and agreement rates."
+  source="Screenshot of the live demo. The numbers are one day's synthetic history and change after every reset."
+/>
+
 ## Enrichment that abstains
 
 Four providers observe each firm, each with its own coverage and error rate, ordered from most to least trusted. The reconciliation step has three outcomes and never picks a winner in a conflict.
+
+| Provider | Coverage | Error rate |
+|---|---|---|
+| BeaconDB, most trusted | 25% | 2% |
+| Deal DB | 70% | 10% |
+| Filings | 60% | 5% |
+| Web search, least trusted | 55% | 20% |
 
 | Providers agree | Result |
 |---|---|
@@ -38,15 +69,15 @@ Four providers observe each firm, each with its own coverage and error rate, ord
 An axis a human has already verified is never re-enriched. When the analyst overrides a finding, the agent's finding is marked rejected and the analyst's is inserted as verified, so the accuracy page can compute agreement, override and abstention rates per provider and per axis from the record rather than from memory.
 
 <Flow
-  n={1}
+  n={3}
   caption="From observations to a rubric input. The reconciler abstains, corroborates, or surfaces a conflict; the analyst confirms, overrides, or resolves."
   source="Drawn from server/enrichment/reconcile.ts and server/actions/findings.ts in the repository."
   steps={[
     [
-      { title: 'beacondb', detail: 'most trusted' },
-      { title: 'dealdb' },
-      { title: 'filings' },
-      { title: 'websearch', detail: 'least trusted' },
+      { title: 'BeaconDB', detail: 'most trusted' },
+      { title: 'Deal DB' },
+      { title: 'Filings' },
+      { title: 'Web search', detail: 'least trusted' },
     ],
     { title: 'Sort by trust, group by value' },
     [
@@ -67,16 +98,26 @@ One function computes the score. The server persists snapshots with it and the d
 
 ## Rules grounded in rejections
 
-A rejection carries a rationale. Rationales for firms still in Rejected are clustered into candidate rules of the form axis, operator, threshold, by Claude when it is available and by a keyword heuristic when it is not. A candidate only counts a rejection as support if that firm actually satisfies the predicate, and it needs at least four grounded supporters. Existing rules, including dismissed ones, are never re-proposed. The result is a pending proposed rule that also reports how many firms on the desk it would screen.
+A rejection carries a rationale. Rationales for firms still in Rejected are clustered into candidate rules of the form axis, operator, threshold, by Claude when it is enabled and by a keyword heuristic otherwise. A candidate only counts a rejection as support if that firm actually satisfies the predicate, and it needs at least four distinct supporting firms, so a firm rejected twice counts once. Existing rules, including dismissed ones, are never re-proposed. The result is a pending proposed rule that also reports how many firms on the desk it would screen.
+
+<Figure
+  n={4}
+  src="/work/beacon/rules.png"
+  width={1440}
+  height={900}
+  alt="Beacon's rules page: three pending proposed rules with their supporting rejection counts and projected screen counts, and one approved rule, employees under 10, screening firms off the desk queue"
+  caption="Three pending rules clustered from rejection rationales, each showing how many rejections support it and how many firms it would screen, above one approved rule already screening the queue."
+  source="Screenshot of the live demo, synthetic data."
+/>
 
 <Flow
-  n={2}
+  n={5}
   caption="The loop from an analyst's written rationale to a versioned screening rule, and back to the desk."
-  source="Drawn from server/actions/rules.ts, server/clustering/heuristic.ts and src/desk/activeScreening.ts in the repository."
+  source="Drawn from server/actions/rules.ts, server/clustering and src/desk/activeScreening.ts in the repository."
   steps={[
     { title: 'Reject a firm', detail: 'rationale required; decision logged' },
-    { title: 'Cluster rationales', detail: 'Claude, or the keyword heuristic as fallback' },
-    { title: 'Ground each candidate', detail: 'the firm must satisfy the predicate; at least four supporters; not an existing rule' },
+    { title: 'Cluster rationales', detail: 'Claude when enabled, or the keyword heuristic' },
+    { title: 'Ground each candidate', detail: 'the firm must satisfy the predicate; at least four distinct firms; not an existing rule' },
     { title: 'Proposed rule', detail: 'pending, with the count of firms it would screen' },
     [
       { title: 'Approve', detail: 'active config, version 1' },
@@ -93,17 +134,27 @@ A rejection carries a rationale. Rationales for firms still in Rejected are clus
 
 Every terminal decision snapshots the score it was made on. New evidence rescores the firm. A qualified firm drifts on any tier change; a rejected firm drifts only when it improves, because the reason for passing may no longer hold. A rejected firm later acquired by a competitor raises a diverged-outcome event. Review resolves each event by re-engaging the firm, which moves it to Outreach, or by keeping it passed, with a rationale.
 
+<Figure
+  n={6}
+  src="/work/beacon/review.png"
+  width={1440}
+  height={900}
+  alt="Beacon's review page: a drift queue of firms whose scores moved since their decision, one rejected firm now scoring an A with the reason 'pass reason invalidated', and several qualified firms that fell a tier"
+  caption="The drift queue. A rejected firm now scores an A, so the reason for passing on it no longer holds; several qualified firms have slipped a tier."
+  source="Screenshot of the live demo, synthetic data."
+/>
+
 ## The port
 
 | On Foundry | Now |
 |---|---|
-| Ontology Manager | One schema declaration; the DDL, the repository, API validation and the typed hooks all derive from it |
+| Ontology Manager, 12 object types, 30 actions, 39 functions | One schema declaration with 11 object types and 17 actions; the DDL, the repository, API validation and the typed hooks all derive from it, and the rubric is one shared module |
 | Generated SDK and its React hooks | Drop-in hooks with the same names over TanStack Query, so page code changed only its imports |
-| Actions | Named actions, each validated and run inside a single transaction |
-| Backend | Postgres: in-process PGlite for tests and local work, hosted Postgres in production |
+| Actions | Named actions, each validated and run inside a single transaction, behind four Vercel Functions |
+| Backend | Postgres: in-process PGlite for tests and local work, Neon in production; the same SQL runs on both |
 
-The frontend already calls a small HTTP API and expects a seed; neither exists in the repository yet, so the app does not run end to end today. The Claude clusterer is a type with a heuristic fallback, not a wired client. A pre-publish check fails the build if any file mentions the original employer, the licensed data vendors, the training stack's hosts, or the real firm names from the original data.
+The demo is open and writable. A single shared analyst can run every action, a nightly job resets the universe at 04:00 UTC, and a Reset button does the same on demand, throttled to once every five minutes; the reset is one transaction. The seed builds thirty days of history through the real actions (three mandates, two searches, an enrichment cohort, a couple of dozen rejections, one approved rule), which makes it an end-to-end test as well as a demo. Claude clustering runs behind a flag with a hard budget of one call per ten minutes and twenty-four a day, and anything else, including any error, falls back to the heuristic. A pre-publish check fails the build if any file mentions the original employer, the licensed data vendors, the training stack's hosts, the real firm names from the original data, or the original rubric wording; its patterns are stored as salted hashes so the check itself gives nothing away.
 
 ## Status
 
-The port began on 22 September 2026: fourteen commits so far, fifteen test files with 186 cases running against in-memory Postgres. There are no captures here until the API and seed land and the app runs. When it does, every screenshot will be of generic seed data.
+Ported between 22 and 24 September 2026 and released under MIT as beacon-demo. Nineteen test files with 214 cases run against in-memory Postgres. Everything on the live site is synthetic: firm names are generated from invented words, enrichment sources are mocks that link to reserved example domains, and the four captures here show one day's seeded history, which the next reset replaces.

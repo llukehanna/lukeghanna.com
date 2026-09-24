@@ -17,6 +17,7 @@ All records live at Cloudflare, DNS-only:
 | CNAME | www      | cname.vercel-dns.com         | 308 redirect to the apex |
 | CNAME | clippers | (Vercel-managed CNAME)       | Clippers Command Center (project `clippers-command-center`) |
 | CNAME | shed     | (Vercel-managed CNAME)       | Shedquarters (project `house-ladder`) |
+| CNAME | beacon   | (Vercel-managed CNAME)       | Beacon demo (project `beacon`), added 2026-09-24 |
 
 Verified with `curl -sI https://<host>`: apex 200, www 308, clippers 307 to /home, shed 200. A stray `ccc.lukeghanna.com` is also attached to `clippers-command-center` with no DNS record; remove it in Vercel → Project → Settings → Domains whenever convenient.
 
@@ -32,5 +33,4 @@ The site's contact address is Luke's existing `luke@zhannas.com`. No Email Routi
 ## 5. Pending content (any time)
 - One curated CCC screenshot from a game day → `public/shots/ccc.png` (1440×900) → add `screenshot` to the `ccc` entry in `content/projects.ts` → extend the capture list in `tests/unit/projects.test.ts` and `tests/e2e/home.spec.ts`; a `Figure` in `content/work/ccc.mdx` with a provenance line.
 - BJS phone screenshots once an app exists to capture → same pattern.
-- Beacon captures once `api/` and the seed land and it runs end to end, of generic seed data only.
 - All seven write-ups (`content/work/*.mdx`) were drafted on 2026-09-23 from each repository's docs and code; review the prose once and adjust anything that reads differently from how Luke would say it.

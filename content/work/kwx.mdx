@@ -1,9 +1,9 @@
 export const meta = {
-  title: 'BT',
-  line: 'A Kalshi weather bot that measured its own edge and found none.',
-  status: 'Paused · research result; scans daily',
+  title: 'Kalshi Weather Edge',
+  line: 'A forecast edge measured and found absent, and a market maker built to test the other side of the book.',
+  status: 'Forecast result in · market maker built, demo run pending',
   role: 'Design, build, operate',
-  stack: 'Python 3.11, httpx, SQLite + JSONL journal, scikit-learn, launchd',
+  stack: 'Python 3.11, httpx, SQLite + JSONL journal, scikit-learn, launchd and systemd',
   source: 'Private. Engineering docs and results public.',
   links: [
     { label: 'Engineering docs', handle: 'github · BT-docs', href: 'https://github.com/llukehanna/BT-docs' },
@@ -15,10 +15,11 @@ export const meta = {
     { label: 'Brier, model', value: '0.187' },
     { label: 'Brier, market', value: '0.120' },
     { label: 'Orders placed', value: '0' },
+    { label: 'Market maker', value: 'built, not yet run' },
   ],
 }
 
-BT tested whether a 31-member GFS ensemble, read as a probability distribution, beats Kalshi's price on daily high-temperature contracts after fees. It ran unattended for four months, settled 7,440 signals against the official NWS climate record, and answered no.
+Kalshi Weather Edge, called BT until September 2026, tested whether a 31-member GFS ensemble, read as a probability distribution, beats Kalshi's price on daily high-temperature contracts after fees. It ran unattended for four months, settled 7,440 signals against the official NWS climate record, and answered no. The same pipeline now carries a market maker for the other side of those books, built and gated but not yet run.
 
 ## What it does
 
@@ -128,4 +129,38 @@ position_usd   = bankroll * min(kelly_fraction, max_position_pct)
 
 Not more of the same data. The ensemble alone is dominated by the price. Things that might contain information the market lacks: a multi-model blend with per-station bias correction, intraday observations close to settlement, or station-specific downscaling. Each is a new hypothesis, not a tuning of this one, and the pipeline can test any of them the same way.
 
-A second pipeline adapts the same shape to sports moneylines using de-vigged sharp consensus as the model. It is built and tested, ran for a single afternoon, and has no results to report. A maker-side experiment on the same weather books, quoting from the sibling brackets rather than from any forecast, is designed and partly planned; nothing is built or run, and there are no results.
+A second pipeline adapts the same shape to sports moneylines using de-vigged sharp consensus as the model. It is built and tested, ran for a single afternoon, and has no results to report.
+
+## The other side of the book
+
+If the forecast has no edge, the price still might: someone is being paid to provide liquidity. Across 785 historical snapshots with all six brackets quoted, the median sum of the six asks was 1.06. That six percent overround is what makers earn, and maker orders on Kalshi pay no fee. So the next experiment quotes the brackets instead of forecasting them.
+
+Fair value for one bracket comes from its siblings, with no forecast input at all, and at most one missing leg is imputed:
+
+```text
+fair_k = clip(100 - sum(mid_j for j != k), 1, 99)
+bid    = fair_k - 2   ask = fair_k + 2       one contract per side
+```
+
+A tick runs every two minutes under launchd or systemd, and there is no daemon: every order carries a six-minute expiry on the exchange, so if the ticks stop the quotes die on their own. Hard caps live in the risk gate, not the quoter: five dollars of worst-case loss per event, twenty-five in total, three contracts per leg, and the same kill file as the scanner.
+
+<Flow
+  n={2}
+  caption="One quoting tick. The exchange, not the bot, enforces that a stale quote disappears."
+  source="Drawn from kwx/mm, kwx/config.py and docs/runbook.md in the repository."
+  steps={[
+    { title: 'Timer, every 120 s', detail: 'launchd or systemd; a kill file cancels everything and exits' },
+    { title: 'Sync', detail: 'reconcile resting maker orders and fills with the exchange' },
+    { title: 'Discover', detail: "today's and tomorrow's high-temperature events, six legs, five cities" },
+    { title: 'Snapshot books', detail: 'own orders stripped; mids stored' },
+    { title: 'Complement fair value', detail: 'fair_k from the sibling mids; bid and ask two cents either side' },
+    { title: 'Diff against resting quotes', detail: 'keep a quote within one cent that outlives the next tick' },
+    { title: 'Risk gate', detail: 'kill switch, duplicates, bankroll, daily loss, $5 per event, $25 total, 3 per leg' },
+    { title: 'Place post-only', detail: 'one contract, six-minute exchange expiry' },
+    { title: 'Markout', detail: '30- and 60-minute markout and settled P&L per fill' },
+  ]}
+/>
+
+Two gates stand between this code and money. The first is plumbing, about two weeks on the demo exchange: clean reconciliation every tick, no orphan orders, caps never breached, expiry verified by killing a tick. It has no profit criterion. The second is the verdict, about four weeks live: at least a hundred fills with positive mean markout at both horizons and positive realized P&L per fill, or the experiment is inconclusive.
+
+As of 24 September 2026 the quoter is merged, off by default, and has placed zero orders on demo or live. There are no results, and there will be none on this page until the gates produce them.
