@@ -40,3 +40,12 @@ test('the icon is the LH monogram as an SVG, with an apple icon rendered as a PN
   await expect(page.locator('link[rel="icon"][href*="icon.svg"]')).toHaveCount(1)
   await expect(page.locator('link[rel="icon"][href*="favicon.ico"]')).toHaveCount(0)
 })
+
+test('a web manifest names the site, the monogram icons and the standalone display', async ({ request }) => {
+  const res = await request.get('/manifest.webmanifest')
+  expect(res.ok()).toBeTruthy()
+  const m = await res.json()
+  expect(m.name).toBe('Luke Hanna')
+  expect(m.display).toBe('standalone')
+  expect(m.icons.map((i: { src: string }) => i.src)).toEqual(['/icon.svg', '/apple-icon'])
+})

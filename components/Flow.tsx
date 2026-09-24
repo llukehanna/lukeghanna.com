@@ -1,3 +1,4 @@
+import type React from 'react'
 import { Caption } from '@/components/Figure'
 import { Reveal } from '@/components/Reveal'
 
@@ -37,7 +38,7 @@ export function Flow({ n, caption, source, steps }: { n: number; caption: string
             <div key={i}>
               {i > 0 && <Arrow />}
               {Array.isArray(step) ? (
-                <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${step.length}, minmax(0, 1fr))` }}>
+                <div className="flow-row grid gap-2" style={{ '--cols': step.length } as React.CSSProperties}>
                   {step.map((node) => <Node key={node.title} node={node} />)}
                 </div>
               ) : (

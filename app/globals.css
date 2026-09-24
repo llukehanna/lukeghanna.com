@@ -93,6 +93,10 @@ body {
 .reveal[data-reveal="pending"] { opacity: 0; transform: translateY(14px); }
 .reveal[data-reveal="in"] { opacity: 1; transform: none; }
 
+/* a row of parallel nodes in a Flow diagram: two columns on a phone, one per node from sm up */
+.flow-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 640px) { .flow-row { grid-template-columns: repeat(var(--cols, 1), minmax(0, 1fr)); } }
+
 /* mono labels */
 .label {
   font-family: var(--font-mono);

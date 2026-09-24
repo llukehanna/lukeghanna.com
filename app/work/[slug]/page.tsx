@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation'
 import { Rail, type RailLink, type RailNavItem } from '@/components/Rail'
 import { ActiveSectionProvider } from '@/components/ActiveSection'
 import { ArticleSidebar } from '@/components/ArticleSidebar'
+import { ArticleFooter } from '@/components/ArticleFooter'
+import { Glance } from '@/components/Glance'
 import { extractToc } from '@/lib/toc'
 import { isWorkSlug, loadWork, readWorkSource, workSlugs } from '@/lib/work'
 import { siteName } from '@/lib/site'
@@ -58,9 +60,13 @@ export default async function WorkPage({ params }: { params: Promise<{ slug: str
       />
       <main className="px-6 pb-20 pt-12 lg:pl-[400px] lg:pr-12">
         <div className="grid gap-14 xl:grid-cols-[minmax(0,720px)_280px]">
-          <article data-testid="article" className="min-w-0 prose-none [&>p:first-of-type]:mb-7 [&>p:first-of-type]:text-[22px] [&>p:first-of-type]:leading-[1.45] [&>p:first-of-type]:tracking-[-0.01em] [&>p:first-of-type]:text-ink">
-            <Post />
-          </article>
+          <div className="min-w-0">
+            <article data-testid="article" className="min-w-0 prose-none [&>p:first-of-type]:mb-7 [&>p:first-of-type]:text-[22px] [&>p:first-of-type]:leading-[1.45] [&>p:first-of-type]:tracking-[-0.01em] [&>p:first-of-type]:text-ink">
+              <Post />
+            </article>
+            <Glance rows={meta.glance} className="mt-10 xl:hidden" />
+            <ArticleFooter links={[...meta.links, ...neighbors]} />
+          </div>
           <ArticleSidebar contents={contents} glance={meta.glance} />
         </div>
       </main>

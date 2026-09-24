@@ -13,7 +13,7 @@ export function SectionNav({ items, layout = 'vertical' }: { items: RailNavItem[
     return (
       <nav
         aria-label="Sections (mobile)"
-        className="glass sticky top-0 z-20 flex h-[var(--nav-bar-h)] items-center justify-around px-4 md:hidden"
+        className="glass sticky top-0 z-20 flex h-[var(--nav-bar-h)] items-stretch justify-around px-2 md:hidden"
       >
         {items.map((i) => (
           <a
@@ -21,7 +21,7 @@ export function SectionNav({ items, layout = 'vertical' }: { items: RailNavItem[
             href={`#${i.id}`}
             data-testid={`navbar-${i.id}`}
             aria-current={active === i.id ? 'true' : undefined}
-            className={`text-[13px] font-medium transition-colors ${active === i.id ? 'text-ink' : 'text-mute hover:text-ink'}`}
+            className={`flex flex-1 items-center justify-center text-[13px] font-medium transition-colors ${active === i.id ? 'text-ink' : 'text-mute hover:text-ink'}`}
           >
             {i.label}
           </a>

@@ -1,14 +1,21 @@
 import { test, expect } from '@playwright/test'
 
+import type { Page } from '@playwright/test'
+
 const slugs = ['pfc', 'beacon', 'ccc', 'bt', 'onair', 'shed', 'bjs']
 
+// Below md the rail hides its link list and the same links close the article instead.
+const linksOf = (page: Page, isMobile: boolean) => (isMobile ? page.getByTestId('article-footer') : page.getByTestId('rail'))
+
 test.describe('write-up', () => {
-  test('renders BT with headings that have ids matching the contents', async ({ page }) => {
+  test('renders BT with headings that have ids matching the contents', async ({ page, isMobile }) => {
     await page.goto('/work/bt')
     await expect(page.getByRole('heading', { level: 1, name: 'BT' })).toBeVisible()
     await expect(page.locator('h2#what-it-does')).toBeVisible()
     await expect(page.locator('h2#the-result')).toBeVisible()
-    await expect(page.getByTestId('rail').getByTestId('nav-what-it-does')).toBeVisible()
+    // Desktop: the rail lists the sections. Phone: the sticky bar's menu does (mobile.spec covers opening it).
+    if (isMobile) await expect(page.getByTestId('navbar-what-it-does')).toHaveCount(1)
+    else await expect(page.getByTestId('rail').getByTestId('nav-what-it-does')).toBeVisible()
   })
 
   test('BT states the negative result, the fee formula, and no projection language', async ({ page }) => {
@@ -20,25 +27,25 @@ test.describe('write-up', () => {
     expect(text).not.toMatch(/projected|estimated|illustrative/i)
   })
 
-  test('renders CCC with an Open link to the live site and Previous / Next neighbours', async ({ page }) => {
+  test('renders CCC with an Open link to the live site and Previous / Next neighbours', async ({ page, isMobile }) => {
     await page.goto('/work/ccc')
     await expect(page.getByRole('heading', { level: 1, name: 'Clippers Command Center' })).toBeVisible()
     await expect(page.locator('h2#provable-insights')).toBeVisible()
-    const rail = page.getByTestId('rail')
-    await expect(rail.getByTestId('open-app')).toHaveAttribute('href', 'https://clippers.lukeghanna.com')
-    await expect(rail.getByRole('link', { name: /Previous/ })).toHaveAttribute('href', '/work/beacon')
-    await expect(rail.getByRole('link', { name: /Next/ })).toHaveAttribute('href', '/work/bt')
+    await expect(page.getByTestId('rail').getByTestId('open-app')).toHaveAttribute('href', 'https://clippers.lukeghanna.com')
+    const links = linksOf(page, isMobile)
+    await expect(links.getByRole('link', { name: /Previous/ })).toHaveAttribute('href', '/work/beacon')
+    await expect(links.getByRole('link', { name: /Next/ })).toHaveAttribute('href', '/work/bt')
   })
 
-  test('the first and last write-ups have only one neighbour', async ({ page }) => {
+  test('the first and last write-ups have only one neighbour', async ({ page, isMobile }) => {
     await page.goto('/work/pfc')
-    let rail = page.getByTestId('rail')
-    await expect(rail.getByRole('link', { name: /Previous/ })).toHaveCount(0)
-    await expect(rail.getByRole('link', { name: /Next/ })).toHaveAttribute('href', '/work/beacon')
+    let links = linksOf(page, isMobile)
+    await expect(links.getByRole('link', { name: /Previous/ })).toHaveCount(0)
+    await expect(links.getByRole('link', { name: /Next/ })).toHaveAttribute('href', '/work/beacon')
     await page.goto('/work/bjs')
-    rail = page.getByTestId('rail')
-    await expect(rail.getByRole('link', { name: /Previous/ })).toHaveAttribute('href', '/work/shed')
-    await expect(rail.getByRole('link', { name: /Next/ })).toHaveCount(0)
+    links = linksOf(page, isMobile)
+    await expect(links.getByRole('link', { name: /Previous/ })).toHaveAttribute('href', '/work/shed')
+    await expect(links.getByRole('link', { name: /Next/ })).toHaveCount(0)
   })
 
   test('every write-up renders, names its state, and avoids projection language', async ({ page }) => {

@@ -38,11 +38,12 @@ export default function Home() {
               was a fellow in <b className="font-medium text-ink">Palantir&apos;s American Tech Fellowship</b>, where the capstone became Beacon.
               Every project below has a write-up that says exactly what state it is in.
             </p>
-            <dl className="grid grid-cols-2 gap-[10px] content-start max-md:grid-cols-1">
+            {/* Four tiles at md+; one compact key-value card on a phone. */}
+            <dl className="grid grid-cols-2 gap-[10px] content-start max-md:grid-cols-1 max-md:gap-0 max-md:divide-y max-md:divide-line max-md:rounded-[12px] max-md:border max-md:border-line max-md:bg-[var(--card)]">
               {facts.map(([k, v]) => (
-                <div key={k} className="rounded-[12px] border border-line bg-[var(--card)] p-[14px]">
-                  <dt className="label mb-2">{k}</dt>
-                  <dd className="text-[14px] font-medium leading-[1.3]">{v}</dd>
+                <div key={k} className="rounded-[12px] border border-line bg-[var(--card)] p-[14px] max-md:flex max-md:items-baseline max-md:justify-between max-md:gap-4 max-md:rounded-none max-md:border-0 max-md:bg-transparent max-md:px-[14px] max-md:py-[11px]">
+                  <dt className="label mb-2 max-md:mb-0 max-md:shrink-0">{k}</dt>
+                  <dd className="text-[14px] font-medium leading-[1.3] max-md:text-right">{v}</dd>
                 </div>
               ))}
             </dl>
