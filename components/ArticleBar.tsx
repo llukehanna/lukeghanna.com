@@ -28,9 +28,9 @@ export function ArticleBar({ items }: { items: RailNavItem[] }) {
 
   return (
     <div ref={ref} className="sticky top-0 z-20 md:hidden">
-      <nav aria-label="Article (mobile)" className="glass flex h-[var(--nav-bar-h)] items-stretch justify-between px-2">
-        <Link href="/#work" className="flex items-center px-2 text-[12px] font-medium uppercase tracking-[0.1em] text-dim">
-          ← Work
+      <nav aria-label="Article (mobile)" className="glass flex h-[var(--nav-bar-h)] items-stretch justify-between bg-[color-mix(in_srgb,var(--bg)_82%,transparent)]! px-2">
+        <Link href="/#projects" className="flex items-center px-2 text-[12px] font-medium uppercase tracking-[0.1em] text-dim">
+          ← Projects
         </Link>
         <button
           type="button"

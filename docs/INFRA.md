@@ -31,6 +31,6 @@ The site's contact address is Luke's existing `luke@zhannas.com`. No Email Routi
 - Add the site to the LinkedIn profile's website field.
 
 ## 5. Pending content (any time)
-- One curated CCC screenshot from a game day → `public/shots/ccc.png` (1440×900) → add `screenshot` to the `ccc` entry in `content/projects.ts` → extend the capture list in `tests/unit/projects.test.ts` and `tests/e2e/home.spec.ts`; a `Figure` in `content/work/ccc.mdx` with a provenance line.
-- BJS phone screenshots once an app exists to capture → same pattern.
+- Replace `public/shots/ccc.png` (a preseason capture, 0–0 record) with one from a game day once the season starts (Oct 21), same 1440×810 @2x framing; add a `Figure` in `content/work/ccc.mdx` with a provenance line.
+- Retake `public/shots/bjs.png` once the rebuild lands on BJS `main`.
 - All seven write-ups (`content/work/*.mdx`) were drafted on 2026-09-23 from each repository's docs and code; review the prose once and adjust anything that reads differently from how Luke would say it.

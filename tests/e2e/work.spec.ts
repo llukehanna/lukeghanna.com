@@ -13,9 +13,13 @@ test.describe('write-up', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Kalshi Weather Edge' })).toBeVisible()
     await expect(page.locator('h2#what-it-does')).toBeVisible()
     await expect(page.locator('h2#the-result')).toBeVisible()
-    // Desktop: the rail lists the sections. Phone: the sticky bar's menu does (mobile.spec covers opening it).
+    // Desktop (xl): the sidebar lists the sections and the rail does not repeat them. Phone: the
+    // sticky bar's menu does (mobile.spec covers opening it).
     if (isMobile) await expect(page.getByTestId('navbar-what-it-does')).toHaveCount(1)
-    else await expect(page.getByTestId('rail').getByTestId('nav-what-it-does')).toBeVisible()
+    else {
+      await expect(page.getByTestId('nav-what-it-does').filter({ visible: true })).toHaveCount(1)
+      await expect(page.getByTestId('rail').getByTestId('nav-what-it-does')).toBeHidden()
+    }
   })
 
   test('Kalshi Weather Edge states the negative result, the fee formula, the unrun market maker, and no projection language', async ({ page }) => {
@@ -60,7 +64,7 @@ test.describe('write-up', () => {
 
   test('the fixed rail scrolls internally when its content is taller than the viewport', async ({ page, isMobile }) => {
     test.skip(isMobile, 'desktop-only: the rail is only fixed at lg+')
-    await page.setViewportSize({ width: 1440, height: 700 })
+    await page.setViewportSize({ width: 1440, height: 520 })
     await page.goto('/work/ccc')
     const rail = page.getByTestId('rail')
     const m = await rail.evaluate((el) => ({
