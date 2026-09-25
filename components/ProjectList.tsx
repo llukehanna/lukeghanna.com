@@ -25,18 +25,13 @@ function Media({ p }: { p: Project }) {
       <div className="relative aspect-[16/9] overflow-hidden rounded-[14px] border border-line bg-[#0d0d0f]">
         <Image
           src={p.screenshot.src}
-          alt={p.screenshot.note ? `${p.title}: ${p.screenshot.note.toLowerCase()}` : `${p.title}, running`}
+          alt={`${p.title}, running`}
           fill
           sizes="(min-width: 1024px) 480px, (min-width: 768px) 50vw, 100vw"
           className="object-cover transition-transform duration-500 ease-[var(--ease)] group-hover:scale-[1.015]"
           style={{ objectPosition: p.screenshot.position ?? '0 0' }}
         />
         <span aria-hidden className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-b from-transparent to-black/40" />
-        {p.screenshot.note && (
-          <span className="absolute bottom-3 right-3 rounded-[8px] border border-white/10 bg-black/60 px-[9px] py-[5px] font-mono text-[10.5px] tracking-[0.02em] text-white/75 backdrop-blur-sm">
-            {p.screenshot.note}
-          </span>
-        )}
       </div>
     )
   }

@@ -19,6 +19,16 @@ export const meta = {
 
 Personal Finance Coach, PFC for short, holds the full state of my finances, checks every action against the plan's gates before it happens, and ranks every dollar's next-best use in one queue. The engineering docs are public. The source and the ledger never leave the machine.
 
+<Figure
+  n={1}
+  src="/work/pfc/today.png"
+  width={2880}
+  height={1620}
+  alt="PFC's Today screen: the card closest to its utilization line, a meter against the 30% reporting line, a second card well under it, freshness for accounts and figures, and the next gated actions"
+  caption="Today. The card closest to its line leads, measured at statement close rather than the due date, and every figure says whether it was observed from a feed or derived from the ledger."
+  source="The Today screen, with invented accounts and amounts."
+/>
+
 ## What it does
 
 It is not a budgeting app. Budgeting is the solved part. The hard part is the credit-card meta-game and the sequencing decisions that no existing tool covers alongside a real financial model.
@@ -27,6 +37,16 @@ It is not a budgeting app. Budgeting is the solved part. The hard part is the cr
 - **Points.** Which card to use at which merchant, right now, given category caps already partly consumed this quarter.
 - **Opportunity cost.** Every dollar has a next-best use. Idle cash, an unclaimed employer match, an uninvested contribution, a fee that should not exist: each is ranked in the same queue, in the same unit, as the card actions.
 - **Trajectory.** A tax-aware five-year projection, frozen monthly and scored against what actually happens.
+
+<Figure
+  n={2}
+  src="/work/pfc/plan.png"
+  width={2880}
+  height={1280}
+  alt="PFC's Plan screen: the Chase 5/24 count derived from self-opened tradelines with their roll-off dates, and hard inquiries counted separately per bureau"
+  caption="Plan. 5/24 is derived from the tradelines you opened yourself, each with its roll-off date; authorized-user lines are shown and excluded. Inquiries are counted per bureau and never merged."
+  source="The Plan screen, with invented accounts and dates."
+/>
 
 > The one thing that cannot fail: never miss a gate. Everything else can degrade; this cannot.
 
@@ -39,7 +59,7 @@ It is not a budgeting app. Budgeting is the solved part. The hard part is the cr
 **Nothing needs to be on the public internet.** Poll on a timer instead of webhooks, request read-only products and never Plaid's `auth` product, and delegate access control to Cloudflare Access at the edge. A total token compromise reads history and cannot move money.
 
 <Flow
-  n={1}
+  n={3}
   caption="Read-only sources enter through a validated boundary into an append-only ledger. One function derives everything else, and four surfaces read the result behind a zero-open-port tunnel."
   source="Drawn from the architecture section of the public engineering docs."
   steps={[
@@ -67,6 +87,16 @@ It is not a budgeting app. Budgeting is the solved part. The hard part is the cr
 The first engine was a rules layer: derive the credit file, check the gates, project the points, alert. The second replaced the objective function with opportunity cost across every dollar, evaluated over a versioned vector of assumptions.
 
 Assumptions are first-class data. Hurdle rate, expected returns, future marginal tax outlook, value of time, risk posture: each is declared as a range rather than a point, stored append-only, and every derivation reruns when one changes. That is how the plan stays dynamic without a scraping loop or a chat history.
+
+<Figure
+  n={4}
+  src="/work/pfc/forward.png"
+  width={2880}
+  height={1720}
+  alt="PFC's Forward screen: cash left over in the leanest projected year against a year of living costs, and the order of claim on that year's wages"
+  caption="Forward. The projection runs from the declared assumptions and leads with the leanest year, not the first. Each claim on that year's wages is listed in the order it is taken."
+  source="The Forward screen, with invented amounts."
+/>
 
 Every proposed action is compared against the alternative use of the same dollar across the whole declared range:
 
@@ -115,4 +145,4 @@ The failure mode is a financial mistake I cannot undo, so this is the part that 
 
 Milestone v1.0 shipped in August 2026: foundation, credit derivation and gates, the MCP server, statement and credit-report backfill, the merchant map, the live Plaid feed. Milestone v2.0, the wealth model, opened 13 August 2026 and shipped: versioned assumptions, the comparator, the twenty rules, the tax engine and projection. Three Plaid production items and one SimpleFIN connection sync daily on the host; the first frozen projection snapshot is in the production ledger, and its monthly scoring cannot be evaluated until snapshotted months elapse.
 
-As of the public docs: 1,400+ commits since 6 August 2026, 37 migrations, 285 test files, 3,144 unit tests and 352 Playwright checks across four viewports. There are no screenshots here on purpose: every screen of this app shows real balances.
+As of the public docs: 1,400+ commits since 6 August 2026, 37 migrations, 285 test files, 3,144 unit tests and 352 Playwright checks across four viewports.
