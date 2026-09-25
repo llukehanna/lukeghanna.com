@@ -30,6 +30,7 @@ export function RailSpecular({ children, className = '', ...rest }: RailSpecular
         className="pointer-events-none absolute -inset-px rounded-[16px]"
         style={{ background: 'radial-gradient(320px circle at var(--rx, 20%) var(--ry, 10%), rgba(255,255,255,0.09), transparent 60%)' }}
       />
+      <span aria-hidden className="pointer-events-none absolute inset-x-10 -top-px h-px bg-gradient-to-r from-transparent via-[var(--edge)] to-transparent" />
       {children}
     </Glass>
   )

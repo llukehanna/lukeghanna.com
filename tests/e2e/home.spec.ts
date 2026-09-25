@@ -3,36 +3,44 @@ import { test, expect } from '@playwright/test'
 test.describe('home', () => {
   const slugs = ['pfc', 'beacon', 'ccc', 'kwx', 'onair', 'shed', 'bjs']
 
-  test('lists the seven projects, each linking to its write-up', async ({ page }) => {
+  test('about comes first, then the seven project cards, each linking to its write-up', async ({ page }) => {
     await page.goto('/')
+    const [about, projects] = await Promise.all([page.locator('#about').boundingBox(), page.locator('#projects').boundingBox()])
+    expect(about!.y).toBeLessThan(projects!.y)
     for (const slug of slugs) await expect(page.getByTestId(`project-${slug}`)).toHaveAttribute('href', `/work/${slug}`)
     // The status line describes the project, not the link: the live domain still shows for live sites.
     await expect(page.getByTestId('project-ccc')).toContainText('clippers.lukeghanna.com')
     await expect(page.getByTestId('project-kwx')).toContainText('demo pending')
-    await expect(page.locator('#work')).toContainText('7 projects')
+    await expect(page.locator('#projects h2')).toHaveText('Projects')
   })
 
-  test('only projects with a real capture have a screenshot reveal, shown on hover', async ({ page, isMobile }) => {
-    test.skip(isMobile, 'hover only')
+  test('cards with a real capture show it; the rest show a figure from the write-up', async ({ page }) => {
     await page.goto('/')
-    for (const slug of ['beacon', 'onair', 'shed']) await expect(page.getByTestId(`reveal-${slug}`)).toHaveCount(1)
-    for (const slug of ['pfc', 'ccc', 'kwx', 'bjs']) await expect(page.getByTestId(`reveal-${slug}`)).toHaveCount(0)
-    await page.getByTestId('project-shed').hover()
-    await expect(page.getByTestId('reveal-shed')).toHaveAttribute('data-open', 'true')
+    for (const slug of ['beacon', 'ccc', 'onair', 'shed', 'bjs']) await expect(page.getByTestId(`project-${slug}`).locator('img')).toHaveCount(1)
+    for (const slug of ['pfc', 'kwx']) await expect(page.getByTestId(`project-${slug}`).locator('img')).toHaveCount(0)
+    await expect(page.getByTestId('project-kwx')).toContainText('7,440')
   })
 
-  test('about names the fellowship and the four tiles', async ({ page }) => {
+  test('about names the fellowship and three facts', async ({ page }) => {
     await page.goto('/')
     const about = page.locator('#about')
     await expect(about).toContainText('American Tech Fellowship')
-    for (const tile of ['Now', 'Palantir', 'Builds with', 'Shipped']) await expect(about.getByRole('term').filter({ hasText: tile })).toHaveCount(1)
+    for (const k of ['Fellowship', 'Builds with', 'Shipped']) await expect(about.getByRole('term').filter({ hasText: k })).toHaveCount(1)
     await expect(about).toContainText('7 projects · 3 live sites')
     await expect(page.locator('body')).not.toContainText(/Houlihan/)
   })
 
-  test('contact shows the email and a build-time colophon', async ({ page }) => {
+  test('contact copies the email and shows a build-time colophon', async ({ page, context, browserName }) => {
     await page.goto('/')
-    await expect(page.locator('#contact')).toContainText('luke@zhannas.com')
-    await expect(page.locator('#contact')).toContainText(/last updated [A-Z][a-z]+ \d{4}/)
+    const contact = page.locator('#contact')
+    const copy = page.getByTestId('copy-email')
+    await expect(copy).toContainText('luke@zhannas.com')
+    await expect(copy).toHaveAttribute('href', 'mailto:luke@zhannas.com')
+    await expect(contact).toContainText(/last updated [A-Z][a-z]+ \d{4}/)
+    test.skip(browserName !== 'chromium', 'clipboard permissions are Chromium-only here')
+    await context.grantPermissions(['clipboard-read', 'clipboard-write'])
+    await copy.click()
+    await expect(copy).toContainText('Copied')
+    expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('luke@zhannas.com')
   })
 })

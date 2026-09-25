@@ -1,16 +1,25 @@
 export type Project = {
   slug: 'pfc' | 'beacon' | 'ccc' | 'kwx' | 'onair' | 'shed' | 'bjs'
   title: string
-  /** One or two words on the project's state: Live, In progress, Paused, macOS, iOS. */
+  /** One or two words on the project's state: Live, Research, macOS, iOS. */
   statusLabel: string
+  /** True when it is running for real right now; the only thing the accent dot means. */
+  live: boolean
   /** Where it lives or what state it is in; shown after the status. Describes the project, not the link. */
   where: string
-  /** Every row goes to its write-up. The write-up's rail carries the live-site and source links. */
+  /** Every card goes to its write-up. The write-up's rail carries the live-site and source links. */
   href: `/work/${Project['slug']}`
+  /** One sentence. The write-up carries the depth. */
   description: string
-  tags: string[]
-  /** Only a real capture from the real app. */
-  screenshot?: { src: string; width: number; height: number }
+  /** The stack, in mono under the description. */
+  stack: string
+  /**
+   * Only a real capture from the real app. `position` is the object-position of the crop;
+   * `phone` marks a portrait capture, shown upright on the slot's backdrop instead of cropped.
+   */
+  screenshot?: { src: string; width: number; height: number; position?: string; phone?: boolean }
+  /** For a project with no capture yet: one true figure from its write-up, shown in the media slot. */
+  figure?: { value: string; label: string }
 }
 
 export const projects: Project[] = [
@@ -18,73 +27,77 @@ export const projects: Project[] = [
     slug: 'pfc',
     title: 'Personal Finance Coach',
     statusLabel: 'Live',
+    live: true,
     where: 'private, syncing daily',
     href: '/work/pfc',
-    description:
-      'A single-user personal-finance system that holds the full state of my finances, checks every action against the credit-card plan’s gates before it happens, and ranks every dollar’s next-best use in one queue. Append-only SQLite ledger, a 20-rule opportunity-cost comparator over assumption ranges, Claude as the primary interface over MCP.',
-    tags: ['TypeScript', 'SQLite', 'MCP'],
+    description: 'My full financial state in one append-only ledger. Every action is checked against the plan’s gates before it happens.',
+    stack: 'TypeScript · SQLite · Claude over MCP',
+    figure: { value: '20', label: 'opportunity-cost rules in 7 families' },
   },
   {
     slug: 'beacon',
     title: 'Beacon',
     statusLabel: 'Live',
-    where: 'beacon.lukeghanna.com · synthetic data',
+    live: true,
+    where: 'beacon.lukeghanna.com',
     href: '/work/beacon',
-    description:
-      'Deal-sourcing workbench for boutique advisory targets: mandates become searches, an enrichment agent fills in facts from ranked sources and abstains when they conflict, analysts qualify or reject, and rejection rationales cluster into proposed screening rules. Built on Foundry as my Palantir fellowship capstone, ported to Postgres and React, and live on a 700-firm synthetic universe that resets nightly.',
-    tags: ['React', 'Postgres', 'Claude'],
-    screenshot: { src: '/shots/beacon.png', width: 1440, height: 900 },
+    description: 'A deal-sourcing workbench that learns its screening rules from the analysts who reject firms.',
+    stack: 'React · Postgres · Claude',
+    screenshot: { src: '/shots/beacon.png', width: 2880, height: 1620 },
   },
   {
     slug: 'ccc',
     title: 'Clippers Command Center',
     statusLabel: 'Live',
+    live: true,
     where: 'clippers.lukeghanna.com',
     href: '/work/ccc',
-    description:
-      'Live NBA analytics for Clippers fans. A provable-insights engine verifies every claim against source data before it renders, then re-verifies every proof nightly. Next.js 16, Neon Postgres, league-wide box scores, and a two-pipeline architecture for live and historical data.',
-    tags: ['Next.js', 'Postgres', 'NBA CDN'],
+    description: 'Live NBA analytics where every claim is verified against source data before it renders, then re-verified nightly.',
+    stack: 'Next.js 16 · Neon Postgres · NBA CDN',
+    screenshot: { src: '/shots/ccc.png', width: 2880, height: 1620 },
   },
   {
     slug: 'kwx',
     title: 'Kalshi Weather Edge',
     statusLabel: 'Research',
-    where: 'market maker built, demo pending',
+    live: false,
+    where: 'demo pending',
     href: '/work/kwx',
-    description:
-      'A Kalshi weather bot that ran unattended for four months and settled 7,440 signals to test whether a GFS ensemble beats the market price. It does not: the market out-predicts the model and the calibration gate never let it trade. A market maker for the other side of the same books is now built and waiting on its demo run.',
-    tags: ['Python', 'Kalshi API', 'Open-Meteo'],
+    description: 'The market out-predicts the model: 7,440 settled signals, and a calibration gate that never let it trade.',
+    stack: 'Python · Kalshi API · Open-Meteo',
+    figure: { value: '7,440', label: 'signals settled, zero orders placed' },
   },
   {
     slug: 'onair',
     title: 'OnAir',
     statusLabel: 'macOS',
-    where: 'unpackaged, source public',
+    live: false,
+    where: 'source public',
     href: '/work/onair',
-    description:
-      'A desktop player that keeps a live stream up: candidate HLS streams from pluggable adapters are probed, ranked and played, and when one stalls, errors or goes off-air it fails over to the next without the picture ever going black. Ships no sources; the demo runs against local fixture streams.',
-    tags: ['Electron', 'hls.js', 'Playwright'],
+    description: 'A live-stream player that fails over between ranked HLS sources without the picture ever going black.',
+    stack: 'Electron · hls.js · Playwright',
     screenshot: { src: '/shots/onair.png', width: 1440, height: 900 },
   },
   {
     slug: 'shed',
     title: 'Shedquarters',
     statusLabel: 'Live',
+    live: true,
     where: 'shed.lukeghanna.com',
     href: '/work/shed',
-    description:
-      'Skill-rating ladders for a house beer-die and spikeball league, scored from a phone at the table. An offline-first idempotent write queue, OpenSkill ratings replayed per sport from an append-only game history, and a four-digit house PIN made safe by a Postgres-backed rate limiter.',
-    tags: ['Next.js', 'Postgres', 'OpenSkill'],
-    screenshot: { src: '/shots/shed.png', width: 1440, height: 900 },
+    description: 'Skill ratings for a house beer-die and spikeball league, scored offline-first from a phone at the table.',
+    stack: 'Next.js · Postgres · OpenSkill',
+    screenshot: { src: '/shots/shed.png', width: 2640, height: 1485 },
   },
   {
     slug: 'bjs',
     title: 'BJS',
     statusLabel: 'iOS',
-    where: 'trainer built, counting next',
+    live: false,
+    where: 'counting next',
     href: '/work/bjs',
-    description:
-      'Native iOS blackjack trainer. Rule-aware basic strategy, Hi-Lo counting and a house-edge calculator live in a tested Swift package with no dependencies; the app is being rebuilt on it, and the strategy trainer is the first screen done.',
-    tags: ['Swift 6', 'SwiftUI', 'SwiftData'],
+    description: 'A native blackjack trainer on a tested Swift package. The strategy trainer is the first screen done.',
+    stack: 'Swift 6 · SwiftUI · SwiftData',
+    screenshot: { src: '/shots/bjs.png', width: 660, height: 1434, phone: true },
   },
 ]

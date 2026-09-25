@@ -11,7 +11,7 @@
   --color-line: var(--line);
   --color-accent: var(--accent);
   --color-accent-soft: var(--accent-soft);
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
@@ -31,6 +31,9 @@
   --glass-hl: rgba(255,255,255,0.90);
   --glass-shadow: 0 30px 80px rgba(0,0,0,0.12);
   --card: rgba(255,255,255,0.50);
+  --edge: rgba(122,90,0,0.55);
+  --glow: radial-gradient(closest-side, rgba(242,193,78,0.22), rgba(242,150,60,0.06) 55%, transparent);
+  --media-shadow: 0 24px 60px rgba(0,0,0,0.14);
   color-scheme: light;
 }
 
@@ -50,12 +53,21 @@
   --glass-hl: rgba(255,255,255,0.14);
   --glass-shadow: 0 30px 80px rgba(0,0,0,0.35);
   --card: rgba(255,255,255,0.03);
+  --edge: rgba(242,193,78,0.6);
+  --glow: radial-gradient(closest-side, rgba(242,193,78,0.12), rgba(242,120,60,0.035) 55%, transparent);
+  --media-shadow: 0 30px 80px rgba(0,0,0,0.45);
   color-scheme: dark;
 }
 
 /* Height of the sticky mobile section bar. Sections use the same value as their
    scroll-margin-top so an anchor jump never lands a heading underneath the bar. */
 :root { --nav-bar-h: 48px; }
+
+/* One easing for every interface transition: fast out, soft landing. */
+:root { --ease: cubic-bezier(.32,.72,0,1); }
+
+h1, h2, h3 { text-wrap: balance; }
+p { text-wrap: pretty; }
 
 html { background: var(--bg); }
 body {
@@ -81,6 +93,43 @@ body {
   box-shadow: inset 0 1px 0 var(--glass-hl), var(--glass-shadow);
   backdrop-filter: blur(20px) saturate(1.2);
   -webkit-backdrop-filter: blur(20px) saturate(1.2);
+}
+
+/* A project card: a quiet double-bezel shell at rest; on hover it takes the glass material,
+   lifts, and an accent hairline lights along its top edge. */
+.card {
+  isolation: isolate;
+  background: var(--card);
+  border: 1px solid var(--line);
+  box-shadow: inset 0 1px 0 var(--glass-hl);
+  transition: transform 0.25s var(--ease), border-color 0.25s var(--ease), box-shadow 0.25s var(--ease);
+}
+/* the glass fill fades in as a layer: a gradient background cannot itself be transitioned */
+.card::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit;
+  background: var(--glass); opacity: 0; transition: opacity 0.25s var(--ease);
+}
+.card-edge {
+  position: absolute; left: 60px; right: 60px; top: -1px; height: 1px; z-index: 1;
+  background: linear-gradient(90deg, transparent, var(--edge), transparent);
+  opacity: 0; transition: opacity 0.25s var(--ease);
+}
+@media (hover: hover) {
+  .card:hover { transform: translateY(-3px); border-color: var(--glass-line); box-shadow: inset 0 1px 0 var(--glass-hl), var(--media-shadow); }
+  .card:hover::before, .card:hover .card-edge { opacity: 1; }
+}
+
+/* The media slot of a project with no capture yet: a figure set on a faint diagonal hatch. */
+.figure-slot {
+  background:
+    radial-gradient(120% 90% at 0% 100%, var(--accent-soft), transparent 60%),
+    repeating-linear-gradient(135deg, var(--card) 0 10px, transparent 10px 20px);
+}
+
+/* A fixed warm light behind the rail, so its glass has something to blur. */
+.ambient {
+  position: fixed; left: -260px; top: -300px; width: 1100px; height: 1100px; border-radius: 9999px;
+  background: var(--glow); pointer-events: none;
 }
 
 /* a scroll container with no visible scrollbar (wheel, touch and keyboard still scroll it) */

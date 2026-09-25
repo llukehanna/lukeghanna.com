@@ -17,7 +17,10 @@ export function ActiveSectionProvider({ items, children }: { items: RailNavItem[
   })
 
   useEffect(() => {
-    const sections = items.map((i) => document.getElementById(i.id)).filter((el): el is HTMLElement => !!el)
+    // Sub-items (the project cards under Projects) are observed alongside their sections; a
+    // parent reads as active whenever one of its children is (see isActive).
+    const ids = items.flatMap((i) => [i.id, ...(i.children?.map((c) => c.id) ?? [])])
+    const sections = ids.map((id) => document.getElementById(id)).filter((el): el is HTMLElement => !!el)
     const visible = new Map<string, number>()
     // A short final section can be outscored by a taller earlier section that still spans
     // the observer's band once the page has scrolled as far as it goes, so once the user
@@ -58,6 +61,10 @@ export function ActiveSectionProvider({ items, children }: { items: RailNavItem[
   }, [items])
 
   return <ActiveSectionContext.Provider value={active}>{children}</ActiveSectionContext.Provider>
+}
+
+export function isActive(item: RailNavItem, active: string | undefined) {
+  return item.id === active || !!item.children?.some((c) => c.id === active)
 }
 
 export function useActiveSection() {

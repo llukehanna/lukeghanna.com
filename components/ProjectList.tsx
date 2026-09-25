@@ -1,91 +1,103 @@
-'use client'
-
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRef, useState, type MouseEvent } from 'react'
 import type { Project } from '@/content/projects'
-import { Tag } from '@/components/Tag'
+import { links } from '@/lib/site'
+import { StatusDot } from '@/components/StatusDot'
 
-function RowBody({ p, index, open, pos }: { p: Project; index: number; open: boolean; pos: { x: number; y: number } }) {
+// The card's media slot. A real capture when there is one; otherwise one true figure from the
+// write-up, set as type, never a stand-in picture of an app.
+function Media({ p }: { p: Project }) {
+  if (p.screenshot?.phone) {
+    return (
+      <div className="figure-slot relative aspect-[16/9] overflow-hidden rounded-[14px] border border-line">
+        <Image
+          src={p.screenshot.src}
+          alt={`${p.title}, running`}
+          width={p.screenshot.width}
+          height={p.screenshot.height}
+          sizes="200px"
+          className="absolute left-1/2 top-[9%] w-[34%] -translate-x-1/2 rounded-[18px] border border-line shadow-[var(--media-shadow)] transition-transform duration-500 ease-[var(--ease)] group-hover:-translate-y-[6px]"
+        />
+      </div>
+    )
+  }
+  if (p.screenshot) {
+    return (
+      <div className="relative aspect-[16/9] overflow-hidden rounded-[14px] border border-line bg-[#0d0d0f]">
+        <Image
+          src={p.screenshot.src}
+          alt={`${p.title}, running`}
+          fill
+          sizes="(min-width: 1024px) 480px, (min-width: 768px) 50vw, 100vw"
+          className="object-cover transition-transform duration-500 ease-[var(--ease)] group-hover:scale-[1.015]"
+          style={{ objectPosition: p.screenshot.position ?? '0 0' }}
+        />
+        <span aria-hidden className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-b from-transparent to-black/40" />
+      </div>
+    )
+  }
   return (
-    <>
-      <span className="font-mono text-[12px] text-dim max-md:hidden">{String(index + 1).padStart(2, '0')}</span>
-      <div>
-        <div className="text-[22px] font-semibold leading-[1.15] tracking-[-0.02em] text-ink transition-colors group-hover:text-accent">
-          <span className="mr-[10px] font-mono text-[12px] font-normal text-dim md:hidden">{String(index + 1).padStart(2, '0')}</span>
-          {p.title}
-        </div>
-        <div className="mt-[6px] font-mono text-[10.5px] uppercase tracking-[0.08em] text-accent">
-          {p.statusLabel} · {p.where}
-        </div>
-      </div>
-      <p className="text-[14.5px] leading-[1.55] text-mute">{p.description}</p>
-      <div className="flex flex-wrap justify-end gap-[6px] max-md:justify-start">
-        {p.tags.map((t) => <Tag key={t}>{t}</Tag>)}
-      </div>
-      <span aria-hidden className="text-right text-[16px] text-dim transition-transform group-hover:translate-x-[3px] group-hover:text-accent max-md:hidden">→</span>
-
-      {p.screenshot && (
-        <div
-          data-testid={`reveal-${p.slug}`}
-          data-open={open ? 'true' : 'false'}
-          aria-hidden
-          className={`glass pointer-events-none absolute z-20 w-[340px] overflow-hidden rounded-[14px] p-2 transition-[opacity,transform] duration-300 ease-out max-md:hidden ${open ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}
-          style={{ left: pos.x, top: pos.y }}
-        >
-          <Image src={p.screenshot.src} alt="" width={p.screenshot.width} height={p.screenshot.height} className="rounded-[8px]" sizes="340px" />
-        </div>
-      )}
-    </>
+    <div className="figure-slot relative flex aspect-[16/9] flex-col justify-end overflow-hidden rounded-[14px] border border-line p-6">
+      <span className="font-mono text-[44px] font-medium leading-none tracking-[-0.04em] text-ink tabular-nums">{p.figure?.value}</span>
+      <span className="label mt-3">{p.figure?.label}</span>
+    </div>
   )
 }
 
-function Row({ p, index, dimmed, onEnter, onLeave }: { p: Project; index: number; dimmed: boolean; onEnter: () => void; onLeave: () => void }) {
-  const [open, setOpen] = useState(false)
-  const [pos, setPos] = useState({ x: 0, y: 0 })
-  const ref = useRef<HTMLAnchorElement>(null)
-
-  const onMove = (e: MouseEvent<HTMLAnchorElement>) => {
-    const r = ref.current?.getBoundingClientRect()
-    if (!r) return
-    setPos({ x: Math.min(e.clientX - r.left + 24, r.width - 340), y: e.clientY - r.top - 120 })
-  }
-
-  const handleEnter = () => {
-    setOpen(true)
-    onEnter()
-  }
-  const handleLeave = () => {
-    setOpen(false)
-    onLeave()
-  }
-
-  const className = `group relative -mx-[22px] grid grid-cols-[48px_1.1fr_1.6fr_auto_40px] items-center gap-6 rounded-[14px] border border-transparent px-[22px] py-[26px] transition-[opacity,background,border-color,box-shadow] duration-300 ease-out hover:glass max-md:grid-cols-1 max-md:gap-3 max-md:py-[22px] ${dimmed ? 'opacity-50' : 'opacity-100'}`
-
+function Card({ p, index }: { p: Project; index: number }) {
   return (
     <Link
-      ref={ref}
       href={p.href}
+      id={p.slug}
       data-testid={`project-${p.slug}`}
-      onMouseEnter={handleEnter}
-      onMouseLeave={handleLeave}
-      onMouseMove={p.screenshot ? onMove : undefined}
-      className={className}
+      className="card group relative flex scroll-mt-[calc(var(--nav-bar-h)+16px)] flex-col rounded-[20px] p-[6px] md:scroll-mt-6"
     >
-      <RowBody p={p} index={index} open={open} pos={pos} />
+      <span aria-hidden className="card-edge" />
+      <Media p={p} />
+      <div className="flex flex-1 flex-col gap-2 px-4 pb-4 pt-[18px] max-md:px-3 max-md:pb-3">
+        <div className="flex items-center gap-2 font-mono text-[10.5px] uppercase tracking-[0.08em] text-dim">
+          <StatusDot live={p.live} />
+          <span className={p.live ? 'text-accent' : 'text-mute'}>{p.statusLabel}</span>
+          <span className="truncate">· {p.where}</span>
+          <span className="ml-auto tracking-normal">{String(index + 1).padStart(2, '0')}</span>
+        </div>
+        <h3 className="text-[21px] font-semibold leading-[1.2] tracking-[-0.025em] text-ink transition-colors duration-200 group-hover:text-accent max-md:text-[19px]">
+          {p.title}
+        </h3>
+        <p className="text-[14.5px] leading-[1.55] text-mute max-md:text-[14px]">{p.description}</p>
+        <div className="mt-auto flex items-center justify-between gap-4 pt-[6px]">
+          <span className="font-mono text-[11px] tracking-[0.02em] text-dim">{p.stack}</span>
+          <span aria-hidden className="text-dim transition-[transform,color] duration-200 ease-[var(--ease)] group-hover:-translate-y-[3px] group-hover:translate-x-[3px] group-hover:text-accent">
+            →
+          </span>
+        </div>
+      </div>
     </Link>
   )
 }
 
 export function ProjectList({ projects }: { projects: Project[] }) {
-  const [hovered, setHovered] = useState<string | null>(null)
   return (
-    <div className="flex flex-col">
+    <div className="grid grid-cols-2 gap-5 max-md:grid-cols-1 max-md:gap-4">
       {projects.map((p, i) => (
-        <div key={p.slug} className={i > 0 ? 'border-t border-line' : ''}>
-          <Row p={p} index={i} dimmed={hovered !== null && hovered !== p.slug} onEnter={() => setHovered(p.slug)} onLeave={() => setHovered(null)} />
-        </div>
+        <Card key={p.slug} p={p} index={i} />
       ))}
+      {projects.length % 2 === 1 && (
+        <a
+          href={links.github.href}
+          target="_blank"
+          rel="noreferrer"
+          data-testid="project-more"
+          className="group flex flex-col justify-end gap-[10px] rounded-[20px] border border-line p-7 transition-colors duration-200 hover:border-[var(--glass-line)] max-md:hidden"
+        >
+          <span className="label">Everything else</span>
+          <span className="text-[21px] font-semibold leading-[1.2] tracking-[-0.025em] text-ink">Smaller experiments live on GitHub</span>
+          <span className="flex items-center justify-between font-mono text-[11px] tracking-[0.02em] text-dim">
+            github.com/{links.github.handle}
+            <span aria-hidden className="transition-colors group-hover:text-accent">↗</span>
+          </span>
+        </a>
+      )}
     </div>
   )
 }

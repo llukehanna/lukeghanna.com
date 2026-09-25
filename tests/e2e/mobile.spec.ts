@@ -12,10 +12,12 @@ test.describe('mobile', () => {
     expect(overflow).toBe(false)
   })
 
-  test('project rows stack and the screenshot reveal is not rendered', async ({ page }) => {
+  test('project cards stack in one column', async ({ page }) => {
     await page.goto('/')
-    await expect(page.getByTestId('project-shed')).toBeVisible()
-    await expect(page.getByTestId('reveal-shed')).toBeHidden()
+    const [a, b] = await Promise.all([page.getByTestId('project-pfc').boundingBox(), page.getByTestId('project-beacon').boundingBox()])
+    expect(Math.abs(a!.x - b!.x)).toBeLessThanOrEqual(1)
+    expect(b!.y).toBeGreaterThan(a!.y + a!.height - 1)
+    await expect(page.getByTestId('project-more')).toBeHidden()
   })
 
   test('section nav becomes a sticky top bar with three links that tracks scroll', async ({ page }) => {
@@ -38,12 +40,12 @@ test.describe('mobile', () => {
   test('an anchor jump lands the section heading just below the bar, never under it', async ({ page }) => {
     await page.goto('/')
     const bar = page.getByRole('navigation', { name: 'Sections (mobile)' })
-    await page.getByTestId('navbar-work').click()
-    await expect(page.getByTestId('navbar-work')).toHaveAttribute('aria-current', 'true')
+    await page.getByTestId('navbar-projects').click()
+    await expect(page.getByTestId('navbar-projects')).toHaveAttribute('aria-current', 'true')
     // The section's scroll-margin-top and the bar's height are the same CSS variable.
     const [barBox, sectionTop] = await Promise.all([
       bar.boundingBox(),
-      page.locator('#work').evaluate((el) => el.getBoundingClientRect().top),
+      page.locator('#projects').evaluate((el) => el.getBoundingClientRect().top),
     ])
     expect(barBox).not.toBeNull()
     expect(sectionTop).toBeGreaterThanOrEqual(barBox!.height - 1)
@@ -58,7 +60,7 @@ test.describe('mobile', () => {
 
     const bar = page.getByRole('navigation', { name: 'Article (mobile)' })
     await expect(bar).toBeVisible()
-    await expect(bar.getByRole('link', { name: /Work/ })).toHaveAttribute('href', '/#work')
+    await expect(bar.getByRole('link', { name: /Projects/ })).toHaveAttribute('href', '/#projects')
     const menu = page.getByTestId('article-contents')
     await expect(menu).toHaveAttribute('aria-expanded', 'false')
     await menu.click()
@@ -82,30 +84,21 @@ test.describe('mobile', () => {
     await expect(footer.getByRole('link', { name: /Next/ })).toHaveAttribute('href', '/work/kwx')
   })
 
-  test('project rows put the number inline with the title and the tiles collapse to one card', async ({ page }) => {
+  test('the about facts are compact rows and the header is not a full-screen card', async ({ page }) => {
     await page.goto('/')
-    const row = page.getByTestId('project-pfc')
-    await expect(row).toContainText('01')
-    const numberBox = await row.locator('span', { hasText: '01' }).filter({ visible: true }).first().boundingBox()
-    const titleBox = await row.getByText('Personal Finance Coach').boundingBox()
-    expect(Math.abs(numberBox!.y + numberBox!.height / 2 - (titleBox!.y + titleBox!.height / 2))).toBeLessThan(titleBox!.height)
-    const tiles = page.locator('#about dl > div')
-    await expect(tiles).toHaveCount(4)
-    const boxes = await tiles.evaluateAll((els) => els.map((el) => el.getBoundingClientRect().height))
-    for (const h of boxes) expect(h).toBeLessThan(80)
+    const rows = page.locator('#about dl > div')
+    await expect(rows).toHaveCount(3)
+    for (const h of await rows.evaluateAll((els) => els.map((el) => el.getBoundingClientRect().height))) expect(h).toBeLessThan(80)
+    const rail = await page.getByTestId('rail').boundingBox()
+    expect(rail!.height).toBeLessThan(300)
   })
 
-  test('contact links lay out in a single row on the rail', async ({ page }) => {
+  test('contact puts the email first and the two links side by side', async ({ page }) => {
     await page.goto('/')
-    const rail = page.getByTestId('rail')
-    const boxes = await Promise.all(
-      ['GitHub', 'LinkedIn', 'Email'].map((name) => rail.getByRole('link', { name }).boundingBox()),
-    )
-    const [first, ...rest] = boxes
-    expect(first).not.toBeNull()
-    for (const box of rest) {
-      expect(box).not.toBeNull()
-      expect(Math.abs(box!.y - first!.y)).toBeLessThanOrEqual(2)
-    }
+    const contact = page.locator('#contact')
+    const copy = await page.getByTestId('copy-email').boundingBox()
+    const [gh, li] = await Promise.all(['GitHub', 'LinkedIn'].map((name) => contact.getByRole('link', { name: new RegExp(name) }).boundingBox()))
+    expect(gh!.y).toBeGreaterThan(copy!.y + copy!.height - 1)
+    expect(Math.abs(gh!.y - li!.y)).toBeLessThanOrEqual(2)
   })
 })

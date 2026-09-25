@@ -16,8 +16,12 @@ describe('projects', () => {
       if (p.screenshot) expect(existsSync(`public${p.screenshot.src}`), `${p.slug} screenshot`).toBe(true)
     }
   })
-  it('only projects with a real capture have a hover screenshot', () => {
-    expect(projects.filter((p) => p.screenshot).map((p) => p.slug)).toEqual(['beacon', 'onair', 'shed'])
+  it('shows a real capture where one exists and a figure everywhere else, never both', () => {
+    expect(projects.filter((p) => p.screenshot).map((p) => p.slug)).toEqual(['beacon', 'ccc', 'onair', 'shed', 'bjs'])
+    for (const p of projects) expect(!!p.screenshot !== !!p.figure, p.slug).toBe(true)
+  })
+  it('keeps each card to one or two sentences', () => {
+    for (const p of projects) expect(p.description.length, p.slug).toBeLessThanOrEqual(140)
   })
   it('never uses projection language', () => {
     for (const p of projects) expect(p.description).not.toMatch(/projected|estimated|targeting/i)
