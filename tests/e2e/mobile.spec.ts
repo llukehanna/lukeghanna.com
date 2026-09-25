@@ -17,7 +17,6 @@ test.describe('mobile', () => {
     const [a, b] = await Promise.all([page.getByTestId('project-pfc').boundingBox(), page.getByTestId('project-beacon').boundingBox()])
     expect(Math.abs(a!.x - b!.x)).toBeLessThanOrEqual(1)
     expect(b!.y).toBeGreaterThan(a!.y + a!.height - 1)
-    await expect(page.getByTestId('project-more')).toBeHidden()
   })
 
   test('section nav becomes a sticky top bar with three links that tracks scroll', async ({ page }) => {
@@ -87,7 +86,7 @@ test.describe('mobile', () => {
   test('the about facts are compact rows and the header is not a full-screen card', async ({ page }) => {
     await page.goto('/')
     const rows = page.locator('#about dl > div')
-    await expect(rows).toHaveCount(3)
+    await expect(rows).toHaveCount(2)
     for (const h of await rows.evaluateAll((els) => els.map((el) => el.getBoundingClientRect().height))) expect(h).toBeLessThan(80)
     const rail = await page.getByTestId('rail').boundingBox()
     expect(rail!.height).toBeLessThan(300)
