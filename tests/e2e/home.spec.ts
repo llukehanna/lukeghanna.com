@@ -8,6 +8,7 @@ test.describe('home', () => {
     const [about, projects] = await Promise.all([page.locator('#about').boundingBox(), page.locator('#projects').boundingBox()])
     expect(about!.y).toBeLessThan(projects!.y)
     for (const slug of slugs) await expect(page.getByTestId(`project-${slug}`)).toHaveAttribute('href', `/work/${slug}`)
+    await expect(page.locator('#projects a')).toHaveCount(slugs.length)
     // The status line describes the project, not the link: the live domain still shows for live sites.
     await expect(page.getByTestId('project-ccc')).toContainText('clippers.lukeghanna.com')
     await expect(page.getByTestId('project-kwx')).toContainText('demo pending')
@@ -21,11 +22,11 @@ test.describe('home', () => {
     await expect(page.getByTestId('project-kwx')).toContainText('7,440')
   })
 
-  test('about names the fellowship and three facts', async ({ page }) => {
+  test('about carries two facts', async ({ page }) => {
     await page.goto('/')
     const about = page.locator('#about')
-    await expect(about).toContainText('American Tech Fellowship')
-    for (const k of ['Fellowship', 'Builds with', 'Shipped']) await expect(about.getByRole('term').filter({ hasText: k })).toHaveCount(1)
+    await expect(about.getByRole('term')).toHaveCount(2)
+    for (const k of ['Builds with', 'Shipped']) await expect(about.getByRole('term').filter({ hasText: k })).toHaveCount(1)
     await expect(about).toContainText('7 projects · 3 live sites')
     await expect(page.locator('body')).not.toContainText(/Houlihan/)
   })

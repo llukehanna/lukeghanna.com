@@ -22,7 +22,6 @@ const nav: RailNavItem[] = [
 const liveSites = projects.filter((p) => p.where.includes('lukeghanna.com')).length
 
 const facts = [
-  ['Fellowship', 'Palantir American Tech Fellowship', 'Frontiers · May–Jul 2026'],
   ['Builds with', 'TypeScript, Python, Swift, Postgres', null],
   ['Shipped', `${projects.length} projects · ${liveSites} live sites`, null],
 ] as const

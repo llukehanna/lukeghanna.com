@@ -1,7 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import type { Project } from '@/content/projects'
-import { links } from '@/lib/site'
 import { StatusDot } from '@/components/StatusDot'
 
 // The card's media slot. A real capture when there is one; otherwise one true figure from the
@@ -82,22 +81,6 @@ export function ProjectList({ projects }: { projects: Project[] }) {
       {projects.map((p, i) => (
         <Card key={p.slug} p={p} index={i} />
       ))}
-      {projects.length % 2 === 1 && (
-        <a
-          href={links.github.href}
-          target="_blank"
-          rel="noreferrer"
-          data-testid="project-more"
-          className="group flex flex-col justify-end gap-[10px] rounded-[20px] border border-line p-7 transition-colors duration-200 hover:border-[var(--glass-line)] max-md:hidden"
-        >
-          <span className="label">Everything else</span>
-          <span className="text-[21px] font-semibold leading-[1.2] tracking-[-0.025em] text-ink">Smaller experiments live on GitHub</span>
-          <span className="flex items-center justify-between font-mono text-[11px] tracking-[0.02em] text-dim">
-            github.com/{links.github.handle}
-            <span aria-hidden className="transition-colors group-hover:text-accent">↗</span>
-          </span>
-        </a>
-      )}
     </div>
   )
 }
