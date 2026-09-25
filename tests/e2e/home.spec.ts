@@ -19,7 +19,6 @@ test.describe('home', () => {
     await page.goto('/')
     for (const slug of ['pfc', 'beacon', 'ccc', 'onair', 'shed', 'bjs']) await expect(page.getByTestId(`project-${slug}`).locator('img')).toHaveCount(1)
     await expect(page.getByTestId('project-kwx').locator('img')).toHaveCount(0)
-    await expect(page.getByTestId('project-pfc')).toContainText('Recreation · invented figures')
     await expect(page.getByTestId('project-kwx')).toContainText('7,440')
   })
 

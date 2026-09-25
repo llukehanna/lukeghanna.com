@@ -104,11 +104,12 @@ test.describe('write-up', () => {
     await expect(page.getByTestId('rail').getByTestId('open-app')).toHaveAttribute('href', 'https://beacon.lukeghanna.com')
   })
 
-  test('PFC has no captures, because every screen would show real balances', async ({ page }) => {
+  test('PFC shows three screens with invented amounts, each saying so, plus its flow', async ({ page }) => {
     await page.goto('/work/pfc')
     const article = page.getByTestId('article')
-    await expect(article.locator('img, video')).toHaveCount(0)
-    await expect(article.locator('figure')).toHaveCount(1)
+    await expect(article.locator('figure img')).toHaveCount(3)
+    await expect(article.locator('figure')).toHaveCount(4)
+    for (const cap of await article.locator('figure:has(img) figcaption').allInnerTexts()) expect(cap).toMatch(/invented/)
     await expect(article.locator('table')).toHaveCount(2)
   })
 
