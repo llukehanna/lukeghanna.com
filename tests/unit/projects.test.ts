@@ -17,7 +17,9 @@ describe('projects', () => {
     }
   })
   it('shows a real capture where one exists and a figure everywhere else, never both', () => {
-    expect(projects.filter((p) => p.screenshot).map((p) => p.slug)).toEqual(['beacon', 'ccc', 'onair', 'shed', 'bjs'])
+    expect(projects.filter((p) => p.screenshot).map((p) => p.slug)).toEqual(['pfc', 'beacon', 'ccc', 'onair', 'shed', 'bjs'])
+    // PFC's image is a recreation (its real screens show real balances), and says so.
+    expect(projects.find((p) => p.slug === 'pfc')?.screenshot?.note).toMatch(/recreation/i)
     for (const p of projects) expect(!!p.screenshot !== !!p.figure, p.slug).toBe(true)
   })
   it('keeps each card to one or two sentences', () => {

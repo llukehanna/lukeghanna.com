@@ -14,10 +14,11 @@ export type Project = {
   /** The stack, in mono under the description. */
   stack: string
   /**
-   * Only a real capture from the real app. `position` is the object-position of the crop;
-   * `phone` marks a portrait capture, shown upright on the slot's backdrop instead of cropped.
+   * A real capture from the real app. `position` is the object-position of the crop; `phone`
+   * marks a portrait capture, shown upright on the slot's backdrop instead of cropped. `note`
+   * labels anything that is not a straight capture, on the image itself.
    */
-  screenshot?: { src: string; width: number; height: number; position?: string; phone?: boolean }
+  screenshot?: { src: string; width: number; height: number; position?: string; phone?: boolean; note?: string }
   /** For a project with no capture yet: one true figure from its write-up, shown in the media slot. */
   figure?: { value: string; label: string }
 }
@@ -32,7 +33,9 @@ export const projects: Project[] = [
     href: '/work/pfc',
     description: 'My full financial state in one append-only ledger. Every action is checked against the plan’s gates before it happens.',
     stack: 'TypeScript · SQLite · Claude over MCP',
-    figure: { value: '20', label: 'opportunity-cost rules in 7 families' },
+    // A recreation of the Today screen with invented accounts and figures: every real screen
+    // shows real balances. Labelled as such on the card.
+    screenshot: { src: '/shots/pfc.png', width: 2880, height: 1620, note: 'Recreation · invented figures' },
   },
   {
     slug: 'beacon',
