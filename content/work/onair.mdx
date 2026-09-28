@@ -13,7 +13,8 @@ export const meta = {
     { label: 'Escalation', value: '4 rungs' },
     { label: 'Continuity', value: 'program-date-time' },
     { label: 'Scores', value: 'ESPN, 60 s poll' },
-    { label: 'Tests', value: '548 + 7 real-decoder' },
+    { label: 'Leagues', value: 'NFL · NBA · MLB · CFB · CBB' },
+    { label: 'Tests', value: '578 + 7 real-decoder' },
   ],
 }
 
@@ -78,7 +79,7 @@ Sources run 45 to 100 seconds apart. When a stream carries wall-clock timestamps
 
 ## The interface
 
-The home screen is built from ESPN's public scoreboard: team logos and colors, live scores, the game clock, the network and the venue, refreshed every sixty seconds while games are on. A live game gets a full-width hero in its teams' colors, with rows of upcoming games under it. The player is full-bleed video with controls that hide themselves and a details drawer: the scoreboard, the current stream's source, quality and distance behind live, the ranked candidates, and how many failures it has recovered from.
+The home screen is built from ESPN's public scoreboard for five leagues, the NFL, NBA, MLB, college football and college basketball: team logos, colors and records, live scores, the game clock, the network and the venue, refreshed every sixty seconds while games are on. A live game gets a full-width hero in its teams' colors, with rows of upcoming games under it. The player is full-bleed video with controls that hide themselves and a details drawer: the scoreboard, the current stream's source, quality and distance behind live, the ranked candidates, and how many failures it has recovered from.
 
 <Figure
   n={4}
@@ -102,4 +103,4 @@ The home screen is built from ESPN's public scoreboard: team logos and colors, l
 
 ## Status
 
-Works end to end against the fixture source; the embedded-player rung is covered by unit tests only. macOS only, installed locally with one command as an ad-hoc arm64 build, not signed or notarized for distribution. 548 tests across 32 suites plus seven real-decoder browser tests, and CI runs typecheck, lint, tests, build and the browser tier on macOS for every pull request.
+Works end to end against the fixture source; the embedded-player rung is covered by unit tests only. macOS only, installed locally with one command as an ad-hoc arm64 build, not signed or notarized for distribution. 578 tests across 33 suites plus seven real-decoder browser tests, and CI runs typecheck, lint, tests, build and the browser tier on macOS for every pull request.
