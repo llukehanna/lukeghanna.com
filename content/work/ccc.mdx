@@ -1,29 +1,51 @@
 export const meta = {
   title: 'Clippers Command Center',
   line: 'A live Clippers dashboard that only says what it can prove.',
-  status: 'Live · desktop only',
+  status: 'Live · responsive, installable to a phone',
   role: 'Design, build, operate',
-  stack: 'Next.js 16, React 19, Neon Postgres, SWR, Recharts, Vitest, GitHub Actions',
+  stack: 'Next.js 16, React 19, Neon Postgres, SWR, Recharts, cmdk, Vitest, GitHub Actions, Vercel CDN',
   source: 'Public. MIT.',
   app: { label: 'clippers.lukeghanna.com', href: 'https://clippers.lukeghanna.com' },
   links: [
     { label: 'Source', handle: 'github', href: 'https://github.com/llukehanna/Clippers-Command-Center' },
   ],
   glance: [
-    { label: 'Live poll', value: 'every 5 min · page 12 s' },
+    { label: 'Live poll', value: '2–30 s by game phase' },
     { label: 'Insight rule', value: 'proof, re-verified nightly' },
-    { label: 'History', value: 'league-wide, by season' },
-    { label: 'Live states', value: 'live · delayed · idle' },
-    { label: 'Jobs', value: '10 scripts, no queue' },
-    { label: 'Tests', value: '227' },
+    { label: 'History', value: '6 full seasons, league-wide' },
+    { label: 'Seasons', value: '2019-20 → 2025-26' },
+    { label: 'Running cost', value: '$0 on free tiers' },
+    { label: 'Tests', value: '331' },
   ],
 }
 
-Clippers Command Center is a desktop dashboard for watching Clippers games with statistical context. Every headline it shows was verified against its own database before it rendered.
+Clippers Command Center is a Clippers dashboard with statistical context: a live game view, a between-games home, players, the schedule and six seasons of history. Every stored insight carries the query that proves it, and every proof is re-run nightly.
+
+<Figure
+  n={1}
+  src="/work/ccc/home.png"
+  width={2880}
+  height={1800}
+  alt="The CCC home page: the season opener against Sacramento with a countdown, last season's record and ratings, a last-ten margin chart, player trends and a verified insight"
+  caption="Home between games: the next game with a countdown, last season's record and ratings, the last ten games as margins, player trends, and the insight pool."
+  source="Screenshot of clippers.lukeghanna.com, 27 September 2026, preseason."
+/>
 
 ## What it does
 
-Three modes in one app. During a Clippers game: scoreboard, a dense box score, four key metrics computed on the fly from the newest snapshot (effective field goal percentage, turnover margin, rebound margin, pace), rotating insights, and a side panel for the other games that night. Between games: a team snapshot, the upcoming schedule with Vegas odds, player trends, and macro insights. A historical explorer covers every season in the database with a final Clippers game, game by game, with drill-through to box scores and trend charts.
+Five pages behind one top bar and a ⌘K palette that searches players, games and pages. Home is the between-games view. Live is the game view: scoreboard, quarter line scores, a dense box score, the score in the browser tab, and a sticky mini-scoreboard. Players has a page per player with a headshot, rolling averages, splits and a game log. Schedule labels back-to-backs, rest days, home stands and road trips. History covers every season in the database game by game, with a results strip and streaks per season, play-in and playoff games labeled and kept out of the records, and drill-through to every box score.
+
+<Figure
+  n={2}
+  src="/work/ccc/player.png"
+  width={2880}
+  height={1800}
+  alt="Kawhi Leonard's player page: headshot, 2025-26 points, rebounds, assists and true shooting with last-ten deltas, a rolling points average chart, and home/away and win/loss splits"
+  caption="A player page: season averages against the last ten games, a rolling average, and venue and result splits."
+  source="Screenshot of clippers.lukeghanna.com/players/274."
+/>
+
+The interface was rebuilt in September 2026 on a new design system: Geist, a Clippers palette and glass panels, real team logos and NBA headshots, page transitions, and layouts that work down to phone width. It installs to a phone's home screen. Before that it was a desktop-only dashboard with a 1,024-pixel minimum.
 
 ## Provable insights
 
@@ -38,23 +60,35 @@ proof_hash    sha256(category | team | player | game | season | metric): identit
 
 A generator whose proof comes back empty is dropped before the upsert. The identity key is a unique index, so re-running the engine updates an existing insight instead of duplicating it, and any insight a run does not re-emit is deactivated. Every night a verify step re-runs every active proof and fails the job if the stored rows no longer come back. Batch categories run in dependency order: scoring and shooting streaks, season milestones, rare events (the top 1% of every NBA player-game that season), opponent context, league comparisons, and year over year. Claims are scoped to one stats season, the latest with at least ten Clippers games, regular season only, for players who finished the season with the Clippers. Importance is a base score per category plus rarity and recency boosts, capped at 100, and the client rotates the top of the pool.
 
-Live insights are different. They are pure functions over the latest snapshot and the rolling ten-game context, and they are never written to the table. Two detectors: a scoring run of eight or more unanswered points in the last two minutes of play-by-play, and a clutch flag for the last five minutes of the fourth quarter or overtime with a margin of eight or less.
+Live insights are different. They are pure functions over the latest live data and the rolling ten-game context, they are never written to the table, and they carry no stored proof. Two detectors: a scoring run of eight or more unanswered points in the last two minutes of play-by-play, and a clutch flag for the last five minutes of the fourth quarter or overtime with a margin of eight or less.
+
+<Figure
+  n={3}
+  src="/work/ccc/insight.png"
+  width={1050}
+  height={744}
+  alt="An insight card: Kawhi Leonard reached 1,750 points in 2025-26, 1,813 points in 65 games, with a Verified footer citing 65 games, above three more verified insights"
+  caption="An insight as it renders: the headline, the number behind it, and a Verified footer naming the rows its proof returned."
+  source="Screenshot of the home page's insight panel on clippers.lukeghanna.com."
+/>
 
 > If it can't prove it from the database, it doesn't show it.
 
 ## Live without flicker
 
-In production a GitHub Actions cron calls a stateless route every five minutes. Each call fetches the scoreboard, box score and play-by-play from the NBA CDN and appends one snapshot to an append-only table: score, clock, both box scores, and the last two minutes of scoring. When the game goes final the route only marks it so; the nightly job writes the box scores. An operator loop that polls every twelve seconds exists for game nights at the keyboard.
+A game-night runner polls the NBA feed on a cadence set by the state of the game: every three seconds in live play, two in the clutch, eight during stoppages, thirty early in halftime. It fetches the box score only when a new play appears and writes one live-state row per game. The live endpoint is served through Vercel's CDN, so the origin answers about once every two seconds per region however many people are watching, and the live page follows the cadence the runner advertises while the site-wide top bar refreshes every thirty seconds. One poller makes about 3,000 requests to the NBA feed over a game.
 
-The live page never calls the CDN. It reads the newest snapshot through one endpoint that returns one of three states: no active game, data delayed, or live. The client polls that endpoint with SWR every twelve seconds while a game is live or possible and every five minutes when nothing is on. When the newest snapshot is more than seven minutes old, the endpoint reports delayed and the page shows last-known numbers under an amber "Data delayed" banner with the age of the snapshot, instead of silently serving them as current.
+The live page never calls the NBA feed itself. It reads the live-state document through that one endpoint, which reports one of three states: no active game, data delayed, or live. When the newest data is too old to trust, the page shows last-known numbers under a "Data delayed" banner instead of silently serving them as current.
+
+This pipeline replaced a fixed twelve-second loop in September 2026 and has not yet run during a real game. The first will be the season opener on 21 October.
 
 ## Pipeline
 
-Separate scripts, one job each: sync the schedule and attach NBA game ids, sync the odds, poll live, sync every NBA game's box scores league-wide (the last three days nightly, or a whole season on demand), finalize games, compute stats incrementally (possessions, pace, offensive and defensive rating, shooting efficiency, five- and ten-game rolling windows), generate insights, verify insights, and backfill. Every write is an idempotent upsert, so any script can be re-run. GitHub Actions cron drives them: the schedule daily, odds every six hours, a five-minute poll that calls the stateless route, and a post-game job that syncs, finalizes, computes, generates and verifies in that order. No queue, no workflow engine. Cron authentication fails closed with a constant-time compare, failures return real error codes instead of a quiet 200, and CI runs typecheck, lint and 227 Vitest cases against a Postgres service.
+Separate scripts, one job each: sync the schedule and attach NBA game ids, sync the odds, run the live game night, sync every NBA game's box scores league-wide (the last three days nightly, or a whole season on demand), finalize games, compute stats incrementally (possessions, pace, offensive and defensive rating, shooting efficiency, five- and ten-game rolling windows), generate insights, verify insights, and backfill. Every write is an idempotent upsert, so any script can be re-run. GitHub Actions drives them: the schedule daily, odds every six hours, the game-night runner, and a post-game job that syncs, finalizes, computes, generates and verifies in that order. No queue, no workflow engine. Cron authentication fails closed with a constant-time compare, failures return real error codes instead of a quiet 200, and CI runs typecheck, lint and 331 Vitest cases against a Postgres service. The whole thing runs on free tiers: Vercel Hobby, Neon Free and GitHub Actions.
 
 <Flow
-  n={1}
-  caption="The two pipelines. Live snapshots are appended every five minutes during a game; everything derived is recomputed nightly and incrementally."
+  n={4}
+  caption="The two pipelines. The game-night runner keeps one live-state row per game current; everything derived is recomputed nightly and incrementally."
   source="Drawn from scripts/, app/api, .github/workflows and Docs/DB_SCHEMA.sql in the repository."
   steps={[
     [
@@ -63,18 +97,42 @@ Separate scripts, one job each: sync the schedule and attach NBA game ids, sync 
       { title: 'the-odds-api', detail: 'spreads, moneylines, totals; display only' },
     ],
     [
-      { title: 'poll-live', detail: 'every 5 min via GitHub Actions; appends a snapshot' },
+      { title: 'game-night runner', detail: 'polls by game phase, 2–30 s; box score only on a new play; one live-state row per game' },
       { title: 'sync-schedule · sync-odds', detail: 'daily, with NBA ids · every 6 h' },
     ],
     { title: 'sync-league-games', detail: 'every NBA game, last three days nightly' },
     { title: 'finalize-games', detail: 'box scores locked once the game is final' },
     { title: 'compute-stats', detail: 'possessions, pace, ratings, rolling 5 and 10; incremental' },
     { title: 'generate-insights · verify-insights', detail: 'proof_sql, proof_params, proof_result, identity key; empty proof rejected; every active proof re-run' },
-    { title: 'Page-shaped API', detail: '/api/live, /api/home, /api/schedule, /api/history, /api/players; staleness in every envelope' },
+    { title: 'Page-shaped API', detail: '/api/live through the CDN; /api/home, /api/schedule, /api/history, /api/players; staleness in every envelope' },
     { title: 'SWR pages', detail: 'live, home, schedule, history, players' },
   ]}
 />
 
+## History
+
+The database holds box scores for every NBA game league-wide, not just the Clippers'. Six seasons are complete, 2020-21 through 2025-26, regular season and postseason; 2019-20 is partial and still loading.
+
+<Figure
+  n={5}
+  src="/work/ccc/game.png"
+  width={2880}
+  height={1800}
+  alt="Game detail for 18 June 2021, Clippers 131, Jazz 119, playoffs: quarter line score and the Clippers box score led by Terance Mann's 39 points"
+  caption="Game 6 against Utah, 18 June 2021: the win that sent the Clippers to their first conference finals, Terance Mann with 39."
+  source="Screenshot of clippers.lukeghanna.com/history/8312."
+/>
+
+<Figure
+  n={6}
+  src="/work/ccc/history.png"
+  width={2880}
+  height={1800}
+  alt="The 2025-26 history page: 42-40 record, home and away splits, average margin, and a season results strip of 83 games with win and loss bars"
+  caption="A season at a glance: record, splits, and every game's margin as one strip, with the longest streaks underneath."
+  source="Screenshot of clippers.lukeghanna.com/history, 2025-26."
+/>
+
 ## What it is not
 
-Desktop only; the layout assumes at least 1024 pixels. No accounts and no personalization. Odds are for display and insight context, not betting. And the engine can only prove what is in the database, which holds league-wide box scores by season rather than franchise history, so a batch claim is scoped to one stats season and the one before it, regular season only.
+No accounts and no personalization. Odds are for display and insight context, not betting. The live pipeline is unproven until it runs through a real game. And the engine can only prove what is in the database, so a batch claim is scoped to one stats season and the one before it, regular season only.

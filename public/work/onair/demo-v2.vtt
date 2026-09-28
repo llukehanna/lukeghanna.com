@@ -1,0 +1,13 @@
+WEBVTT
+
+00:00.000 --> 00:02.500
+The home screen; the next game's hero is clicked to watch.
+
+00:02.500 --> 00:10.000
+The first fixture stream plays, with the details drawer open.
+
+00:10.000 --> 00:17.500
+A stall is injected; the picture holds its last frame.
+
+00:17.500 --> 00:22.320
+Failover to the second stream with no black frame; the drawer reports one recovered failure.
