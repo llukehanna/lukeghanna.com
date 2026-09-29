@@ -32,7 +32,9 @@ test.describe('rail', () => {
     test.skip(isMobile, 'the rail nav is md+')
     await page.goto('/')
     const rail = page.getByTestId('rail')
-    for (const slug of ['pfc', 'beacon', 'ccc', 'kwx', 'onair', 'shed', 'bjs']) await expect(rail.getByTestId(`nav-${slug}`)).toHaveAttribute('href', `#${slug}`)
+    for (const slug of ['pfc', 'beacon', 'ccc', 'kwx', 'onair', 'solitaire']) await expect(rail.getByTestId(`nav-${slug}`)).toHaveAttribute('href', `#${slug}`)
+    // The index under the grid stays out of the rail.
+    for (const slug of ['shed', 'bjs']) await expect(rail.getByTestId(`nav-${slug}`)).toHaveCount(0)
     await page.getByTestId('project-onair').scrollIntoViewIfNeeded()
     await page.evaluate(() => window.scrollBy(0, 1))
     await expect(rail.getByTestId('nav-projects')).toHaveAttribute('aria-current', 'true')

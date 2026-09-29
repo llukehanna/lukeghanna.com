@@ -1,9 +1,9 @@
 import { test, expect } from '@playwright/test'
 
 test.describe('home', () => {
-  const slugs = ['pfc', 'beacon', 'ccc', 'kwx', 'onair', 'shed', 'bjs']
+  const slugs = ['pfc', 'beacon', 'ccc', 'kwx', 'onair', 'solitaire', 'shed', 'bjs']
 
-  test('about comes first, then the seven project cards, each linking to its write-up', async ({ page }) => {
+  test('about comes first, then every project, each linking to its write-up', async ({ page }) => {
     await page.goto('/')
     const [about, projects] = await Promise.all([page.locator('#about').boundingBox(), page.locator('#projects').boundingBox()])
     expect(about!.y).toBeLessThan(projects!.y)
@@ -15,9 +15,22 @@ test.describe('home', () => {
     await expect(page.locator('#projects h2')).toHaveText('Projects')
   })
 
+  test('six cards in the grid, the rest as one-line rows in the index under it', async ({ page }) => {
+    await page.goto('/')
+    const more = page.getByTestId('more-projects')
+    await expect(more.getByRole('link')).toHaveCount(2)
+    for (const slug of ['shed', 'bjs']) {
+      await expect(more.getByTestId(`project-${slug}`)).toBeVisible()
+      await expect(page.getByTestId(`project-${slug}`).locator('img')).toHaveCount(0)
+    }
+    await expect(more).toContainText('08')
+    const [lastCard, index] = await Promise.all([page.getByTestId('project-solitaire').boundingBox(), more.boundingBox()])
+    expect(index!.y).toBeGreaterThan(lastCard!.y + lastCard!.height - 1)
+  })
+
   test('cards with a real capture show it; the rest show a figure from the write-up', async ({ page }) => {
     await page.goto('/')
-    for (const slug of ['pfc', 'beacon', 'ccc', 'onair', 'shed', 'bjs']) await expect(page.getByTestId(`project-${slug}`).locator('img')).toHaveCount(1)
+    for (const slug of ['pfc', 'beacon', 'ccc', 'onair', 'solitaire']) await expect(page.getByTestId(`project-${slug}`).locator('img')).toHaveCount(1)
     await expect(page.getByTestId('project-kwx').locator('img')).toHaveCount(0)
     await expect(page.getByTestId('project-kwx')).toContainText('7,440')
   })
@@ -27,7 +40,7 @@ test.describe('home', () => {
     const about = page.locator('#about')
     await expect(about.getByRole('term')).toHaveCount(2)
     for (const k of ['Builds with', 'Shipped']) await expect(about.getByRole('term').filter({ hasText: k })).toHaveCount(1)
-    await expect(about).toContainText('7 projects · 3 live sites')
+    await expect(about).toContainText('8 projects · 4 live sites')
     await expect(page.locator('body')).not.toContainText(/Houlihan/)
   })
 

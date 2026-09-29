@@ -3,8 +3,14 @@ import { existsSync } from 'node:fs'
 import { projects } from '@/content/projects'
 
 describe('projects', () => {
-  it('has exactly the seven projects in order', () => {
-    expect(projects.map((p) => p.slug)).toEqual(['pfc', 'beacon', 'ccc', 'kwx', 'onair', 'shed', 'bjs'])
+  it('has exactly the eight projects in order', () => {
+    expect(projects.map((p) => p.slug)).toEqual(['pfc', 'beacon', 'ccc', 'kwx', 'onair', 'solitaire', 'shed', 'bjs'])
+  })
+  it('keeps the grid at six, ahead of the index', () => {
+    expect(projects.filter((p) => p.selected).map((p) => p.slug)).toEqual(['pfc', 'beacon', 'ccc', 'kwx', 'onair', 'solitaire'])
+    // Grid first, index after, so the numbering and the write-ups' previous/next read in one order.
+    const firstIndexed = projects.findIndex((p) => !p.selected)
+    expect(projects.slice(firstIndexed).every((p) => !p.selected)).toBe(true)
   })
   it('has unique slugs and every row goes to its own write-up', () => {
     const slugs = new Set(projects.map((p) => p.slug))
@@ -17,7 +23,7 @@ describe('projects', () => {
     }
   })
   it('shows a real capture where one exists and a figure everywhere else, never both', () => {
-    expect(projects.filter((p) => p.screenshot).map((p) => p.slug)).toEqual(['pfc', 'beacon', 'ccc', 'onair', 'shed', 'bjs'])
+    expect(projects.filter((p) => p.screenshot).map((p) => p.slug)).toEqual(['pfc', 'beacon', 'ccc', 'onair', 'solitaire', 'shed', 'bjs'])
     for (const p of projects) expect(!!p.screenshot !== !!p.figure, p.slug).toBe(true)
   })
   it('keeps each card to one or two sentences', () => {

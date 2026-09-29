@@ -1,5 +1,5 @@
 export type Project = {
-  slug: 'pfc' | 'beacon' | 'ccc' | 'kwx' | 'onair' | 'shed' | 'bjs'
+  slug: 'pfc' | 'beacon' | 'ccc' | 'kwx' | 'onair' | 'solitaire' | 'shed' | 'bjs'
   title: string
   /** One or two words on the project's state: Live, Research, macOS, iOS. */
   statusLabel: string
@@ -9,6 +9,11 @@ export type Project = {
   where: string
   /** Every card goes to its write-up. The write-up's rail carries the live-site and source links. */
   href: `/work/${Project['slug']}`
+  /**
+   * In the six-card grid. The rest sit in the one-line index under it. The grid stays at six: a
+   * new project earns a card by replacing the weakest one, which moves down to the index.
+   */
+  selected: boolean
   /** One sentence. The write-up carries the depth. */
   description: string
   /** The stack, in mono under the description. */
@@ -28,6 +33,7 @@ export const projects: Project[] = [
     title: 'Personal Finance Coach',
     statusLabel: 'Live',
     live: true,
+    selected: true,
     where: 'private, syncing daily',
     href: '/work/pfc',
     description: 'My full financial state in one append-only ledger. Every action is checked against the plan’s gates before it happens.',
@@ -40,6 +46,7 @@ export const projects: Project[] = [
     title: 'Beacon',
     statusLabel: 'Live',
     live: true,
+    selected: true,
     where: 'beacon.lukeghanna.com',
     href: '/work/beacon',
     description: 'A deal-sourcing workbench that learns its screening rules from the analysts who reject firms.',
@@ -51,6 +58,7 @@ export const projects: Project[] = [
     title: 'Clippers Command Center',
     statusLabel: 'Live',
     live: true,
+    selected: true,
     where: 'clippers.lukeghanna.com',
     href: '/work/ccc',
     description: 'Clippers analytics where every stored insight carries the query that proves it, over six seasons of league-wide box scores.',
@@ -62,6 +70,7 @@ export const projects: Project[] = [
     title: 'Kalshi Weather Edge',
     statusLabel: 'Research',
     live: false,
+    selected: true,
     where: 'demo pending',
     href: '/work/kwx',
     description: 'The market out-predicts the model: 7,440 settled signals, and a calibration gate that never let it trade.',
@@ -73,6 +82,7 @@ export const projects: Project[] = [
     title: 'OnAir',
     statusLabel: 'macOS',
     live: false,
+    selected: true,
     where: 'local build, source public',
     href: '/work/onair',
     description: 'A live-sports player that fails over between ranked HLS streams without the picture ever going black.',
@@ -80,10 +90,23 @@ export const projects: Project[] = [
     screenshot: { src: '/shots/onair-home.png', width: 1440, height: 900 },
   },
   {
+    slug: 'solitaire',
+    title: 'Solitaire',
+    statusLabel: 'Live',
+    live: true,
+    selected: true,
+    where: 'solitaire.lukeghanna.com',
+    href: '/work/solitaire',
+    description: 'Ad-free Klondike where a solver proves every deal winnable before you see it, then backs the hints and the rewind.',
+    stack: 'React · TypeScript · Web Worker solver',
+    screenshot: { src: '/work/solitaire/table.png', width: 2880, height: 1620 },
+  },
+  {
     slug: 'shed',
     title: 'Shedquarters',
     statusLabel: 'Live',
     live: true,
+    selected: false,
     where: 'shed.lukeghanna.com',
     href: '/work/shed',
     description: 'Skill ratings for a house beer-die and spikeball league, scored offline-first from a phone at the table.',
@@ -95,6 +118,7 @@ export const projects: Project[] = [
     title: 'BJS',
     statusLabel: 'iOS',
     live: false,
+    selected: false,
     where: 'counting next',
     href: '/work/bjs',
     description: 'A native blackjack trainer on a tested Swift package. The strategy trainer is the first screen done.',

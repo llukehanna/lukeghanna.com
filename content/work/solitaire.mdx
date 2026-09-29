@@ -1,0 +1,105 @@
+export const meta = {
+  title: 'Solitaire',
+  line: 'Ad-free Klondike where every deal is proven winnable before it is dealt.',
+  status: 'Live · installable, plays offline',
+  role: 'Design, build, operate',
+  stack: 'React 19, TypeScript, Vite, Web Workers, vite-plugin-pwa, Vitest, Playwright',
+  source: 'Private, no git remote.',
+  app: { label: 'solitaire.lukeghanna.com', href: 'https://solitaire.lukeghanna.com' },
+  links: [],
+  glance: [
+    { label: 'Deal bank', value: '2,000 per draw mode' },
+    { label: 'Solver', value: 'DFS + transposition table' },
+    { label: 'Hint budget', value: '1.5 s, in a worker' },
+    { label: 'Repeats skipped', value: 'last 200 deals' },
+    { label: 'Backend', value: 'none' },
+    { label: 'Tests', value: '134 unit · 12 e2e' },
+  ],
+}
+
+Klondike solitaire with nothing in the way: no ads, no accounts, no server. It is a static page that installs as an app and plays offline. The part that matters is one TypeScript solver, which runs at build time to pick the deals and in a Web Worker at runtime to answer the question every solitaire player eventually asks: can I still win this?
+
+<Figure
+  n={1}
+  src="/work/solitaire/table.png"
+  width={2880}
+  height={1620}
+  alt="A Klondike table mid-game on green felt: stock and empty waste top left, hearts and clubs foundations started top right, seven tableau columns below, with a toolbar of New, Undo, Redo, Hint, Winnable?, Stats and Settings"
+  caption="Ninety moves into a draw-one deal on the Classic Felt theme. The score floors at zero because this line recycles the stock."
+  source="Screenshot of solitaire.lukeghanna.com at 1440×810, 29 September 2026. The deal is from the bank; the moves were fed in from the solver's own solution through the app's test hook."
+/>
+
+## Every deal is proven winnable
+
+Random Klondike deals are sometimes impossible, and a player cannot tell a lost deal from a lost game. So there are no random deals. A 32-bit seed drives a mulberry32 generator and a Fisher–Yates shuffle, so a seed fully determines a deal, and a build script solves seeds across every CPU core until it has 2,000 winnable ones for each draw mode. The banked solutions run 118 to 261 moves in draw one and 101 to 189 in draw three.
+
+A new game picks a random banked seed and skips the last 200 the player has seen. Solutions are not stored: the solver is deterministic, so the tests re-solve banked seeds with the bank's own node budget and replay each solution through the engine to a win, a sample on every run and all 4,000 on demand.
+
+The guarantee has one stated limit. The solver assumes unlimited passes through the stock, and Vegas scoring allows one pass in draw one and three in draw three, so the settings say plainly that a Vegas deal may not be winnable.
+
+## One solver, three jobs
+
+The search is a depth-first search with a transposition table. Its state key sorts the tableau columns, so positions that differ only in which column holds which pile collapse into one, and it encodes the stock as a position in its draw cycle rather than as two piles. Safe foundation moves are applied without branching, and stock play is folded into compound moves (draw until a given card is on top, then play it), which removes most of the branching a Klondike search wastes on the stock.
+
+It runs in two passes. A pruned pass that only considers useful tableau moves finds most wins quickly. If it runs out of moves, a complete pass searches everything, and only a complete pass that runs out can answer "unwinnable". Running out of budget or time always answers "couldn't tell", never "lost".
+
+<Flow
+  n={2}
+  caption="What the in-game solver answers, and what the app does with each answer."
+  source="Drawn from src/solver/solve.ts, src/solver/rewind.ts and src/ui/useSolver.ts."
+  steps={[
+    { title: 'Hint or Winnable?', detail: 'the current position goes to the worker; input never waits' },
+    { title: 'Search', detail: 'pruned pass, then complete pass, within 1.5 s' },
+    [
+      { title: 'Winnable', detail: 'highlight the first move of the winning line' },
+      { title: 'Couldn’t tell', detail: 'fall back to a heuristic hint' },
+      { title: 'Unwinnable', detail: 'offer to rewind to the last winnable position' },
+    ],
+  ]}
+/>
+
+The hint is the first move of an actual winning line, not the first legal move. The Winnable? button runs the same search and reports the verdict, and the check also runs by itself when the player has no productive moves left. When the answer is no, rewind walks back through the game's history: it tests the newest position first, then binary-searches the rest, since the opening deal is known to be winnable, and undoes to the most recent position the solver can prove.
+
+<Figure
+  n={3}
+  src="/work/solitaire/winnable.png"
+  width={2880}
+  height={1620}
+  alt="The same table with a toast at the bottom reading 'Still winnable. Keep going!'"
+  caption="The Winnable? check on the same position. The worker searches while the table stays live."
+  source="Screenshot of solitaire.lukeghanna.com at 1440×810, 29 September 2026."
+/>
+
+## Finishing and winning
+
+Once every tableau card is face up, the game is usually decided, but not always: draw three can bury a card in the stock, and Vegas can run out of passes. Auto-finish tries a greedy pass first (play the lowest card that fits a foundation, otherwise draw) and falls back to a short solver run that respects the pass limit. If neither finds a finish, play just continues, and it checks again after the next move. When it does fire, input locks, the cards fly home, and the classic bouncing-card cascade plays on a canvas that is never cleared.
+
+<Figure
+  n={4}
+  src="/work/solitaire/cascade.png"
+  width={2880}
+  height={1620}
+  alt="The win cascade: cards bouncing off the bottom of the screen, each leaving a trail of copies of itself across the green felt"
+  caption="The win cascade, about two seconds in. Each card leaves a trail because the canvas is never cleared. The timer reads 0:00 because the moves were fed in instantly."
+  source="Screenshot of solitaire.lukeghanna.com at 1440×810, 29 September 2026, the same deal played to the end from its banked solution."
+/>
+
+## The table
+
+All 52 cards are absolutely positioned elements keyed by card id, and each card's position is a pure function of the game state and the layout, so every state change animates through CSS transforms with no animation code per move. Card size comes from both the viewport's width and height, so the whole table fits without scrolling, and long columns compress their offsets to fit. Tap sends a card to its best destination, double-tap sends it to a foundation, drag works with a five-pixel threshold between tap and drag, and the whole game is playable from the keyboard with every move announced to screen readers.
+
+The game is saved after every move as the seed plus the list of turns, and replayed on load, so undo, redo, the timer and the score survive a reload. Every read from storage is validated, and the app still works when storage is unavailable. The classic faces are Adrian Kennard's public-domain SVG deck; the minimal theme draws its own cards, and the sounds are synthesized with Web Audio, so there are no audio files.
+
+<Figure
+  n={5}
+  src="/work/solitaire/minimal-dark.png"
+  width={2880}
+  height={1620}
+  alt="The same position on the Modern Minimal theme in dark mode: flat dark cards with large corner indices and one large centre suit"
+  caption="The same position on the Modern Minimal theme, which follows the system's dark mode. Court cards are a large rank letter instead of a face."
+  source="Screenshot of solitaire.lukeghanna.com at 1440×810, 29 September 2026."
+/>
+
+## Status
+
+Live at solitaire.lukeghanna.com as static files on Vercel, installable as an app, and fully playable offline once loaded; an open tab reloads onto a new deploy. Draw one and draw three, standard, Vegas or no scoring, stats per draw mode, and a four-colour deck. Klondike only for now; the engine is structured for FreeCell and Spider next. 134 unit tests across 21 files and 12 Playwright end-to-end tests, including one that plays a banked deal to a win and one that moves cards with the keyboard alone.

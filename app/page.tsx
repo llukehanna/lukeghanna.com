@@ -7,13 +7,17 @@ import { projects } from '@/content/projects'
 import { buildLabel } from '@/lib/colophon'
 import { links } from '@/lib/site'
 
+// The grid holds the six best; everything else sits in the index under it. The rail lists only the grid.
+const selected = projects.filter((p) => p.selected)
+const more = projects.filter((p) => !p.selected)
+
 const nav: RailNavItem[] = [
   { id: 'about', label: 'About', index: '01' },
   {
     id: 'projects',
     label: 'Projects',
     index: '02',
-    children: projects.map((p) => ({ id: p.slug, label: p.title, live: p.live })),
+    children: selected.map((p) => ({ id: p.slug, label: p.title, live: p.live })),
   },
   { id: 'contact', label: 'Contact', index: '03' },
 ]
@@ -58,7 +62,7 @@ export default function Home() {
         </Section>
 
         <Section id="projects" title="Projects" index="02">
-          <ProjectList projects={projects} />
+          <ProjectList projects={selected} more={more} />
         </Section>
 
         <Section id="contact" title="Contact" index="03">
