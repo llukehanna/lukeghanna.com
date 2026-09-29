@@ -75,12 +75,57 @@ function Card({ p, index }: { p: Project; index: number }) {
   )
 }
 
-export function ProjectList({ projects }: { projects: Project[] }) {
+// A project that is not in the grid: one line in a quiet index under it, still going to its
+// write-up. Numbering continues from the cards.
+function Row({ p, index }: { p: Project; index: number }) {
   return (
-    <div className="grid grid-cols-2 gap-5 max-md:grid-cols-1 max-md:gap-4">
-      {projects.map((p, i) => (
-        <Card key={p.slug} p={p} index={i} />
-      ))}
-    </div>
+    <li className="border-t border-line first:border-t-0">
+      <Link
+        href={p.href}
+        id={p.slug}
+        data-testid={`project-${p.slug}`}
+        className="group grid scroll-mt-[calc(var(--nav-bar-h)+16px)] grid-cols-[28px_minmax(0,1fr)_auto] items-baseline gap-x-4 gap-y-1 rounded-[14px] px-4 py-4 transition-colors duration-200 hover:bg-[var(--spot)] md:scroll-mt-6 max-md:grid-cols-[minmax(0,1fr)_auto] max-md:px-3"
+      >
+        <span className="font-mono text-[10.5px] tracking-normal text-dim max-md:hidden">{String(index + 1).padStart(2, '0')}</span>
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+            <h3 className="text-[16px] font-semibold leading-[1.3] tracking-[-0.015em] text-ink transition-colors duration-200 group-hover:text-accent">
+              {p.title}
+            </h3>
+            <span className="flex items-center gap-2 font-mono text-[10.5px] uppercase tracking-[0.08em] text-dim">
+              <StatusDot live={p.live} />
+              <span className={p.live ? 'text-accent' : 'text-mute'}>{p.statusLabel}</span>
+              <span>· {p.where}</span>
+            </span>
+          </div>
+          <p className="mt-1 text-[14px] leading-[1.55] text-mute">{p.description}</p>
+        </div>
+        <span aria-hidden className="text-dim transition-[transform,color] duration-200 ease-[var(--ease)] group-hover:-translate-y-[3px] group-hover:translate-x-[3px] group-hover:text-accent">
+          →
+        </span>
+      </Link>
+    </li>
+  )
+}
+
+export function ProjectList({ projects, more = [] }: { projects: Project[]; more?: Project[] }) {
+  return (
+    <>
+      <div className="grid grid-cols-2 gap-5 max-md:grid-cols-1 max-md:gap-4">
+        {projects.map((p, i) => (
+          <Card key={p.slug} p={p} index={i} />
+        ))}
+      </div>
+      {more.length > 0 && (
+        <div className="mt-12 max-md:mt-10" data-testid="more-projects">
+          <h3 className="label mb-3 px-4 max-md:px-3">Also built</h3>
+          <ul className="rounded-[20px] border border-line bg-[var(--card)] p-[6px] shadow-[inset_0_1px_0_var(--glass-hl)]">
+            {more.map((p, i) => (
+              <Row key={p.slug} p={p} index={projects.length + i} />
+            ))}
+          </ul>
+        </div>
+      )}
+    </>
   )
 }

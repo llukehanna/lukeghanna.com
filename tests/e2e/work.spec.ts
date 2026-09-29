@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test'
 
 import type { Page } from '@playwright/test'
 
-const slugs = ['pfc', 'beacon', 'ccc', 'kwx', 'onair', 'shed', 'bjs']
+const slugs = ['pfc', 'beacon', 'ccc', 'kwx', 'onair', 'solitaire', 'shed', 'bjs']
 
 // Below md the rail hides its link list and the same links close the article instead.
 const linksOf = (page: Page, isMobile: boolean) => (isMobile ? page.getByTestId('article-footer') : page.getByTestId('rail'))
@@ -54,6 +54,8 @@ test.describe('write-up', () => {
   })
 
   test('every write-up renders, names its state, and avoids projection language', async ({ page }) => {
+    // One page load per write-up; under a full parallel run eight of them outgrow the default 30 s.
+    test.slow()
     for (const slug of slugs) {
       await page.goto(`/work/${slug}`)
       await expect(page.getByTestId('rail').getByRole('term').filter({ hasText: 'Status' })).toHaveCount(1)
