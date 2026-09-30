@@ -3,7 +3,7 @@ export const meta = {
   line: 'Ad-free Klondike where every deal is proven winnable before it is dealt.',
   status: 'Live · installable, plays offline',
   role: 'Design, build, operate',
-  stack: 'React 19, TypeScript, Vite, Web Workers, vite-plugin-pwa, Vitest, Playwright',
+  stack: 'React 19, TypeScript, Vite, Web Workers, vite-plugin-pwa, Geist, Vitest, Playwright',
   source: 'Private, no git remote.',
   app: { label: 'solitaire.lukeghanna.com', href: 'https://solitaire.lukeghanna.com' },
   links: [],
@@ -12,8 +12,8 @@ export const meta = {
     { label: 'Solver', value: 'DFS + transposition table' },
     { label: 'Hint budget', value: '1.5 s, in a worker' },
     { label: 'Repeats skipped', value: 'last 200 deals' },
-    { label: 'Backend', value: 'none' },
-    { label: 'Tests', value: '134 unit · 12 e2e' },
+    { label: 'Tables', value: 'Studio · Felt · Paper' },
+    { label: 'Tests', value: '183 unit · 33 e2e' },
   ],
 }
 
@@ -24,8 +24,8 @@ Klondike solitaire with nothing in the way: no ads, no accounts, no server. It i
   src="/work/solitaire/table.png"
   width={2880}
   height={1620}
-  alt="A Klondike table mid-game on green felt: stock and empty waste top left, hearts and clubs foundations started top right, seven tableau columns below, with a toolbar of New, Undo, Redo, Hint, Winnable?, Stats and Settings"
-  caption="Ninety moves into a draw-one deal on the Classic Felt theme. The score floors at zero because this line recycles the stock."
+  alt="A Klondike table mid-game on a dark, warm leather table: a Deco card back on the stock, hearts and clubs foundations started top right, seven tableau columns of cream cards with large corner indices, under a floating glass toolbar with a mono score readout and a three-dot table switch"
+  caption="Ninety moves into a draw-one deal on Studio, the default table. The score floors at zero because this line recycles the stock."
   source="Screenshot of solitaire.lukeghanna.com at 1440×810, 29 September 2026. The deal is from the bank; the moves were fed in from the solver's own solution through the app's test hook."
 />
 
@@ -70,36 +70,50 @@ The hint is the first move of an actual winning line, not the first legal move. 
   source="Screenshot of solitaire.lukeghanna.com at 1440×810, 29 September 2026."
 />
 
-## Finishing and winning
+## Nothing moves unless you move it
 
-Once every tableau card is face up, the game is usually decided, but not always: draw three can bury a card in the stock, and Vegas can run out of passes. Auto-finish tries a greedy pass first (play the lowest card that fits a foundation, otherwise draw) and falls back to a short solver run that respects the pass limit. If neither finds a finish, play just continues, and it checks again after the next move. When it does fire, input locks, the cards fly home, and the classic bouncing-card cascade plays on a canvas that is never cleared.
+Many solitaire apps play safe cards to the foundations for you, and this one used to by default. Cards moving that the player never touched made the game harder to read, so auto-move is now opt-in and off for everyone, including players who had it on. With it on, a card the player pulls down from a foundation stays down: the cards held back are derived from the turn history rather than stored, so undo, redo and a reload need no extra state.
+
+The one thing that always moves by itself is the finish. Once every tableau card is face up, the game is usually decided, but not always: draw three can bury a card in the stock, and Vegas can run out of passes. Auto-finish tries a greedy pass first (play the lowest card that fits a foundation, otherwise draw) and falls back to a short solver run that respects the pass limit. If neither finds a finish, play just continues, and it checks again after the next move. When it does fire, input locks and the cards leave one every 110 ms, each on the normal move transition, so the finish reads as a stream you can watch. The win waits until the last card lands, then the classic bouncing-card cascade plays on a canvas that is never cleared. Reduced motion quickens the finish rather than skipping it and leaves out the cascade; only the Animation: Off setting makes the finish instant.
 
 <Figure
   n={4}
   src="/work/solitaire/cascade.png"
   width={2880}
   height={1620}
-  alt="The win cascade: cards bouncing off the bottom of the screen, each leaving a trail of copies of itself across the green felt"
+  alt="The win cascade: cream cards bouncing off the bottom of the screen, each leaving a trail of copies of itself across the dark table"
   caption="The win cascade, about two seconds in. Each card leaves a trail because the canvas is never cleared. The timer reads 0:00 because the moves were fed in instantly."
   source="Screenshot of solitaire.lukeghanna.com at 1440×810, 29 September 2026, the same deal played to the end from its banked solution."
 />
 
 ## The table
 
-All 52 cards are absolutely positioned elements keyed by card id, and each card's position is a pure function of the game state and the layout, so every state change animates through CSS transforms with no animation code per move. Card size comes from both the viewport's width and height, so the whole table fits without scrolling, and long columns compress their offsets to fit. Tap sends a card to its best destination, double-tap sends it to a foundation, drag works with a five-pixel threshold between tap and drag, and the whole game is playable from the keyboard with every move announced to screen readers.
+There are three tables, switched from the toolbar: Studio, a warm charcoal with a leather grain and a stitched rail; Felt, green with a choice of five cloths; and Paper, a light linen. Every texture is CSS gradients and inline SVG noise, so the table ships no image files. The cards are drawn in HTML: one large rank-and-suit index in the top-left corner, where it stays readable in a fanned column, and one big pip, with no court art. The four-colour deck and five card backs, Deco by default, work on every table. Type is Geist, bundled so it works offline.
 
-The game is saved after every move as the seed plus the list of turns, and replayed on load, so undo, redo, the timer and the score survive a reload. Every read from storage is validated, and the app still works when storage is unavailable. The classic faces are Adrian Kennard's public-domain SVG deck; the minimal theme draws its own cards, and the sounds are synthesized with Web Audio, so there are no audio files.
+All 52 cards are absolutely positioned elements keyed by card id, and each card's position is a pure function of the game state and the layout, so every state change animates through CSS transforms with no animation code per move. A card turning face up does a real 3D flip. A card that can be picked up lifts slightly under the pointer, and tapping a card with nowhere to go shakes it and every card above it, and moves nothing. Tap sends a card to its best destination, double-tap sends it to a foundation, drag works with a five-pixel threshold, Space draws, and Enter picks up and drops, so the whole game plays from the keyboard, with every move announced to screen readers.
 
 <Figure
   n={5}
-  src="/work/solitaire/minimal-dark.png"
+  src="/work/solitaire/settings.png"
   width={2880}
   height={1620}
-  alt="The same position on the Modern Minimal theme in dark mode: flat dark cards with large corner indices and one large centre suit"
-  caption="The same position on the Modern Minimal theme, which follows the system's dark mode. Court cards are a large rank letter instead of a face."
+  alt="The Settings dialog on its Appearance tab: a live preview of a Deco card back and three cards, then pickers for the table (Studio, Felt, Paper), the card back (Deco, Amber, Ink, Oxblood, Navy), two- or four-colour suits, and animation speed"
+  caption="Settings opens on Appearance, with a live preview above the pickers. Game and Controls hold the rules, scoring and key bindings."
   source="Screenshot of solitaire.lukeghanna.com at 1440×810, 29 September 2026."
 />
 
+<Figure
+  n={6}
+  src="/work/solitaire/paper.png"
+  width={2880}
+  height={1620}
+  alt="The same position on the Paper table: a light linen background, a light glass toolbar, and the same cream cards and Deco backs"
+  caption="The same position on Paper. Only the table and the chrome change; the cards read the same on all three."
+  source="Screenshot of solitaire.lukeghanna.com at 1440×810, 29 September 2026."
+/>
+
+The game is saved after every move as the seed plus the list of turns, and replayed on load, so undo, redo, the timer and the score survive a reload. Every read from storage is validated, settings from older versions migrate once on load, and the app still works when storage is unavailable. The sounds are synthesized with Web Audio, so there are no audio files.
+
 ## Status
 
-Live at solitaire.lukeghanna.com as static files on Vercel, installable as an app, and fully playable offline once loaded; an open tab reloads onto a new deploy. Draw one and draw three, standard, Vegas or no scoring, stats per draw mode, and a four-colour deck. Klondike only for now; the engine is structured for FreeCell and Spider next. 134 unit tests across 21 files and 12 Playwright end-to-end tests, including one that plays a banked deal to a win and one that moves cards with the keyboard alone.
+Live at solitaire.lukeghanna.com as static files on Vercel, installable as an app, and fully playable offline once loaded; a new deploy takes over open tabs as soon as it installs. Draw one and draw three, standard, Vegas or no scoring, and stats per draw mode, with a one-time import from solitaired.com. Klondike only for now; the engine is structured for FreeCell and Spider next. 183 unit tests across 25 files and 33 Playwright tests, run on desktop and a Pixel 7 profile, including one that plays a banked deal to a win, one that moves cards with the keyboard alone, and one that checks a tap with no move shakes and moves nothing.
