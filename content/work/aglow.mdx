@@ -1,0 +1,124 @@
+export const meta = {
+  title: 'Aglow',
+  line: 'A remake of Christmas Tree Light Up: the same puzzle, lit like a real tree.',
+  status: 'Live · the game is done; radio and admin are planned',
+  role: 'Design, build, operate',
+  stack: 'TypeScript, Canvas 2D, Web Audio, Vite, Vitest, Playwright',
+  source: 'Private.',
+  app: { label: 'aglow.lukeghanna.com', href: 'https://aglow.lukeghanna.com' },
+  links: [],
+  glance: [
+    { label: 'Board', value: '97 tiles, one spanning tree' },
+    { label: 'Turn', value: '120 ms, 3 taps buffered' },
+    { label: 'Scenes', value: 'Midnight · Fireside · Frost' },
+    { label: 'Light paths', value: 'Filament · Fairy · Neon' },
+    { label: 'Score', value: '50,000 − 100 × seconds' },
+    { label: 'Tests', value: '103 unit · 9 e2e' },
+  ],
+}
+
+Christmas Tree Light Up is an old browser puzzle: a tree-shaped board of wire tiles, a power source at the trunk, and one rule. Turn tiles until every wire connects and the whole tree is lit. Aglow keeps that puzzle exactly and rebuilds everything around it: the light, the sound, the scenes and the feel of a solve. There is no framework, only TypeScript and one Canvas 2D renderer.
+
+<Figure
+  n={1}
+  src="/work/aglow/fireside.png"
+  width={2880}
+  height={1800}
+  alt="A Christmas tree in a warm, dark room, half solved: glowing filament wires and coloured bulbs run up from the trunk, the unlit tiles above are thin dark wires with dark glass bulbs, a garland of C9 bulbs across the top is two-thirds lit, and wrapped presents sit on a wooden floor"
+  caption="Fireside, about sixty per cent solved. The garland across the top is the progress bar: each C9 bulb lights as the lit share of the tree passes its mark."
+  source="Screenshot of aglow.lukeghanna.com at 1440×900, 1 October 2026. Tiles were turned to their solved orientation by real taps, driven through the game's test hook."
+/>
+
+## The same puzzle
+
+The board is the original's: 97 tiles in rows of 3, 5, 7 and up to 17, with the source under the trunk. A new tree is a randomized Prim's spanning tree over those tiles, so every tile is needed, there are no loops, and there is exactly one way to connect them. Each tile then gets a random orientation of its own shape (end, straight, bend, T or cross), which means a tile can start already correct, as it could in the original. Lighting is a breadth-first search from the root, a turn is always 90 degrees clockwise, and the score is 50,000 minus 100 for every whole second.
+
+Three things changed on purpose, all about feel. A turn takes 120 ms with a slight overshoot instead of a linear 200 ms. Taps on a tile that is still turning are buffered, up to three, so a quick double tap becomes one fluid half turn instead of a lost input. And the clock starts when the board becomes playable and stops while the game is paused, so times are fair but not comparable with the original's.
+
+<Flow
+  n={2}
+  caption="What happens on a tap, from the rules to the light."
+  source="Drawn from src/core/board.ts, src/render/visual-state.ts and src/audio/sfx.ts."
+  steps={[
+    { title: 'Tap', detail: 'the tile turns clockwise; up to three taps queue' },
+    { title: 'Turning tile goes dark', detail: 'its bits are zero mid-turn, so everything downstream goes dark too' },
+    { title: 'Lighting BFS', detail: 'from the root, when the turn ends' },
+    [
+      { title: 'Light flows', detail: 'each newly lit tile fills in 30 ms, in BFS order' },
+      { title: 'Bulbs pop', detail: 'one chime per bulb, up a pentatonic scale' },
+    ],
+  ]}
+/>
+
+## Light is the hero
+
+Every tile that becomes lit fills in 30 ms, starting when its parent finishes, so a connection runs out through the tree as a visible wave led by a white-hot point. Bulbs overshoot to almost twice their brightness when they light, then settle. The glow is three blurred copies of a half-resolution glow layer, added on top of the scene: a tight halo, a soft glow and a faint atmosphere. An auto-exposure term pulls the wide passes down as more of the tree lights, so a nearly solved tree loses its fog first and stays legible instead of washing out. Lit light falls on its surroundings too: the floor or snow under the tree brightens, the presents warm, and on Fireside the lights reflect in the floor.
+
+There are three light paths. Filament is a warm wire with a gentle shimmer that drifts outward from the source. Fairy lights are micro-LEDs on copper wire that twinkle out of phase. Neon is a glass tube that stutters on as gas fills it.
+
+<Figure
+  n={3}
+  src="/work/aglow/fairy.png"
+  width={2880}
+  height={1800}
+  alt="The Midnight scene: a tree under a deep indigo sky with faint snow, its lit branches drawn as strings of tiny warm LEDs and the unlit ones as thin copper wire"
+  caption="Midnight with fairy lights. Every lit LED glows on its own and twinkles out of phase with its neighbours."
+  source="Screenshot of aglow.lukeghanna.com at 1440×900, 1 October 2026."
+/>
+
+<Figure
+  n={4}
+  src="/work/aglow/neon.png"
+  width={2880}
+  height={1800}
+  alt="The Midnight scene with neon tubes: lit paths are thick glowing amber tubes, unlit ones are pale empty glass"
+  caption="Midnight with neon. The unlit tubes are empty glass, so the puzzle still reads in the dark."
+  source="Screenshot of aglow.lukeghanna.com at 1440×900, 1 October 2026."
+/>
+
+## Three scenes
+
+The scene follows the local time unless the player picks one: Frost from 07:00, Fireside from 16:00, Midnight from 20:00. All three share a procedural fir, drawn once per layout in three passes of needles and lit from the scene's side. Frost was the hard one. Glow on a pale daylight background barely shows, and dark wires on a dark fir barely show either, so unlit paths on Frost get their own treatment per light path, a two-tone wire or a soft snow glint, while lit light stays the brightest and warmest thing on screen.
+
+<Figure
+  n={5}
+  src="/work/aglow/frost.png"
+  width={2880}
+  height={1800}
+  alt="The Frost scene: a dark, snow-dusted fir on a pale daylight background, half its filament wires lit warm, the unlit ones drawn as light silver wires that stand out against the needles"
+  caption="Frost, half solved. The unlit wires are silver two-tone so they read against the dark fir; the lit ones are still the warmest thing in the frame."
+  source="Screenshot of aglow.lukeghanna.com at 1440×900, 1 October 2026."
+/>
+
+## Smooth on a phone
+
+Everything is drawn in one Canvas 2D context, and the blur that makes the glow is the expensive part. A quality governor watches the frame interval: after about a second of frames over 22 ms it drops a tier (two bloom passes instead of three, then half the particles and snow, then no reflection or embers), and after about five seconds under 18 ms it climbs back. It tells a slow device from a phone in Low Power Mode, which caps the frame rate at 30 Hz but is not struggling. Where the browser has no canvas blur filter, as on older Safari, the same helper blurs by scaling the layer down and back up. On a phone the tree fits the screen width, and pinching zooms and pans without ever turning a tile.
+
+<Figure
+  n={6}
+  src="/work/aglow/phone.png"
+  width={780}
+  height={1688}
+  frame="phone"
+  alt="Aglow on a phone in portrait: the half-lit tree fits the screen width, the presents sit in front of it on the floor, and the lights reflect in the floorboards below"
+  caption="On a phone the presents move in front of the tree, below the ground line, so they never sit over a tile."
+  source="Screenshot of aglow.lukeghanna.com at 390×844, 1 October 2026."
+/>
+
+## Winning
+
+On the last connection the star ignites, a brightness wave sweeps the bulbs from the bottom up, the garland blazes, and gold flecks and snow fall over the tree. Then a gift tag gives the time, the score, a new-best badge, and the solved count, average time and daily streak. Share renders the player's own lit tree in their scene as a 1080×1350 image with the time on it, through the share sheet on a phone or the clipboard on a desktop. A game in progress is saved on every turn, so closing the tab and coming back resumes the same tree with a "Welcome back" and the clock where it was.
+
+<Figure
+  n={7}
+  src="/work/aglow/won.png"
+  width={2880}
+  height={1800}
+  alt="The solved tree on Fireside with the star lit and gold confetti falling, and a cream gift tag in front reading 'Lit in 0:26', 'Merry & bright', score 47,400, a New best badge, one solved, 0:26 average, one-day streak, and New tree and Share buttons"
+  caption="The gift tag after a win. 0:26 is not a real solve: the last tiles were finished by the test hook."
+  source="Screenshot of aglow.lukeghanna.com at 1440×900, 1 October 2026."
+/>
+
+## Status
+
+Live at aglow.lukeghanna.com as a static site on Vercel. The game is complete: three scenes, three light paths, synthesized sound effects with no audio files, saved games, stats and sharing. A radio is designed and planned but not built yet: Christmas stations streamed from Vercel Blob, a password-protected admin page to upload to them, and a light show that pulses the bulbs to the music. 103 unit tests across 26 files cover the rules, including a generator property test over a thousand seeded trees, and 9 Playwright smoke tests cover loading, turning, zooming, winning, sharing, settings, pausing and resuming.

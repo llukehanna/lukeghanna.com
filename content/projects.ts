@@ -1,5 +1,5 @@
 export type Project = {
-  slug: 'pfc' | 'beacon' | 'ccc' | 'kwx' | 'onair' | 'solitaire' | 'shed' | 'bjs'
+  slug: 'pfc' | 'beacon' | 'ccc' | 'kwx' | 'onair' | 'solitaire' | 'aglow' | 'shed' | 'bjs'
   title: string
   /** One or two words on the project's state: Live, Research, macOS, iOS. */
   statusLabel: string
@@ -100,6 +100,18 @@ export const projects: Project[] = [
     description: 'Ad-free Klondike where a solver proves every deal winnable before you see it, then backs the hints and the rewind.',
     stack: 'React · TypeScript · Web Worker solver',
     screenshot: { src: '/work/solitaire/table.png', width: 2880, height: 1620 },
+  },
+  {
+    slug: 'aglow',
+    title: 'Aglow',
+    statusLabel: 'Live',
+    live: true,
+    selected: false,
+    where: 'aglow.lukeghanna.com',
+    href: '/work/aglow',
+    description: 'The Christmas Tree Light Up puzzle with its original rules, rebuilt so every connection sends light flowing through the tree.',
+    stack: 'TypeScript · Canvas 2D · Web Audio',
+    screenshot: { src: '/work/aglow/fireside.png', width: 2880, height: 1800 },
   },
   {
     slug: 'shed',

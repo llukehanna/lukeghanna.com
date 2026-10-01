@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
 
 test.describe('home', () => {
-  const slugs = ['pfc', 'beacon', 'ccc', 'kwx', 'onair', 'solitaire', 'shed', 'bjs']
+  const slugs = ['pfc', 'beacon', 'ccc', 'kwx', 'onair', 'solitaire', 'aglow', 'shed', 'bjs']
 
   test('about comes first, then every project, each linking to its write-up', async ({ page }) => {
     await page.goto('/')
@@ -18,12 +18,12 @@ test.describe('home', () => {
   test('six cards in the grid, the rest as one-line rows in the index under it', async ({ page }) => {
     await page.goto('/')
     const more = page.getByTestId('more-projects')
-    await expect(more.getByRole('link')).toHaveCount(2)
-    for (const slug of ['shed', 'bjs']) {
+    await expect(more.getByRole('link')).toHaveCount(3)
+    for (const slug of ['aglow', 'shed', 'bjs']) {
       await expect(more.getByTestId(`project-${slug}`)).toBeVisible()
       await expect(page.getByTestId(`project-${slug}`).locator('img')).toHaveCount(0)
     }
-    await expect(more).toContainText('08')
+    await expect(more).toContainText('09')
     const [lastCard, index] = await Promise.all([page.getByTestId('project-solitaire').boundingBox(), more.boundingBox()])
     expect(index!.y).toBeGreaterThan(lastCard!.y + lastCard!.height - 1)
   })
@@ -40,7 +40,7 @@ test.describe('home', () => {
     const about = page.locator('#about')
     await expect(about.getByRole('term')).toHaveCount(2)
     for (const k of ['Builds with', 'Shipped']) await expect(about.getByRole('term').filter({ hasText: k })).toHaveCount(1)
-    await expect(about).toContainText('8 projects · 4 live sites')
+    await expect(about).toContainText('9 projects · 5 live sites')
     await expect(page.locator('body')).not.toContainText(/Houlihan/)
   })
 
