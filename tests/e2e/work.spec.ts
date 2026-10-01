@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test'
 
 import type { Page } from '@playwright/test'
 
-const slugs = ['pfc', 'beacon', 'ccc', 'kwx', 'onair', 'solitaire', 'shed', 'bjs']
+const slugs = ['pfc', 'beacon', 'ccc', 'kwx', 'onair', 'solitaire', 'aglow', 'shed', 'bjs']
 
 // Below md the rail hides its link list and the same links close the article instead.
 const linksOf = (page: Page, isMobile: boolean) => (isMobile ? page.getByTestId('article-footer') : page.getByTestId('rail'))
