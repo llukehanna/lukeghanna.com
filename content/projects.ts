@@ -39,7 +39,7 @@ export const projects: Project[] = [
     description: 'My full financial state in one append-only ledger. Every action is checked against the plan’s gates before it happens.',
     stack: 'TypeScript · SQLite · Claude over MCP',
     // The Today screen with invented accounts and amounts: every real screen shows real balances.
-    screenshot: { src: '/work/pfc/today.png', width: 2880, height: 1620 },
+    screenshot: { src: '/work/pfc/today.webp', width: 2880, height: 1620 },
   },
   {
     slug: 'beacon',
@@ -51,7 +51,7 @@ export const projects: Project[] = [
     href: '/work/beacon',
     description: 'A deal-sourcing workbench that learns its screening rules from the analysts who reject firms.',
     stack: 'React · Postgres · Claude',
-    screenshot: { src: '/shots/beacon.png', width: 2880, height: 1620 },
+    screenshot: { src: '/shots/beacon.webp', width: 2880, height: 1620 },
   },
   {
     slug: 'ccc',
@@ -63,7 +63,7 @@ export const projects: Project[] = [
     href: '/work/ccc',
     description: 'Clippers analytics where every stored insight carries the query that proves it, over six seasons of league-wide box scores.',
     stack: 'Next.js 16 · Neon Postgres · Vercel CDN',
-    screenshot: { src: '/shots/ccc-home.png', width: 2880, height: 1620 },
+    screenshot: { src: '/shots/ccc-home.webp', width: 2880, height: 1620 },
   },
   {
     slug: 'kwx',
@@ -87,7 +87,7 @@ export const projects: Project[] = [
     href: '/work/onair',
     description: 'A live-sports player that fails over between ranked HLS streams without the picture ever going black.',
     stack: 'Electron · hls.js · Playwright',
-    screenshot: { src: '/shots/onair-home.png', width: 1440, height: 900 },
+    screenshot: { src: '/shots/onair-home.webp', width: 1440, height: 900 },
   },
   {
     slug: 'solitaire',
@@ -99,7 +99,7 @@ export const projects: Project[] = [
     href: '/work/solitaire',
     description: 'Ad-free Klondike where a solver proves every deal winnable before you see it, then backs the hints and the rewind.',
     stack: 'React · TypeScript · Web Worker solver',
-    screenshot: { src: '/work/solitaire/table.png', width: 2880, height: 1620 },
+    screenshot: { src: '/work/solitaire/table.webp', width: 2880, height: 1620 },
   },
   {
     slug: 'aglow',
@@ -111,7 +111,7 @@ export const projects: Project[] = [
     href: '/work/aglow',
     description: 'The Christmas Tree Light Up puzzle with its original rules, rebuilt so every connection sends light flowing through the tree.',
     stack: 'TypeScript · Canvas 2D · Web Audio',
-    screenshot: { src: '/work/aglow/fireside.png', width: 2880, height: 1800 },
+    screenshot: { src: '/work/aglow/fireside.webp', width: 2880, height: 1800 },
   },
   {
     slug: 'shed',
@@ -123,7 +123,7 @@ export const projects: Project[] = [
     href: '/work/shed',
     description: 'Skill ratings for a house beer-die and spikeball league, scored offline-first from a phone at the table.',
     stack: 'Next.js · Postgres · OpenSkill',
-    screenshot: { src: '/shots/shed.png', width: 2640, height: 1485 },
+    screenshot: { src: '/shots/shed.webp', width: 2640, height: 1485 },
   },
   {
     slug: 'bjs',
@@ -135,6 +135,6 @@ export const projects: Project[] = [
     href: '/work/bjs',
     description: 'A native blackjack trainer on a tested Swift package. The strategy trainer is the first screen done.',
     stack: 'Swift 6 · SwiftUI · SwiftData',
-    screenshot: { src: '/shots/bjs.png', width: 660, height: 1434, phone: true },
+    screenshot: { src: '/shots/bjs.webp', width: 660, height: 1434, phone: true },
   },
 ]

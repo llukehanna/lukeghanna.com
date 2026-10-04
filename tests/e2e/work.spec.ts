@@ -91,7 +91,7 @@ test.describe('write-up', () => {
     await expect(first.locator('figcaption')).toContainText('Fig. 1')
     await expect(first.locator('figcaption')).toContainText('Recorded from the real app')
     const video = first.locator('video')
-    await expect(video).toHaveAttribute('poster', '/work/shed/table.png')
+    await expect(video).toHaveAttribute('poster', '/work/shed/table.webp')
     await expect(video.locator('track[kind="captions"]')).toHaveCount(1)
     // A flow diagram is a figure too, drawn from the code.
     await expect(page.getByTestId('article').locator('figure', { hasText: 'Serialized drain' })).toHaveCount(1)
