@@ -3,7 +3,7 @@ export const meta = {
   line: 'A deal-sourcing workbench that learns its screening rules from the analysts who reject firms.',
   status: 'Live · synthetic data, resets daily',
   role: 'Design, build, operate',
-  stack: 'React 18, TypeScript, Postgres on Neon (PGlite locally), Vercel Functions, TanStack Query, Claude',
+  stack: 'React 18, TypeScript, Postgres on Neon (PGlite locally), Cloudflare Workers, TanStack Query, Claude',
   source: 'Public. MIT. Sanitized: no employer, vendor, or real firm names.',
   app: { label: 'beacon.lukeghanna.com', href: 'https://beacon.lukeghanna.com' },
   links: [
@@ -150,7 +150,7 @@ Every terminal decision snapshots the score it was made on. New evidence rescore
 |---|---|
 | Ontology Manager, 12 object types, 30 actions, 39 functions | One schema declaration with 11 object types and 17 actions; the DDL, the repository, API validation and the typed hooks all derive from it, and the rubric is one shared module |
 | Generated SDK and its React hooks | Drop-in hooks with the same names over TanStack Query, so page code changed only its imports |
-| Actions | Named actions, each validated and run inside a single transaction, behind four Vercel Functions |
+| Actions | Named actions, each validated and run inside a single transaction, behind four API routes on a Cloudflare Worker |
 | Backend | Postgres: in-process PGlite for tests and local work, Neon in production; the same SQL runs on both |
 
 The demo is open and writable. A single shared analyst can run every action, a nightly job resets the universe at 04:00 UTC, and a Reset button does the same on demand, throttled to once every five minutes; the reset is one transaction. The seed builds thirty days of history through the real actions (three mandates, two searches, an enrichment cohort, a couple of dozen rejections, one approved rule), which makes it an end-to-end test as well as a demo. Claude clustering runs behind a flag with a hard budget of one call per ten minutes and twenty-four a day, and anything else, including any error, falls back to the heuristic. A pre-publish check fails the build if any file mentions the original employer, the licensed data vendors, the training stack's hosts, the real firm names from the original data, or the original rubric wording; its patterns are stored as salted hashes so the check itself gives nothing away.

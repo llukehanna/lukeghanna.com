@@ -62,7 +62,7 @@ export const projects: Project[] = [
     where: 'clippers.lukeghanna.com',
     href: '/work/ccc',
     description: 'Clippers analytics where every stored insight carries the query that proves it, over six seasons of league-wide box scores.',
-    stack: 'Next.js 16 · Neon Postgres · Vercel CDN',
+    stack: 'Next.js 16 · Neon Postgres · Cloudflare Workers',
     screenshot: { src: '/shots/ccc-home.webp', width: 2880, height: 1620 },
   },
   {
