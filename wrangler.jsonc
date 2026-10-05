@@ -4,6 +4,9 @@
   // static assets. There is no Worker script, so no request ever costs CPU or counts against
   // the free plan's 100k requests/day.
   "name": "lukeghanna-com",
+  "routes": [
+    { "pattern": "lukeghanna.com", "custom_domain": true }
+  ],
   "compatibility_date": "2026-10-01",
   "assets": {
     "directory": "./out",
