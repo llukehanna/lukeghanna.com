@@ -1,0 +1,8 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  // 301s for alias hostnames (see src/index.ts). Deploy from this directory: npx wrangler deploy
+  "name": "lukeghanna-redirects",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-01",
+  "workers_dev": true
+}
