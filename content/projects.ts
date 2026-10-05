@@ -119,7 +119,7 @@ export const projects: Project[] = [
     statusLabel: 'Live',
     live: true,
     selected: false,
-    where: 'shed.lukeghanna.com',
+    where: 'die.lukeghanna.com',
     href: '/work/shed',
     description: 'Skill ratings for a house beer-die and spikeball league, scored offline-first from a phone at the table.',
     stack: 'Next.js · Postgres · OpenSkill',
