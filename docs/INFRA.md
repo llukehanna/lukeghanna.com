@@ -16,10 +16,10 @@ All records live at Cloudflare, DNS-only:
 | A     | @        | 76.76.21.21                  | lukeghanna.com (Vercel project `lukeghanna-com`) |
 | CNAME | www      | cname.vercel-dns.com         | 308 redirect to the apex |
 | CNAME | clippers | (Vercel-managed CNAME)       | Clippers Command Center (project `clippers-command-center`) |
-| CNAME | shed     | (Vercel-managed CNAME)       | Shedquarters (project `house-ladder`) |
+| CNAME | die      | (Vercel-managed CNAME)       | Shedquarters (project `house-ladder`); replaced `shed` on 2026-10-04 |
 | CNAME | beacon   | (Vercel-managed CNAME)       | Beacon demo (project `beacon`), added 2026-09-24 |
 
-Verified with `curl -sI https://<host>`: apex 200, www 308, clippers 307 to /home, shed 200. A stray `ccc.lukeghanna.com` is also attached to `clippers-command-center` with no DNS record; remove it in Vercel → Project → Settings → Domains whenever convenient.
+Verified with `curl -sI https://<host>`: apex 200, www 308, clippers 307 to /home, shed 200 (now die, 200 on 2026-10-04). A stray `ccc.lukeghanna.com` is also attached to `clippers-command-center` with no DNS record; remove it in Vercel → Project → Settings → Domains whenever convenient.
 
 ## 3. Email — not needed
 
@@ -27,7 +27,7 @@ The site's contact address is Luke's existing `luke@zhannas.com`. No Email Routi
 
 ## 4. After the domain is live
 - Update `siteUrl` in `lib/site.ts` only if the domain differs from `https://lukeghanna.com`.
-- Point the GitHub profile README's project links at `clippers.lukeghanna.com` and `shed.lukeghanna.com`.
+- ~~Point the GitHub profile README's project links at the subdomains.~~ Done 2026-10-04.
 - Add the site to the LinkedIn profile's website field.
 
 ## 5. Pending content (any time)
