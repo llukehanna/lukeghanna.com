@@ -2,9 +2,11 @@ import type { NextConfig } from 'next'
 import createMDX from '@next/mdx'
 
 const nextConfig: NextConfig = {
+  // Fully static: `next build` writes plain files to out/, which Cloudflare Workers serves as static assets.
+  output: 'export',
   pageExtensions: ['ts', 'tsx', 'md', 'mdx'],
-  // Screenshots in public/ are pre-sized WebP (≤1600px wide), so serve them as-is rather than
-  // spending the Hobby team's shared 5,000/month image transformations on them.
+  // Screenshots in public/ are pre-sized WebP (≤1600px wide), so serve them as-is. A static export
+  // has no image optimizer anyway.
   images: { unoptimized: true },
 }
 
