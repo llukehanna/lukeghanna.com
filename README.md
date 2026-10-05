@@ -1,6 +1,6 @@
 # lukeghanna.com
 
-Personal site. Next.js App Router, statically generated, deployed on Vercel. Seven project write-ups in `content/work/*.mdx` with figures (`Figure`, `Flow`, Markdown tables) that each carry a provenance line.
+Personal site. Next.js App Router, exported as static files (`output: 'export'`) and served as Cloudflare Workers static assets. `npm run deploy` builds and deploys. Seven project write-ups in `content/work/*.mdx` with figures (`Figure`, `Flow`, Markdown tables) that each carry a provenance line.
 
 - `npm run dev` — local dev on http://localhost:3000
 - `npm run test:unit` — Vitest (tokens, contrast, projects, toc, colophon, motion, smoke)

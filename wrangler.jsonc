@@ -1,0 +1,16 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // The whole site is a static export (next.config.ts → output: 'export'), served as Workers
+  // static assets. There is no Worker script, so no request ever costs CPU or counts against
+  // the free plan's 100k requests/day.
+  "name": "lukeghanna-com",
+  "routes": [
+    { "pattern": "lukeghanna.com", "custom_domain": true }
+  ],
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./out",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page"
+  }
+}

@@ -1,6 +1,9 @@
 import type { MetadataRoute } from 'next'
 import { siteName, siteTagline } from '@/lib/site'
 
+// Rendered once at build time into the static export.
+export const dynamic = 'force-static'
+
 // "Add to Home Screen" on a phone gets the monogram, the site's colours, and a standalone window.
 export default function manifest(): MetadataRoute.Manifest {
   return {

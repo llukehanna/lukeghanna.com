@@ -3,7 +3,7 @@ export const meta = {
   line: 'A live Clippers dashboard that only says what it can prove.',
   status: 'Live · responsive, installable to a phone',
   role: 'Design, build, operate',
-  stack: 'Next.js 16, React 19, Neon Postgres, SWR, Recharts, cmdk, Vitest, GitHub Actions, Vercel CDN',
+  stack: 'Next.js 16, React 19, Neon Postgres, SWR, Recharts, cmdk, Vitest, GitHub Actions, Cloudflare Workers',
   source: 'Public. MIT.',
   app: { label: 'clippers.lukeghanna.com', href: 'https://clippers.lukeghanna.com' },
   links: [
@@ -76,7 +76,7 @@ Live insights are different. They are pure functions over the latest live data a
 
 ## Live without flicker
 
-A game-night runner polls the NBA feed on a cadence set by the state of the game: every three seconds in live play, two in the clutch, eight during stoppages, thirty early in halftime. It fetches the box score only when a new play appears and writes one live-state row per game. The live endpoint is served through Vercel's CDN, so the origin answers about once every two seconds per region however many people are watching, and the live page follows the cadence the runner advertises while the site-wide top bar refreshes every thirty seconds. One poller makes about 3,000 requests to the NBA feed over a game.
+A game-night runner polls the NBA feed on a cadence set by the state of the game: every three seconds in live play, two in the clutch, eight during stoppages, thirty early in halftime. It fetches the box score only when a new play appears and writes one live-state row per game. The live endpoint is served through Cloudflare's edge cache, so the origin answers about once every two seconds per region however many people are watching, and the live page follows the cadence the runner advertises while the site-wide top bar refreshes every thirty seconds. One poller makes about 3,000 requests to the NBA feed over a game.
 
 The live page never calls the NBA feed itself. It reads the live-state document through that one endpoint, which reports one of three states: no active game, data delayed, or live. When the newest data is too old to trust, the page shows last-known numbers under a "Data delayed" banner instead of silently serving them as current.
 
@@ -84,7 +84,7 @@ This pipeline replaced a fixed twelve-second loop in September 2026 and has not 
 
 ## Pipeline
 
-Separate scripts, one job each: sync the schedule and attach NBA game ids, sync the odds, run the live game night, sync every NBA game's box scores league-wide (the last three days nightly, or a whole season on demand), finalize games, compute stats incrementally (possessions, pace, offensive and defensive rating, shooting efficiency, five- and ten-game rolling windows), generate insights, verify insights, and backfill. Every write is an idempotent upsert, so any script can be re-run. GitHub Actions drives them: the schedule daily, odds every six hours, the game-night runner, and a post-game job that syncs, finalizes, computes, generates and verifies in that order. No queue, no workflow engine. Cron authentication fails closed with a constant-time compare, failures return real error codes instead of a quiet 200, and CI runs typecheck, lint and 331 Vitest cases against a Postgres service. The whole thing runs on free tiers: Vercel Hobby, Neon Free and GitHub Actions.
+Separate scripts, one job each: sync the schedule and attach NBA game ids, sync the odds, run the live game night, sync every NBA game's box scores league-wide (the last three days nightly, or a whole season on demand), finalize games, compute stats incrementally (possessions, pace, offensive and defensive rating, shooting efficiency, five- and ten-game rolling windows), generate insights, verify insights, and backfill. Every write is an idempotent upsert, so any script can be re-run. GitHub Actions drives them: the schedule daily, odds every six hours, the game-night runner, and a post-game job that syncs, finalizes, computes, generates and verifies in that order. No queue, no workflow engine. Cron authentication fails closed with a constant-time compare, failures return real error codes instead of a quiet 200, and CI runs typecheck, lint and 331 Vitest cases against a Postgres service. The whole thing runs on free tiers: Cloudflare Workers, Neon Free and GitHub Actions.
 
 <Flow
   n={4}

@@ -2,6 +2,9 @@ import { ImageResponse } from 'next/og'
 import { MARK_PATH, MARK_TRANSFORM, MARK_VIEWBOX } from '@/components/Mark'
 import { tokens } from '@/lib/tokens'
 
+// Rendered once at build time into the static export.
+export const dynamic = 'force-static'
+
 // Home-screen icon: the monogram on the dark charcoal, since iOS squares the corners itself.
 export const size = { width: 180, height: 180 }
 export const contentType = 'image/png'
