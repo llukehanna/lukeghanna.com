@@ -79,7 +79,7 @@ export default function Home() {
             </a>
           </div>
           <p className="mt-16 border-t border-line pt-4 font-mono text-[11px] tracking-[0.03em] text-dim">
-            Built with Next.js, deployed on Vercel, last updated {built}.
+            Built with Next.js, served by Cloudflare, last updated {built}.
           </p>
         </Section>
       </main>

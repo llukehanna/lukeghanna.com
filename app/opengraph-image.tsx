@@ -3,6 +3,9 @@ import { siteName, siteTagline } from '@/lib/site'
 import { tokens } from '@/lib/tokens'
 import { MARK_PATH, MARK_TRANSFORM, MARK_VIEWBOX } from '@/components/Mark'
 
+// Rendered once at build time into the static export.
+export const dynamic = 'force-static'
+
 export const alt = `${siteName}: ${siteTagline}`
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
