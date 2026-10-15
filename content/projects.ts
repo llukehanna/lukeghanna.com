@@ -1,5 +1,5 @@
 export type Project = {
-  slug: 'pfc' | 'beacon' | 'ccc' | 'kwx' | 'onair' | 'solitaire' | 'aglow' | 'shed' | 'bjs'
+  slug: 'pfc' | 'beacon' | 'ccc' | 'kwx' | 'onair' | 'solitaire' | 'mapped' | 'aglow' | 'shed' | 'bjs'
   title: string
   /** One or two words on the project's state: Live, Research, macOS, iOS. */
   statusLabel: string
@@ -100,6 +100,18 @@ export const projects: Project[] = [
     description: 'Ad-free Klondike where a solver proves every deal winnable before you see it, then backs the hints and the rewind.',
     stack: 'React · TypeScript · Web Worker solver',
     screenshot: { src: '/work/solitaire/table.webp', width: 2880, height: 1620 },
+  },
+  {
+    slug: 'mapped',
+    title: 'Mapped',
+    statusLabel: 'Live',
+    live: true,
+    selected: false,
+    where: 'mapped.lukeghanna.com',
+    href: '/work/mapped',
+    description: 'A map-first geography quiz on countries, flags and capitals, with 63 leaderboards the server checks by replaying every game.',
+    stack: 'React · d3-geo · Cloudflare D1',
+    screenshot: { src: '/work/mapped/world.webp', width: 2880, height: 1620 },
   },
   {
     slug: 'aglow',
