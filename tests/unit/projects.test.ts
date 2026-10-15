@@ -3,8 +3,8 @@ import { existsSync } from 'node:fs'
 import { projects } from '@/content/projects'
 
 describe('projects', () => {
-  it('has exactly the eight projects in order', () => {
-    expect(projects.map((p) => p.slug)).toEqual(['pfc', 'beacon', 'ccc', 'kwx', 'onair', 'solitaire', 'aglow', 'shed', 'bjs'])
+  it('has exactly the ten projects in order', () => {
+    expect(projects.map((p) => p.slug)).toEqual(['pfc', 'beacon', 'ccc', 'kwx', 'onair', 'solitaire', 'mapped', 'aglow', 'shed', 'bjs'])
   })
   it('keeps the grid at six, ahead of the index', () => {
     expect(projects.filter((p) => p.selected).map((p) => p.slug)).toEqual(['pfc', 'beacon', 'ccc', 'kwx', 'onair', 'solitaire'])
@@ -23,7 +23,7 @@ describe('projects', () => {
     }
   })
   it('shows a real capture where one exists and a figure everywhere else, never both', () => {
-    expect(projects.filter((p) => p.screenshot).map((p) => p.slug)).toEqual(['pfc', 'beacon', 'ccc', 'onair', 'solitaire', 'aglow', 'shed', 'bjs'])
+    expect(projects.filter((p) => p.screenshot).map((p) => p.slug)).toEqual(['pfc', 'beacon', 'ccc', 'onair', 'solitaire', 'mapped', 'aglow', 'shed', 'bjs'])
     for (const p of projects) expect(!!p.screenshot !== !!p.figure, p.slug).toBe(true)
   })
   it('keeps each card to one or two sentences', () => {
