@@ -1,0 +1,103 @@
+export const meta = {
+  title: 'Circuit',
+  line: 'Ten daily puzzle games under one streak, with a puzzle supply that only goes live once a person approves it.',
+  status: 'Live · free to play, sign in to keep your streak',
+  role: 'Design, build, operate',
+  stack: 'Next.js 16, React 19, TypeScript, Postgres (Neon via Hyperdrive), Cloudflare Workers via OpenNext, Cron Triggers, Google sign-in, Vitest',
+  source: 'Private: the repository holds every answer bank.',
+  app: { label: 'circuit.lukeghanna.com', href: 'https://circuit.lukeghanna.com' },
+  links: [],
+  glance: [
+    { label: 'Games', value: '10 · daily, unlimited, archive' },
+    { label: 'Supply', value: 'drafted 14 days ahead' },
+    { label: 'Goes live', value: 'only once approved' },
+    { label: 'Streak', value: 'one, across every game' },
+    { label: 'Keystone bank', value: '806 rounds, blind-reviewed' },
+    { label: 'Runs on', value: 'Workers Free + Neon Free' },
+  ],
+}
+
+Circuit is ten daily puzzle games on one site with one record across them: Cipher, Abacus, Atlas, Doublets, Fathom, Hardwood, Hivemind, Keystone, Meridian and Outlier. The people who play dailies every morning play them on a dozen unrelated sites, with a separate streak on each and no way to tell whether they are getting better. Circuit starts from the bet that the games are the inventory and the layer across them is the product. Anyone can play from the first tap; signing in with Google keeps the streak beyond the browser.
+
+The success bar was set before any code: about twenty friends and I play most mornings and keep our streaks. Strangers who stay, and eventually pay, would be better, but the design doesn't depend on them. What it does depend on is the operating side: a puzzle supply that never misses a morning, content that agents drafted and reviewers checked, and a cost of zero.
+
+<Figure
+  n={1}
+  src="/work/circuit/home.webp"
+  width={2880}
+  height={1620}
+  alt="Circuit's Today page in dark mode: a floating header with Today, Games and Profile, a Next up panel for Abacus with a gold Play button, a side panel reading 1/10 done today with a seven-day streak and a countdown to new puzzles, and the start of the games list with Abacus up next, Atlas solved in two guesses and Cipher in progress"
+  caption="Today on day 15. The lead panel is the next unplayed game, the side panel holds the one figure that matters this morning, and the list below holds all ten games."
+  source="Screenshot of a local instance at 1440×810, 3 November 2026, against a throwaway database, never production. One anonymous player's history and today's plays are seeded: this is a demo, not real usage."
+/>
+
+## A puzzle plays only after someone approves it
+
+Nothing is drawn on request. Each puzzle is generated ahead of time and stored, and it moves through three states: a **draft** until a reviewer approves it on the admin page, **approved** until its day arrives, and **live** from then on. A Cron Trigger runs at 05:01 UTC, one minute after the day turns, promotes everything approved up to today, and drafts the next 14 days for any game that has none.
+
+<Flow
+  n={2}
+  caption="One puzzle from draft to the morning it plays."
+  source="Drawn from src/lib/play/generation.ts, custom-worker.ts and the README's puzzle-supply section."
+  steps={[
+    { title: 'Draft', detail: 'the cron keeps 14 days of drafts per game, generated and stored before anyone needs them' },
+    { title: 'Review', detail: 'an allowlisted reviewer approves each day at /admin/puzzles; the page is a 404 for everyone else' },
+    { title: 'Approved', detail: 'playable from the moment its day begins, whether or not the cron has run yet' },
+    [
+      { title: 'Live', detail: 'the cron records the promotion; approving a day that has already arrived promotes it at once' },
+      { title: 'Unavailable', detail: 'a day nobody approved shows as a state on the home page, never an error' },
+    ],
+  ]}
+/>
+
+The order of those rules is the point. An approved puzzle is playable from the start of its day, and the cron's promotion records that rather than causing it, so a late or missed cron run costs nobody a puzzle. The build refuses to ship a bad answer list: it fails if a word is on the blocklist, if an answer is over its par budget, or if a bundled word module is out of date.
+
+<Figure
+  n={3}
+  src="/work/circuit/game.webp"
+  width={2880}
+  height={1620}
+  alt="Cipher on day 15: a five-wide grid with CRANE and STOIC played, A, E and T marked, a third row of ZZZZZ with a red 'Not in word list' above the grid, a Hint button with 3 left, and a large 4 left with six pips, two spent"
+  caption="Cipher with four guesses left. ZZZZZ is refused with a reason and costs nothing; the count of guesses left sits beside the title rather than in a small label."
+  source="Screenshot of a local instance at 1440×810, 3 November 2026, against a throwaway database. The puzzles are seeded; the three guesses were played through the app."
+/>
+
+## One standing, honest at small numbers
+
+Games give scores that cannot be compared: guesses used, a factor off, points. The obvious common currency, your percentile against today's players, breaks at twenty players. It moves in steps of 1 in 20 and swings on who happened to show up. So every puzzle ships with a par, computed by a reference solver and capped, which works with one player.
+
+Then I played every game, and par read worse on screen than it did on paper. It left the interface. It still sets each puzzle's difficulty and the rotation, but the solved screen now shows the result as one large figure, your last 30 days of that game, your streak, and how you compare with everyone else today. That comparison appears only once 10 players have finished the puzzle. Before that, nothing is shown in its place.
+
+There is only one streak, site-wide, and finishing any one daily keeps it going. Miss a day and the streak survives if you finish that day's puzzle from the archive within 48 hours, twice in any 30 days. A repaired day is marked as repaired.
+
+<Figure
+  n={4}
+  src="/work/circuit/solved.webp"
+  width={2880}
+  height={1488}
+  alt="Atlas's solved screen: a large 2/6 with two of six pips lit, an answer card for Hungary reading Europe, 9.5M, 93k km² and Landlocked, a gold Cipher button beside Share, tiles for time 1:38, streak 7 and today 1/10, and a Last 30 days strip with bars for the last two weeks"
+  caption="The solved screen every game shares, here Atlas in two. Next game is the one gold button. The strip has two weeks of bars because the site is 15 days old, and there is no comparison with other players because a local demo has fewer than 10."
+  source="Screenshot of a local instance at 1440×810, 3 November 2026, against a throwaway database, cropped below the header. The history is seeded rows and the solve time was set to 1:38."
+/>
+
+## Content drafted by agents, gated by blind review
+
+Ten games a day for months is a lot of content. Agents drafted the questions, a pipeline checked them, and reviewers who hadn't seen the answers sampled them against bars set before the results came in. Two of those gates failed first.
+
+**Keystone** shows clue words and asks for the word that links them. The plan was to score guesses by GloVe word-vector similarity. Measured on the drafted rounds, GloVe accepted 29.7% of bridge rounds against a gate of 40%, and ConceptNet Numberbatch managed 32.9%. So bridge rounds moved to drafted boards of graded answers, and only the closest-word rounds kept GloVe. The bank that shipped holds 806 rounds. Its first final review failed: recall 0.82 and within-one 0.87, against bars of 0.90. Once the boards were widened, a second review passed at 0.96 and 0.94.
+
+**Fathom** is napkin math, three questions a day, scored by how many orders of magnitude off you are, averaged. It began as recall of national statistics and was rebuilt around questions worth working out. Of 737 drafted, 116 shipped after research, blind estimates, checking every source against the opened page, and a screen for napkin math. The bar was 80% of a 40-question sample enjoyed, and the last sample missed it by one, at 31 of 40. Every question a reviewer didn't enjoy was cut. I shipped the 116 knowing that.
+
+| Gate | Bar | First result | Shipped on |
+|---|---|---|---|
+| Keystone word vectors (bridge rounds) | 40% accepted | 29.7% | drafted boards instead |
+| Keystone final review, recall / within-one | 0.90 / 0.90 | 0.82 / 0.87 | 0.96 / 0.94 after widening |
+| Fathom, enjoyed in a sample of 40 | 32 | 24 | 31; shipped by decision |
+
+## Free tiers as the design brief
+
+Circuit runs on Cloudflare Workers Free and Neon Free, so its limits shaped the code. A request gets 10 ms of CPU, and the gzipped Worker stays under 2,050 KiB. Question text and answers live in Postgres, reached through Hyperdrive. Only small id indexes and par tables are bundled, so the runtime never runs a solver. The games list and today's live set are remembered per isolate for 60 seconds.
+
+The deploy script exists because of a trap in the adapter. OpenNext copies every `.env` file it finds into the bundle as fallback values, so a plain deploy could ship a laptop's secrets as production's defaults. The script blanks them before upload, so a missing secret fails closed. The same rule runs through the rest: the admin allowlist means nobody when it's unset, and the cron route returns an error and does nothing without its token.
+
+What isn't done yet is written down too. I have no usage numbers worth citing. New clues for Hardwood and Atlas and a redesign of the Hivemind and Outlier boards are in progress, not live.

@@ -1,5 +1,5 @@
 export type Project = {
-  slug: 'pfc' | 'beacon' | 'ccc' | 'kwx' | 'onair' | 'solitaire' | 'mapped' | 'aglow' | 'shed' | 'bjs'
+  slug: 'pfc' | 'beacon' | 'ccc' | 'kwx' | 'circuit' | 'onair' | 'solitaire' | 'mapped' | 'aglow' | 'shed' | 'bjs'
   title: string
   /** One or two words on the project's state: Live, Research, macOS, iOS. */
   statusLabel: string
@@ -78,6 +78,18 @@ export const projects: Project[] = [
     screenshot: { src: '/shots/ccc-home.webp', width: 2880, height: 1620 },
   },
   {
+    slug: 'circuit',
+    title: 'Circuit',
+    statusLabel: 'Live',
+    live: true,
+    selected: true,
+    where: 'circuit.lukeghanna.com',
+    href: '/work/circuit',
+    description: 'Ten daily puzzle games under one streak. Each puzzle is drafted ahead by a cron and plays only once a person approves it.',
+    stack: 'Next.js 16 · Postgres · Cloudflare Workers',
+    screenshot: { src: '/work/circuit/home.webp', width: 2880, height: 1620 },
+  },
+  {
     slug: 'shed',
     title: 'Shedquarters',
     statusLabel: 'Live',
@@ -94,7 +106,7 @@ export const projects: Project[] = [
     title: 'Solitaire',
     statusLabel: 'Live',
     live: true,
-    selected: true,
+    selected: false,
     where: 'solitaire.lukeghanna.com',
     href: '/work/solitaire',
     description: 'Ad-free Klondike where a solver proves every deal winnable before you see it, then backs the hints and the rewind.',
