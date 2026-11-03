@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
 
 test.describe('home', () => {
-  const slugs = ['pfc', 'beacon', 'ccc', 'kwx', 'onair', 'solitaire', 'mapped', 'aglow', 'shed', 'bjs']
+  const slugs = ['beacon', 'kwx', 'pfc', 'ccc', 'shed', 'solitaire', 'onair', 'mapped', 'aglow', 'bjs']
 
   test('about comes first, then every project, each linking to its write-up', async ({ page }) => {
     await page.goto('/')
@@ -19,7 +19,7 @@ test.describe('home', () => {
     await page.goto('/')
     const more = page.getByTestId('more-projects')
     await expect(more.getByRole('link')).toHaveCount(4)
-    for (const slug of ['mapped', 'aglow', 'shed', 'bjs']) {
+    for (const slug of ['onair', 'mapped', 'aglow', 'bjs']) {
       await expect(more.getByTestId(`project-${slug}`)).toBeVisible()
       await expect(page.getByTestId(`project-${slug}`).locator('img')).toHaveCount(0)
     }
@@ -30,16 +30,16 @@ test.describe('home', () => {
 
   test('cards with a real capture show it; the rest show a figure from the write-up', async ({ page }) => {
     await page.goto('/')
-    for (const slug of ['pfc', 'beacon', 'ccc', 'onair', 'solitaire']) await expect(page.getByTestId(`project-${slug}`).locator('img')).toHaveCount(1)
+    for (const slug of ['beacon', 'pfc', 'ccc', 'shed', 'solitaire']) await expect(page.getByTestId(`project-${slug}`).locator('img')).toHaveCount(1)
     await expect(page.getByTestId('project-kwx').locator('img')).toHaveCount(0)
     await expect(page.getByTestId('project-kwx')).toContainText('7,440')
   })
 
-  test('about carries two facts', async ({ page }) => {
+  test('about carries three facts', async ({ page }) => {
     await page.goto('/')
     const about = page.locator('#about')
-    await expect(about.getByRole('term')).toHaveCount(2)
-    for (const k of ['Builds with', 'Shipped']) await expect(about.getByRole('term').filter({ hasText: k })).toHaveCount(1)
+    await expect(about.getByRole('term')).toHaveCount(3)
+    for (const k of ['Studying', 'Looking for', 'Shipped']) await expect(about.getByRole('term').filter({ hasText: k })).toHaveCount(1)
     await expect(about).toContainText('10 projects · 6 live sites')
     await expect(page.locator('body')).not.toContainText(/Houlihan/)
   })

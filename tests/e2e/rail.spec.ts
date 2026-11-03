@@ -5,7 +5,7 @@ test.describe('rail', () => {
     await page.goto('/')
     const rail = page.getByTestId('rail')
     await expect(rail.getByRole('heading', { level: 1, name: 'Luke Hanna' })).toBeVisible()
-    await expect(rail.getByText('Builds things end-to-end to understand them.')).toBeVisible()
+    await expect(rail.getByText('Senior at USC studying computer science and business administration.')).toBeVisible()
     // On a phone the header is just the name; the links live in Contact at the end of the page.
     const links = isMobile ? page.locator('#contact') : rail
     await expect(links.getByRole('link', { name: /GitHub/ })).toHaveAttribute('href', 'https://github.com/llukehanna')
@@ -32,10 +32,10 @@ test.describe('rail', () => {
     test.skip(isMobile, 'the rail nav is md+')
     await page.goto('/')
     const rail = page.getByTestId('rail')
-    for (const slug of ['pfc', 'beacon', 'ccc', 'kwx', 'onair', 'solitaire']) await expect(rail.getByTestId(`nav-${slug}`)).toHaveAttribute('href', `#${slug}`)
+    for (const slug of ['beacon', 'kwx', 'pfc', 'ccc', 'shed', 'solitaire']) await expect(rail.getByTestId(`nav-${slug}`)).toHaveAttribute('href', `#${slug}`)
     // The index under the grid stays out of the rail.
-    for (const slug of ['shed', 'bjs']) await expect(rail.getByTestId(`nav-${slug}`)).toHaveCount(0)
-    await page.getByTestId('project-onair').scrollIntoViewIfNeeded()
+    for (const slug of ['onair', 'bjs']) await expect(rail.getByTestId(`nav-${slug}`)).toHaveCount(0)
+    await page.getByTestId('project-shed').scrollIntoViewIfNeeded()
     await page.evaluate(() => window.scrollBy(0, 1))
     await expect(rail.getByTestId('nav-projects')).toHaveAttribute('aria-current', 'true')
     await expect(rail.locator('[data-testid^="nav-"][aria-current="true"]').filter({ hasNotText: 'Projects' })).toHaveCount(1)

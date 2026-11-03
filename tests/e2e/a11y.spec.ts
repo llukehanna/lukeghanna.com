@@ -27,7 +27,7 @@ test('every project row is reachable by keyboard and shows a visible focus ring'
   expect(outline.style).not.toBe('none')
   expect(outline.width).toBeGreaterThanOrEqual(2)
   await page.keyboard.press('Tab')
-  await expect(page.getByTestId('project-kwx')).toBeFocused()
+  await expect(page.getByTestId('project-shed')).toBeFocused()
 })
 
 test('keyboard focus does not override an element\'s own border radius', async ({ page }) => {
