@@ -5,7 +5,7 @@ import { ProjectList } from '@/components/ProjectList'
 import { CopyEmail } from '@/components/CopyEmail'
 import { projects } from '@/content/projects'
 import { buildLabel } from '@/lib/colophon'
-import { links } from '@/lib/site'
+import { graduation, links } from '@/lib/site'
 
 // The grid holds the six best; everything else sits in the index under it. The rail lists only the grid.
 const selected = projects.filter((p) => p.selected)
@@ -26,7 +26,8 @@ const nav: RailNavItem[] = [
 const liveSites = projects.filter((p) => p.where.includes('lukeghanna.com')).length
 
 const facts = [
-  ['Builds with', 'TypeScript, Python, Swift, Postgres', null],
+  ['Studying', 'CS + Business Administration, USC', `Graduating ${graduation}`],
+  ['Looking for', 'Strategy · BizOps · Deployment', 'Full-time, at startups'],
   ['Shipped', `${projects.length} projects · ${liveSites} live sites`, null],
 ] as const
 
@@ -42,10 +43,11 @@ export default function Home() {
         <Section id="about" title="About" index="01">
           <div className="grid gap-14 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] max-lg:gap-6">
             <p className="text-[18px] leading-[1.6] text-mute max-md:text-[16.5px]">
-              I&apos;m fascinated by what AI makes possible, and I build software end-to-end because it&apos;s the fastest way I know to
-              understand how something works:{' '}
-              <span className="text-ink">the product shape, the systems behind it, the data, the interface, and getting it deployed.</span>{' '}
-              Every project here has a write-up that says exactly what state it&apos;s in.
+              I take a problem from question to running system:{' '}
+              <span className="text-ink">who does the work and how, the data, the interface, and keeping it up once it ships.</span>{' '}
+              Beacon began as my capstone in Palantir&apos;s American Tech Fellowship, a sourcing workbench built around how analysts
+              reject firms. Kalshi Weather Edge ran unattended for four months, settled 7,440 signals, and never placed an order, because
+              the market was better calibrated than the model. Every project here has a write-up that says exactly what state it&apos;s in.
             </p>
             <dl className="flex flex-col self-start border-b border-line">
               {facts.map(([k, v, sub]) => (
@@ -67,7 +69,8 @@ export default function Home() {
 
         <Section id="contact" title="Contact" index="03">
           <p className="text-[18px] leading-[1.6] text-mute max-md:text-[16px]">
-            The fastest way to reach me is email. I&apos;m also on GitHub and LinkedIn.
+            I&apos;m looking for a full-time operator role at a startup after I graduate in {graduation}: strategy, BizOps, or
+            deployment. Email is the fastest way to reach me. I&apos;m also on GitHub and LinkedIn.
           </p>
           <div className="mt-5 flex flex-wrap items-center gap-2 max-md:grid max-md:grid-cols-2">
             <CopyEmail className="max-md:col-span-2" />
