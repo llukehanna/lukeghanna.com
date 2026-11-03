@@ -15,7 +15,7 @@ export type WorkMeta = {
   glance: { label: string; value: string }[]
 }
 
-export const workSlugs = ['pfc', 'beacon', 'ccc', 'kwx', 'onair', 'solitaire', 'mapped', 'aglow', 'shed', 'bjs'] as const
+export const workSlugs = ['pfc', 'beacon', 'ccc', 'kwx', 'circuit', 'onair', 'solitaire', 'mapped', 'aglow', 'shed', 'bjs'] as const
 export type WorkSlug = (typeof workSlugs)[number]
 
 export function isWorkSlug(s: string): s is WorkSlug {
@@ -31,6 +31,7 @@ const loaders = {
   beacon: () => import('@/content/work/beacon.mdx'),
   ccc: () => import('@/content/work/ccc.mdx'),
   kwx: () => import('@/content/work/kwx.mdx'),
+  circuit: () => import('@/content/work/circuit.mdx'),
   onair: () => import('@/content/work/onair.mdx'),
   solitaire: () => import('@/content/work/solitaire.mdx'),
   mapped: () => import('@/content/work/mapped.mdx'),
