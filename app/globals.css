@@ -70,6 +70,16 @@ h1, h2, h3 { text-wrap: balance; }
 p { text-wrap: pretty; }
 
 html { background: var(--bg); }
+/* The layout fills the screen up to 1920px wide. Past that, the whole page scales up in steps
+   (zoom = step / 1920) so a wide screen gets the same composition, larger, instead of a
+   third of it empty. */
+@media (min-width: 2080px) { html { zoom: 1.083; } }
+@media (min-width: 2240px) { html { zoom: 1.167; } }
+@media (min-width: 2400px) { html { zoom: 1.25; } }
+@media (min-width: 2560px) { html { zoom: 1.333; } }
+@media (min-width: 2880px) { html { zoom: 1.5; } }
+@media (min-width: 3200px) { html { zoom: 1.667; } }
+@media (min-width: 3840px) { html { zoom: 2; } }
 body {
   background: var(--bg);
   color: var(--ink);
