@@ -47,7 +47,7 @@ export function Figure({
           {isVideo ? (
             <Video src={src} poster={poster ?? ''} captions={captions ?? ''} width={width} height={height} label={alt} className={media} />
           ) : (
-            <Image src={src} alt={alt} width={width} height={height} className={media} sizes={frame === 'phone' ? '300px' : '(min-width: 1280px) 720px, 100vw'} />
+            <Image src={src} alt={alt} width={width} height={height} className={media} sizes={frame === 'phone' ? '300px' : '(min-width: 1280px) 1120px, 100vw'} />
           )}
         </div>
         <Caption n={n} source={source}>{caption}</Caption>
