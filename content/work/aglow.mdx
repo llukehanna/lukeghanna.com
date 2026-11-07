@@ -1,23 +1,25 @@
 export const meta = {
   title: 'Aglow',
   line: 'A remake of Christmas Tree Light Up: the same puzzle, lit like a real tree.',
-  status: 'Live · the game is done; radio and admin are planned',
+  status: 'Live · free to play, sign in to rank',
   role: 'Design, build, operate',
-  stack: 'TypeScript, Canvas 2D, Web Audio, Vite, Vitest, Playwright',
-  source: 'Private.',
+  stack: 'TypeScript, Canvas 2D, Web Audio, Vite, Cloudflare Workers, D1, R2, Google sign-in, Vitest, Playwright',
+  source: 'Public. MIT.',
   app: { label: 'aglow.lukeghanna.com', href: 'https://aglow.lukeghanna.com' },
-  links: [],
+  links: [
+    { label: 'Source', handle: 'github', href: 'https://github.com/llukehanna/ChristmasTreeLightUp' },
+  ],
   glance: [
     { label: 'Board', value: '97 tiles, one spanning tree' },
     { label: 'Turn', value: '120 ms, 3 taps buffered' },
     { label: 'Scenes', value: 'Midnight · Fireside · Frost' },
     { label: 'Light paths', value: 'Filament · Fairy · Neon' },
     { label: 'Score', value: '50,000 − 100 × seconds' },
-    { label: 'Tests', value: '103 unit · 9 e2e' },
+    { label: 'Tests', value: '1,079 unit · 167 e2e' },
   ],
 }
 
-Christmas Tree Light Up is an old browser puzzle: a tree-shaped board of wire tiles, a power source at the trunk, and one rule. Turn tiles until every wire connects and the whole tree is lit. Aglow keeps that puzzle exactly and rebuilds everything around it: the light, the sound, the scenes and the feel of a solve. There is no framework, only TypeScript and one Canvas 2D renderer.
+Christmas Tree Light Up is an old browser puzzle: a tree-shaped board of wire tiles, a power source at the trunk, and one rule. Turn tiles until every wire connects and the whole tree is lit. Aglow keeps that puzzle exactly and rebuilds everything around it: the light, the sound, the scenes and the feel of a solve. There is no framework, only TypeScript and one Canvas 2D renderer. Around the game there is now a radio and a leaderboard whose times the server checks by replaying every run.
 
 <Figure
   n={1}
@@ -26,7 +28,7 @@ Christmas Tree Light Up is an old browser puzzle: a tree-shaped board of wire ti
   height={1800}
   alt="A Christmas tree in a warm, dark room, half solved: glowing filament wires and coloured bulbs run up from the trunk, the unlit tiles above are thin dark wires with dark glass bulbs, a garland of C9 bulbs across the top is two-thirds lit, and wrapped presents sit on a wooden floor"
   caption="Fireside, about sixty per cent solved. The garland across the top is the progress bar: each C9 bulb lights as the lit share of the tree passes its mark."
-  source="Screenshot of aglow.lukeghanna.com at 1440×900, 1 October 2026. Tiles were turned to their solved orientation by real taps, driven through the game's test hook."
+  source="Screenshot of aglow.lukeghanna.com at 1440×900, 1 October 2026, before the radio pill and the account chip were added. Tiles were turned to their solved orientation by real taps, driven through the game's test hook."
 />
 
 ## The same puzzle
@@ -63,7 +65,7 @@ There are three light paths. Filament is a warm wire with a gentle shimmer that 
   height={1800}
   alt="The Midnight scene: a tree under a deep indigo sky with faint snow, its lit branches drawn as strings of tiny warm LEDs and the unlit ones as thin copper wire"
   caption="Midnight with fairy lights. Every lit LED glows on its own and twinkles out of phase with its neighbours."
-  source="Screenshot of aglow.lukeghanna.com at 1440×900, 1 October 2026."
+  source="Screenshot of aglow.lukeghanna.com at 1440×900, 1 October 2026, before the radio pill and the account chip were added."
 />
 
 <Figure
@@ -73,7 +75,7 @@ There are three light paths. Filament is a warm wire with a gentle shimmer that 
   height={1800}
   alt="The Midnight scene with neon tubes: lit paths are thick glowing amber tubes, unlit ones are pale empty glass"
   caption="Midnight with neon. The unlit tubes are empty glass, so the puzzle still reads in the dark."
-  source="Screenshot of aglow.lukeghanna.com at 1440×900, 1 October 2026."
+  source="Screenshot of aglow.lukeghanna.com at 1440×900, 1 October 2026, before the radio pill and the account chip were added."
 />
 
 ## Three scenes
@@ -87,7 +89,7 @@ The scene follows the local time unless the player picks one: Frost from 07:00, 
   height={1800}
   alt="The Frost scene: a dark, snow-dusted fir on a pale daylight background, half its filament wires lit warm, the unlit ones drawn as light silver wires that stand out against the needles"
   caption="Frost, half solved. The unlit wires are silver two-tone so they read against the dark fir; the lit ones are still the warmest thing in the frame."
-  source="Screenshot of aglow.lukeghanna.com at 1440×900, 1 October 2026."
+  source="Screenshot of aglow.lukeghanna.com at 1440×900, 1 October 2026, before the radio pill and the account chip were added."
 />
 
 ## Smooth on a phone
@@ -102,7 +104,7 @@ Everything is drawn in one Canvas 2D context, and the blur that makes the glow i
   frame="phone"
   alt="Aglow on a phone in portrait: the half-lit tree fits the screen width, the presents sit in front of it on the floor, and the lights reflect in the floorboards below"
   caption="On a phone the presents move in front of the tree, below the ground line, so they never sit over a tile."
-  source="Screenshot of aglow.lukeghanna.com at 390×844, 1 October 2026."
+  source="Screenshot of aglow.lukeghanna.com at 390×844, 1 October 2026, before the radio pill and the account chip were added."
 />
 
 ## Winning
@@ -116,9 +118,21 @@ On the last connection the star ignites, a brightness wave sweeps the bulbs from
   height={1800}
   alt="The solved tree on Fireside with the star lit and gold confetti falling, and a cream gift tag in front reading 'Lit in 0:26', 'Merry & bright', score 47,400, a New best badge, one solved, 0:26 average, one-day streak, and New tree and Share buttons"
   caption="The gift tag after a win. 0:26 is not a real solve: the last tiles were finished by the test hook."
-  source="Screenshot of aglow.lukeghanna.com at 1440×900, 1 October 2026."
+  source="Screenshot of aglow.lukeghanna.com at 1440×900, 1 October 2026, before the radio pill and the account chip were added."
 />
+
+## A leaderboard that replays every run
+
+Playing never needs an account, but a time only ranks if the server can check it. When a tree starts, the Worker picks its seed, stamps the start and returns a game id. The browser builds the same tree from that seed and logs every tap and pause with its time. On the last connection it sends the log, and the Worker rebuilds the board from the seed and plays the log through the game's own rules code: turns finish at their exact times, and each tap goes in when it happened. A tap before the reveal ends, during a pause or after the solve, a tap the three-deep queue would have dropped, or a tree that never gets solved makes the log unverifiable, and the game is deleted.
+
+The time comes from the replay: the solve, minus pauses, minus the 900 ms reveal. It has to agree with the server's own clock to within three seconds, so a log cannot claim a faster solve than the server saw, and a made-up log takes as long to submit as the time it claims. A verified run still doesn't rank if it was paused for more than ten minutes or more than 20 times, took under five seconds, or had more than a tenth of its taps under 40 ms apart. A win played signed out is verified and kept for 90 days, and ranks once the player signs in on that browser and claims it.
+
+Sign-in is Google's OpenID Connect flow, done on the server with PKCE. The board shows the top 50 for Today, This week or All time, in the viewer's own calendar, and pins the player's best under the list when it is further down. Your games lists the account's recent runs with its solved count, average and streaks, which match on every device. One path skips the replay: an admin-only import that brings a device's history from before accounts existed onto my account, as runs with no log that rank like any other.
+
+## Radio, and a few eggs
+
+The radio has two stations, Christmas Jazz and Christmas Classics, streamed from Cloudflare R2 and edited at /admin, which signs in with Google and opens only for the admin account. Tracks crossfade over three seconds. Two more sources are synthesized in the browser with no audio files, a music box playing public-domain carols and a procedural fireplace, and a Spotify or Apple Music playlist plays through the official embed. After a win, a light show pulses the bulbs up the tree on the beat and breathes the glow with the low end. There are also easter eggs: five quick taps on the star, or typing "hohoho", swap it for my head in a Santa hat and bring in a secret aurora scene with its own station, and typing "kevin" turns the room into the house from Home Alone.
 
 ## Status
 
-Live at aglow.lukeghanna.com as a static site on Cloudflare. The game is complete: three scenes, three light paths, synthesized sound effects with no audio files, saved games, stats and sharing. A radio is designed and planned but not built yet: Christmas stations streamed from Cloudflare R2, a password-protected admin page to upload to them, and a light show that pulses the bulbs to the music. 103 unit tests across 26 files cover the rules, including a generator property test over a thousand seeded trees, and 9 Playwright smoke tests cover loading, turning, zooming, winning, sharing, settings, pausing and resuming.
+Live at aglow.lukeghanna.com, served as Cloudflare Workers static assets with a Worker on `/api/*` only, over D1 for accounts and games and R2 for the radio's music; every other path comes straight from the assets. Three scenes, three light paths, synthesized sound effects, saved games, stats and sharing; the radio added on 4 October 2026 and its admin on 5 October, accounts and the leaderboard from 7 October, and the Today and This week boards on 14 October. 1,079 Vitest tests across 108 files, including a generator property test over a thousand seeded trees and Worker tests against a real local D1, and 167 Playwright tests (137 desktop, 30 on a Pixel 7 profile) against the real Worker with a fake sign-in that only works on localhost.

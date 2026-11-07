@@ -13,8 +13,8 @@ export const meta = {
     { label: 'Escalation', value: '4 rungs' },
     { label: 'Continuity', value: 'program-date-time' },
     { label: 'Scores', value: 'ESPN, 60 s poll' },
-    { label: 'Leagues', value: 'NFL · NBA · MLB · CFB · CBB' },
-    { label: 'Tests', value: '578 + 7 real-decoder' },
+    { label: 'Leagues', value: 'NFL · NBA · MLB · NHL · CFB · CBB' },
+    { label: 'Tests', value: '738 + 7 real-decoder' },
   ],
 }
 
@@ -29,7 +29,7 @@ OnAir turns "click a game" into a live HLS stream that stays up. It collects can
   height={900}
   alt="OnAir playing a fixture stream with the details drawer open; a stall is injected, the picture holds its last frame, and playback fails over to a second stream with no black frame"
   caption="A game is opened and plays; a stall is injected, the picture holds its last frame, and playback fails over to the second stream without going black. The drawer reports one recovered failure."
-  source="Recorded from the real app, one take, against its built-in fixture source: two local HLS streams that can be broken on command."
+  source="Recorded from the real app, one take, against its built-in fixture source: two local HLS streams that can be broken on command, before the top bar was rebuilt and the Guide added."
 />
 
 ## Never black
@@ -79,7 +79,7 @@ Sources run 45 to 100 seconds apart. When a stream carries wall-clock timestamps
 
 ## The interface
 
-The home screen is built from ESPN's public scoreboard for five leagues, the NFL, NBA, MLB, college football and college basketball: team logos, colors and records, live scores, the game clock, the network and the venue, refreshed every sixty seconds while games are on. A live game gets a full-width hero in its teams' colors, with rows of upcoming games under it. The player is full-bleed video with controls that hide themselves and a details drawer: the scoreboard, the current stream's source, quality and distance behind live, the ranked candidates, and how many failures it has recovered from.
+The home screen is built from ESPN's public scoreboard for six leagues, the NFL, NBA, MLB, NHL, college football and college basketball: team logos, colors and records, live scores, the game clock, the network and the venue, refreshed every sixty seconds while games are on. A live game gets a full-width hero in its teams' colors, with rows of upcoming games under it. The player is full-bleed video with controls that hide themselves and a details drawer: the scoreboard, the current stream's source, quality and distance behind live, the ranked candidates, and how many failures it has recovered from.
 
 <Figure
   n={4}
@@ -88,7 +88,7 @@ The home screen is built from ESPN's public scoreboard for five leagues, the NFL
   height={900}
   alt="OnAir's home screen: a full-width hero for Rams at Broncos, live, 16 to 8 in the third quarter on NBC, with a Watch live button, a Live now row and a Coming up row of games in team colors"
   caption="Home during a live NFL game: the hero and the rows come from ESPN's scoreboard, in each team's colors."
-  source="Screenshot of the app, 27 September 2026, running against its fixture source."
+  source="Screenshot of the app, 27 September 2026, running against its fixture source, before the top bar was rebuilt and the Guide added."
 />
 
 <Figure
@@ -98,9 +98,15 @@ The home screen is built from ESPN's public scoreboard for five leagues, the NFL
   height={900}
   alt="OnAir diagnostics: the Dev Fixture source healthy at 100% confidence, and two recent events, a stream failed and a source switch, both with reason stall"
   caption="Diagnostics after the failover in Fig. 1: source health and confidence, and the two events the injected stall produced."
-  source="Screenshot of the app running against its fixture source, taken right after the recording."
+  source="Screenshot of the app running against its fixture source, taken right after the recording, before the top bar was rebuilt and the Guide added."
 />
+
+## Guide and live channels
+
+A Guide screen, added on 28 September 2026, puts always-on channels beside the games. A source adapter can optionally list the channels it carries; a discovery pass on startup and every 30 minutes collects those listings and folds each source's spelling into one canonical channel, so the same channel from several sources is one row. The guide's programs come from ESPN's games, already in the database, and TVmaze's US schedule for today and tomorrow, shown from about an hour behind to a day ahead. A channel is a watch target exactly like a game: it goes through the same probe, ranking and failover, with its match confidence fixed at 1.0 because the link already names the channel. The fixture source has no channels, so none of this is captured here.
+
+The last change on main fixed a starved extraction. Only four headless pages run at once, and sources that didn't carry the game held them for about 12 seconds each, so the sources that did got a page at about 21 seconds and missed the 30-second extraction timeout. An adapter now stops as soon as no listing link names the game, and adapters are dispatched by priority: 0.7 × their startup success rate (a neutral 0.5 with no history) plus 0.3 × their confidence weight.
 
 ## Status
 
-Works end to end against the fixture source; the embedded-player rung is covered by unit tests only. macOS only, installed locally with one command as an ad-hoc arm64 build, not signed or notarized for distribution. 578 tests across 33 suites plus seven real-decoder browser tests, and CI runs typecheck, lint, tests, build and the browser tier on macOS for every pull request.
+Works end to end against the fixture source; the embedded-player rung is covered by unit tests only. macOS only, installed locally with one command as an ad-hoc arm64 build, not signed or notarized for distribution. 738 tests across 39 suites plus seven real-decoder browser tests, and CI runs typecheck, lint, tests, build and the browser tier on macOS for every pull request.
