@@ -1,77 +1,68 @@
 export const meta = {
   title: 'Beacon',
-  line: 'A deal-sourcing workbench that learns its screening rules from the analysts who reject firms.',
+  line: 'A deal-sourcing workbench where every value carries its source, and the reasons analysts pass on firms become the next search’s screening rules.',
   status: 'Live · synthetic data, resets daily',
   role: 'Design, build, operate',
-  stack: 'React 18, TypeScript, Postgres on Neon (PGlite locally), Cloudflare Workers, TanStack Query, Claude',
+  stack: 'React 18, TypeScript, Postgres on Neon (PGlite locally), Cloudflare Workers, TanStack Query, Claude Haiku 4.5, Playwright',
   source: 'Public. MIT. Sanitized: no employer, vendor, or real firm names.',
   app: { label: 'beacon.lukeghanna.com', href: 'https://beacon.lukeghanna.com' },
   links: [
     { label: 'Source', handle: 'github · beacon', href: 'https://github.com/llukehanna/beacon' },
+    { label: 'Evals', handle: 'docs · evals', href: 'https://github.com/llukehanna/beacon/blob/main/docs/evals.md' },
+    { label: 'Case study', handle: 'docs · Foundry to open stack', href: 'https://github.com/llukehanna/beacon/blob/main/docs/foundry-origins.md' },
   ],
   glance: [
-    { label: 'Object types', value: '11 · 17 actions' },
+    { label: 'Grounded values', value: '6,455 of 6,472 quote their source' },
+    { label: 'Settled values right', value: '93.2%, against synthetic truth' },
     { label: 'Rubric', value: '9 axes, 18 points' },
-    { label: 'Providers', value: '4, ranked by trust' },
-    { label: 'Rule support', value: '≥ 4 distinct firms' },
+    { label: 'Ontology', value: '18 object types · 18 actions' },
     { label: 'Demo universe', value: '700 synthetic firms' },
-    { label: 'Tests', value: '214 cases' },
+    { label: 'Tests', value: '1,000+ unit · 154 end-to-end' },
   ],
 }
 
-Beacon was the capstone of Palantir's American Tech Fellowship (Frontiers), May to July 2026, built on Foundry. It is a workbench for sourcing boutique advisory firms as acquisition targets. It has since been ported to Postgres and React and runs live on a synthetic universe of 700 firms that resets every night.
+Beacon was the capstone of Palantir's American Tech Fellowship (Frontiers), May to July 2026, built on Foundry. It is a workbench for a corporate development team sourcing boutique advisory firms as acquisition targets. It has since been ported to Postgres, TypeScript and Cloudflare Workers behind the same frontend, and runs live on a synthetic universe of 700 firms that resets every night.
+
+The problem it takes on is the stretch between a thesis and a short list a team can defend. Sources disagree, gaps get filled by hand, most firms are passed on, and the reasons for passing are written once and never used again. An AI that fills the gaps by guessing makes the list harder to defend, not easier. So Beacon's rule is that every value it shows carries the sentence it came from, and when no source has the answer, it says so.
 
 <Figure
   n={1}
   src="/work/beacon/desk.webp"
-  width={1440}
-  height={900}
-  alt="Beacon's enrichment desk: a conflict between Web search and Deal DB on deals per managing director, five proposed findings with their source excerpts, four axes with no source, and the analyst's call panel"
-  caption="The enrichment desk. One axis is in conflict between two sources, five findings are proposed with the excerpt that supports each, and four axes have no source at all, which is the analyst's job to fill."
-  source="Screenshot of the live demo at beacon.lukeghanna.com. Every firm name is invented; every source is a mock."
+  width={2880}
+  height={1620}
+  alt="Beacon's enrichment desk for Ainsley Advisors: a grid of axes against four sources, one conflict on deals per managing director between Deal DB (5.3) and Web search (3.9), three proposed values, axes marked 'No source had it. Beacon abstained instead of guessing', and an evidence panel showing the Deal DB record with the supporting sentence highlighted and three grounding checks passed"
+  caption="The enrichment desk. Deal DB and Web search disagree on deals per managing director, so both positions go to the analyst; the evidence panel opens the source record at the quoted line and shows the grounding checks it passed. Seven axes have no source, and the grid says so."
+  source="Screenshot of the live demo at beacon.lukeghanna.com, 1440×810, 6 November 2026. Every firm name is invented; every source is a mock."
 />
 
 ## What it does
 
-A mandate states an intent: a kind of firm, a geography, an industry, a size cap. On the search page the analyst's facet picks become the interpretation of that intent, and the search yields a candidate universe of firms. Each firm then moves through a six-stage funnel: Discovered, In Review, Outreach, In Talks, and the terminal states Qualified and Rejected.
+A mandate states a thesis in plain language: a kind of firm, a geography, a product, a sector. Beacon reads it back as filters, and the search yields a candidate universe. Each firm then moves through a deal funnel, Discovered, Screening, Qualified, Outreach, NDA, IOI, LOI and Closed, with Passed as the other way out.
 
-Between Discovered and a decision sits the enrichment desk. An agent fills in facts about each firm from ranked data sources; the analyst verifies or overrides them, reads the rubric score they imply, and makes the call. Rejections need a written rationale, and those rationales are where the system learns.
+Between Discovered and a decision sits the enrichment desk. An agent proposes a value for each scoring axis from four source records; the analyst verifies or overrides them, reads the rubric score they imply, and makes the call. Passing needs a written reason, and those reasons are where the system learns.
 
-The home page is a start-of-day operations page rather than a dashboard: every card and number on it links to the surface that does the work, and it never promises work the linked page does not show.
+The home page is a start-of-day page rather than a dashboard: every card and number links to the surface that does the work.
 
 <Figure
   n={2}
   src="/work/beacon/home.webp"
-  width={1440}
-  height={900}
-  alt="Beacon's home page: a triage count, three mandates with their scoped firm counts, the pipeline funnel from Discovered to Qualified and Rejected, an abstention rate, an agreement rate, and observed outcomes"
-  caption="Home after a reset: what needs the analyst today, the three seeded mandates, the funnel, and the trust rail with the agent's abstention and agreement rates."
-  source="Screenshot of the live demo. The numbers are one day's synthetic history and change after every reset."
+  width={2880}
+  height={1620}
+  alt="Beacon's home page: an introduction with three claims (cites every value, says when it doesn't know, learns from your passes) and a tour button, then '54 items need you', four trust cards (100% of agent values grounded in a source, 23% honest abstention, 93% analyst agreement, 697 firms in coverage), the pipeline funnel from Discovered to Passed, and an agent activity feed"
+  caption="Home after a reset: what needs the analyst today, the trust figures for the agent's work, the funnel, and the agent's latest runs."
+  source="Screenshot of the live demo, viewed as the analyst persona, so the three restricted firms are not counted. The numbers are one day's synthetic history and change after every reset."
 />
 
-## Enrichment that abstains
+## Evidence that quotes its source
 
-Four providers observe each firm, each with its own coverage and error rate, ordered from most to least trusted. The reconciliation step has three outcomes and never picks a winner in a conflict.
+Claude Haiku 4.5 reads each firm's four source records and returns every value with the exact sentence that supports it. A value survives only if the quote appears word for word in the record and contains the value. A reconciliation step then has three outcomes, and never picks a winner in a conflict: no source has it, and the axis is an abstention; the sources agree, and it is one proposed finding; they disagree, and the analyst sees both.
 
-| Provider | Coverage | Error rate |
-|---|---|---|
-| BeaconDB, most trusted | 25% | 2% |
-| Deal DB | 70% | 10% |
-| Filings | 60% | 5% |
-| Web search, least trusted | 55% | 20% |
-
-| Providers agree | Result |
-|---|---|
-| No source knows | An abstained finding: the axis stays unknown |
-| One value, from one or more sources | A proposed finding, marked high confidence when corroborated or at least 0.8 confident |
-| Two or more values | A conflict pair: the two most trusted positions, both low confidence, sharing a conflict group |
-
-An axis a human has already verified is never re-enriched. When the analyst overrides a finding, the agent's finding is marked rejected and the analyst's is inserted as verified, so the accuracy page can compute agreement, override and abstention rates per provider and per axis from the record rather than from memory.
+The extraction for all 700 firms ran once through the Message Batches API and was committed as fixtures, so the demo, the seed and CI need no API key. It cost $1.39, and 6,455 of the 6,472 values it returned passed the grounding check.
 
 <Flow
   n={3}
-  caption="From observations to a rubric input. The reconciler abstains, corroborates, or surfaces a conflict; the analyst confirms, overrides, or resolves."
-  source="Drawn from server/enrichment/reconcile.ts and server/actions/findings.ts in the repository."
+  caption="From four source records to a rubric input. A value without a verbatim quote is dropped; the reconciler abstains, proposes, or surfaces a conflict; the analyst confirms, overrides, or resolves."
+  source="Drawn from server/extraction and server/enrichment/reconcile.ts in the repository."
   steps={[
     [
       { title: 'BeaconDB', detail: 'most trusted' },
@@ -79,68 +70,86 @@ An axis a human has already verified is never re-enriched. When the analyst over
       { title: 'Filings' },
       { title: 'Web search', detail: 'least trusted' },
     ],
-    { title: 'Sort by trust, group by value' },
+    { title: 'Claude reads each record', detail: 'a value and its supporting sentence' },
+    { title: 'Grounding check', detail: 'the quote is in the record and contains the value' },
     [
-      { title: 'Abstain', detail: 'no observations' },
-      { title: 'Propose', detail: 'one value; high confidence if corroborated' },
-      { title: 'Conflict pair', detail: 'two values; both low confidence' },
+      { title: 'Abstain', detail: 'no source has it' },
+      { title: 'Propose', detail: 'one value, corroborated or not' },
+      { title: 'Conflict', detail: 'two values; both go to the analyst' },
     ],
-    { title: 'Analyst', detail: 'verify, override, or resolve the conflict' },
-    { title: 'Normalized score', detail: 'feeds the nine-axis rubric' },
+    { title: 'Analyst', detail: 'verify, override, or resolve' },
   ]}
 />
 
+Because the universe is generated, every firm has a hidden true value for every axis, and the agent's work can be scored exactly. `npm run eval` does that on every CI run and fails below its floors. None of these figures says how the agent would do on real firms.
+
+| Measure, against synthetic truth | Value |
+|---|---|
+| Settled values that match the truth | 93.2%, on 68.3% of axes |
+| Conflicts where the more trusted source was right | 90.8% |
+| Abstentions where no source had the value | 100% |
+| Planted rejection patterns recovered as rules | 4 of 4 |
+
+| Provider | Coverage | Precision |
+|---|---|---|
+| BeaconDB, most trusted | 25.8% | 98.5% |
+| Deal DB | 70.9% | 97.1% |
+| Filings | 54.4% | 95.2% |
+| Web search, least trusted | 51.1% | 82.3% |
+
 ## The rubric
 
-Nine axes, each scored 0 to 2, for a maximum of 18. Two models share six axes and differ on three: corporate-finance firms are read on coverage model, services and managing-director experience; capital-solutions firms on balance sheet, services fit and managing-director experience. Tiers are A, B, C or Rejected; an A goes to outreach, a strong B goes to outreach, a C is followed, and a score-based reject goes back to enrichment. Two hard rejects sit above the score: a generalist coverage model or conflicted services on one side, an advisory conflict or a firm that invests its own balance sheet on the other.
+Nine axes, each scored 0 to 2, for a maximum of 18. Two models share six axes and differ on three: corporate-finance firms are read on coverage model, services and managing-director experience; capital-solutions firms on balance sheet, services fit and managing-director experience. Tiers are A, B and C, with hard rejects above the score: a generalist coverage model or conflicted services on one side, an advisory conflict or a firm that invests its own balance sheet on the other.
 
-One function computes the score. The server persists snapshots with it and the desk previews with it, so the two cannot drift.
+One module computes the score. The server records with it and the desk previews with it, so the two cannot drift.
 
-## Rules grounded in rejections
+## Rules grounded in passes
 
-A rejection carries a rationale. Rationales for firms still in Rejected are clustered into candidate rules of the form axis, operator, threshold, by Claude when it is enabled and by a keyword heuristic otherwise. A candidate only counts a rejection as support if that firm actually satisfies the predicate, and it needs at least four distinct supporting firms, so a firm rejected twice counts once. Existing rules, including dismissed ones, are never re-proposed. The result is a pending proposed rule that also reports how many firms on the desk it would screen.
+A pass carries a reason. Reasons are clustered into candidate rules of the form axis, operator, threshold, by Claude when it is enabled and by a keyword heuristic otherwise. A candidate counts a pass as support only if that firm actually satisfies the predicate, and it needs at least four distinct firms. Each proposal quotes the notes behind it and says how many firms it would screen, and nothing applies until an analyst approves it.
 
 <Figure
   n={4}
   src="/work/beacon/rules.webp"
-  width={1440}
-  height={900}
-  alt="Beacon's rules page: three pending proposed rules with their supporting rejection counts and projected screen counts, and one approved rule, employees under 10, screening firms off the desk queue"
-  caption="Three pending rules clustered from rejection rationales, each showing how many rejections support it and how many firms it would screen, above one approved rule already screening the queue."
+  width={2880}
+  height={1620}
+  alt="Beacon's rules page: three proposed hard-screen rules (coverage model is Generalist, average deal size below $20m, fewer than 1.5 deals per managing director), each with the analysts' notes behind it and how many firms it would screen, above one active rule, employees under 10, screening 90 firms"
+  caption="Three proposed rules clustered from pass reasons, each quoting the analysts' notes that support it and how many firms it would screen, above one approved rule already screening the queue."
   source="Screenshot of the live demo, synthetic data."
-/>
-
-<Flow
-  n={5}
-  caption="The loop from an analyst's written rationale to a versioned screening rule, and back to the desk."
-  source="Drawn from server/actions/rules.ts, server/clustering and src/desk/activeScreening.ts in the repository."
-  steps={[
-    { title: 'Reject a firm', detail: 'rationale required; decision logged' },
-    { title: 'Cluster rationales', detail: 'Claude when enabled, or the keyword heuristic' },
-    { title: 'Ground each candidate', detail: 'the firm must satisfy the predicate; at least four distinct firms; not an existing rule' },
-    { title: 'Proposed rule', detail: 'pending, with the count of firms it would screen' },
-    [
-      { title: 'Approve', detail: 'active config, version 1' },
-      { title: 'Amend', detail: 'new version; old one deactivated' },
-      { title: 'Dismiss', detail: 'reason required' },
-    ],
-    { title: 'Screen the desk queue', note: 'a firm missing the property is never screened' },
-  ]}
 />
 
 > Unknown is not a failure. It is the reason the firm is on the desk at all.
 
-## Drift
+## Drift and market signals
 
-Every terminal decision snapshots the score it was made on. New evidence rescores the firm. A qualified firm drifts on any tier change; a rejected firm drifts only when it improves, because the reason for passing may no longer hold. A rejected firm later acquired by a competitor raises a diverged-outcome event. Review resolves each event by re-engaging the firm, which moves it to Outreach, or by keeping it passed, with a rationale.
+Every decision snapshots the score it was made on. New evidence rescores the firm, and so do synthetic market signals: invented news (a senior hire, a departure, a deal announcement, an acquisition) that an hourly job applies as it comes due, labelled as synthetic wherever it appears. A qualified firm drifts on any tier change; a passed firm drifts when it improves, because the reason for passing may no longer hold; a passed firm bought by a competitor raises an outcome-diverged event. Review resolves each one by re-engaging the firm or keeping it passed, with a reason.
+
+<Figure
+  n={5}
+  src="/work/beacon/review.webp"
+  width={2880}
+  height={1620}
+  alt="Beacon's drift queue: eleven firms that moved since their decision, among them passed firms acquired by a competitor, passed firms whose reason no longer holds (one from B 11 to A 17), and qualified firms that fell a tier; the side panel shows a passed firm with the original pass reason and 'Acquired by competitor, synthetic market signal', with Re-engage and Keep passed buttons"
+  caption="The drift queue. A firm passed for a generalist coverage model has since been acquired by a competitor, so the outcome diverged from the decision; others have moved tier on new evidence."
+  source="Screenshot of the live demo, synthetic data and synthetic market signals."
+/>
+
+## Work that leaves the tool
+
+The finance track turns the desk's work into things a deal team uses elsewhere, each carrying the same citations:
+
+- **Exports.** An Excel workbook with a Targets sheet and a Citations sheet, and CSVs in Salesforce, DealCloud and Affinity layouts. Cells that look like formulas are neutralised.
+- **Tear sheets.** A printable one-page profile per firm: overview, score by axis, key evidence with its source and model, open conflicts and abstentions, signals and decision history.
+- **Lookalikes.** "More like this" for any firm and for the approved targets, each match with the reasons it matched.
+- **Information barriers.** A demo persona (analyst, deal-team lead, compliance). A restricted list is hidden from everyone but compliance on every read path, a mandate a viewer is not cleared for shows only its codename, and views are logged.
+- **An MCP server.** A read-only Model Context Protocol endpoint lets an AI assistant search firms, read a firm's cited evidence and list screening rules, under the same barriers.
 
 <Figure
   n={6}
-  src="/work/beacon/review.webp"
-  width={1440}
-  height={900}
-  alt="Beacon's review page: a drift queue of firms whose scores moved since their decision, one rejected firm now scoring an A with the reason 'pass reason invalidated', and several qualified firms that fell a tier"
-  caption="The drift queue. A rejected firm now scores an A, so the reason for passing on it no longer holds; several qualified firms have slipped a tier."
+  src="/work/beacon/tearsheet.webp"
+  width={2880}
+  height={1620}
+  alt="A Beacon tear sheet for Dalrymple & Wadsworth Advisory: an overview of profile fields, then a score of 13 out of 18, tier B, with the points for each axis and an unknown services axis stated plainly, and a Print / Save as PDF button"
+  caption="A tear sheet on screen. Printed, it drops the app's chrome and keeps each section whole on the page."
   source="Screenshot of the live demo, synthetic data."
 />
 
@@ -148,13 +157,15 @@ Every terminal decision snapshots the score it was made on. New evidence rescore
 
 | On Foundry | Now |
 |---|---|
-| Ontology Manager, 12 object types, 30 actions, 39 functions | One schema declaration with 11 object types and 17 actions; the DDL, the repository, API validation and the typed hooks all derive from it, and the rubric is one shared module |
-| Generated SDK and its React hooks | Drop-in hooks with the same names over TanStack Query, so page code changed only its imports |
-| Actions | Named actions, each validated and run inside a single transaction, behind four API routes on a Cloudflare Worker |
+| Ontology Manager, 12 object types | One schema declaration, 18 object types and 18 named actions; the DDL, API validation, typed hooks and a generated ontology reference all derive from it |
+| Generated SDK and its React hooks | Hooks with the same names over TanStack Query, so screens changed only their imports |
+| Actions and Functions | Named actions, each validated and run in one transaction, and query functions, behind a handful of API routes on a Cloudflare Worker |
+| AIP Logic | Claude extraction with a grounding check, recorded as fixtures; clustering behind a flag with a hard budget |
+| Markings and permissions | A demo persona with a restricted list, need-to-know codenames and an access log, enforced on the server |
 | Backend | Postgres: in-process PGlite for tests and local work, Neon in production; the same SQL runs on both |
 
-The demo is open and writable. A single shared analyst can run every action, a nightly job resets the universe at 04:00 UTC, and a Reset button does the same on demand, throttled to once every five minutes; the reset is one transaction. The seed builds thirty days of history through the real actions (three mandates, two searches, an enrichment cohort, a couple of dozen rejections, one approved rule), which makes it an end-to-end test as well as a demo. Claude clustering runs behind a flag with a hard budget of one call per ten minutes and twenty-four a day, and anything else, including any error, falls back to the heuristic. A pre-publish check fails the build if any file mentions the original employer, the licensed data vendors, the training stack's hosts, the real firm names from the original data, or the original rubric wording; its patterns are stored as salted hashes so the check itself gives nothing away.
+The demo is open and writable. A single shared analyst can run every action, a nightly job restores the seeded world at 04:00 UTC, and a Reset button does the same on demand, throttled to once every five minutes; the reset is one transaction. The seed builds the history through the real actions, which makes it an end-to-end test as well as a demo. A pre-publish check fails the build if any file mentions the original employer, the licensed data vendors, the real firm names from the original data or the original rubric wording; its patterns are stored as salted hashes so the check itself gives nothing away.
 
 ## Status
 
-Ported between 22 and 24 September 2026 and released under MIT as beacon-demo. Nineteen test files with 214 cases run against in-memory Postgres. Everything on the live site is synthetic: firm names are generated from invented words, enrichment sources are mocks that link to reserved example domains, and the four captures here show one day's seeded history, which the next reset replaces.
+Ported in September 2026 and public under MIT since November. Over 1,000 unit and integration tests run against in-memory Postgres, 154 Playwright tests drive the app, and the evaluation runs on every CI build. Ten decision records explain the choices that matter. Everything on the live site is synthetic: firm names are generated from invented words, sources are mocks, market signals are invented news, and the captures here show one day's seeded history, which the next reset replaces.

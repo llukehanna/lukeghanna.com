@@ -97,10 +97,10 @@ test.describe('write-up', () => {
     await expect(page.getByTestId('article').locator('figure', { hasText: 'Serialized drain' })).toHaveCount(1)
   })
 
-  test('Beacon shows four production captures of synthetic data, each with provenance', async ({ page }) => {
+  test('Beacon shows five production captures of synthetic data, each with provenance', async ({ page }) => {
     await page.goto('/work/beacon')
     const article = page.getByTestId('article')
-    await expect(article.locator('figure img')).toHaveCount(4)
+    await expect(article.locator('figure img')).toHaveCount(5)
     const captions = await article.locator('figure:has(img) figcaption').allInnerTexts()
     for (const c of captions) expect(c).toMatch(/live demo|synthetic/i)
     await expect(page.getByTestId('rail').getByTestId('open-app')).toHaveAttribute('href', 'https://beacon.lukeghanna.com')
