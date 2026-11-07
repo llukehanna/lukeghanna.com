@@ -189,3 +189,8 @@ Every project was checked against its repository's `main`, its live site and Git
 - **Tonight**: still not listed. TestFlight build 12 is internal only, with no external testers or users, and its launch blockers are open.
 
 GitHub: descriptions, homepages and topics brought in line (Circuit, Aglow, Solitaire, CCC, Shedquarters, BT, BT-docs; `vercel` topics replaced with `cloudflare-workers`); PFC-docs and BT-docs status sections updated; the profile README's Mapped, Aglow, OnAir and BJS lines updated.
+
+**Same day, after pushing.** At Luke's go-ahead, the code each live site ran ahead of GitHub was pushed, and the write-ups moved with it:
+- **Shedquarters:** local `main` fast-forwarded GitHub to `f0ea6cd`. CI's first run failed fetching a Google font during `next build`; the rerun passed with 835 tests across 60 files (run 42418592709), and the write-up now cites that.
+- **Aglow:** the `home-alone` branch was pushed and fast-forwarded onto `main` (`f4d2f90`). The write-up now covers the Daily Tree, replays and ghosts, the wardrobe and Advent, six scenes and four light paths, and no longer mentions a score. 1,664 Vitest tests across 156 files (run; six need a build or performance flag) and 230 Playwright tests (200 desktop, 30 phone; listed).
+- **BJS:** local `main`, with Step 7 merged, was merged with GitHub's two README commits and pushed (`df1854c`), with the README's status brought through Step 7. Seven of eight steps are merged; 292 engine tests (run with `swift test`), 264 app and 7 UI (from `docs/superpowers/progress.md`).

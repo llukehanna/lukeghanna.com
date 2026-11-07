@@ -15,7 +15,7 @@ export const meta = {
     { label: 'Provisional until', value: '10 games' },
     { label: 'PIN guesses', value: '20 a day, global' },
     { label: 'Sports', value: 'beer die · spikeball' },
-    { label: 'Tests', value: '738 across 57 files' },
+    { label: 'Tests', value: '835 across 60 files' },
   ],
 }
 
@@ -126,4 +126,4 @@ The session cookie holds a signature, never the PIN, so hammering the write API 
 
 ## Status
 
-Live and in use. Rankings, the game log and player pages are public; changing anything needs the house PIN or an invite link. It runs on Cloudflare Workers with Postgres on Neon. Deploys are run by hand with `npm run deploy`, which applies the schema migration first and then ships to Workers; merging to main does not deploy. Production at die.lukeghanna.com runs local main, six commits ahead of GitHub's main and not yet pushed: October's fixes to stay under the Workers CPU limit. Every night at 09:00 UTC a Cloudflare Cron Trigger writes a JSON backup to Workers KV. Known gaps: beer die (2v2, 3v3) and spikeball (2v2) only, each rated separately, and no rating decay, so a badge marks inactive players instead. 738 tests across 57 files passed in CI against Postgres 17, including component tests in jsdom, on 22cfc9e; the six unpushed commits have not been through CI.
+Live and in use. Rankings, the game log and player pages are public; changing anything needs the house PIN or an invite link. It runs on Cloudflare Workers with Postgres on Neon. Deploys are run by hand with `npm run deploy`, which applies the schema migration first and then ships to Workers; merging to main does not deploy. October's fixes to stay under the Workers CPU limit, which production ran before they reached GitHub, were pushed to main on 7 November. Every night at 09:00 UTC a Cloudflare Cron Trigger writes a JSON backup to Workers KV. Known gaps: beer die (2v2, 3v3) and spikeball (2v2) only, each rated separately, and no rating decay, so a badge marks inactive players instead. 835 tests across 60 files passed in CI against Postgres 17, including component tests in jsdom, on f0ea6cd (run 42418592709).

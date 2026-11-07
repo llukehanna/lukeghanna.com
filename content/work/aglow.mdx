@@ -12,14 +12,14 @@ export const meta = {
   glance: [
     { label: 'Board', value: '97 tiles, one spanning tree' },
     { label: 'Turn', value: '120 ms, 3 taps buffered' },
-    { label: 'Scenes', value: 'Midnight · Fireside · Frost' },
-    { label: 'Light paths', value: 'Filament · Fairy · Neon' },
-    { label: 'Score', value: '50,000 − 100 × seconds' },
-    { label: 'Tests', value: '1,079 unit · 167 e2e' },
+    { label: 'Scenes', value: 'Six, Fireside to start' },
+    { label: 'Light paths', value: 'Filament · Fairy · Neon · Neon bright' },
+    { label: 'Wardrobe', value: '71 items, earned by 64 goals' },
+    { label: 'Tests', value: '1,664 unit · 230 e2e' },
   ],
 }
 
-Christmas Tree Light Up is an old browser puzzle: a tree-shaped board of wire tiles, a power source at the trunk, and one rule. Turn tiles until every wire connects and the whole tree is lit. Aglow keeps that puzzle exactly and rebuilds everything around it: the light, the sound, the scenes and the feel of a solve. There is no framework, only TypeScript and one Canvas 2D renderer. Around the game there is now a radio and a leaderboard whose times the server checks by replaying every run.
+Christmas Tree Light Up is an old browser puzzle: a tree-shaped board of wire tiles, a power source at the trunk, and one rule. Turn tiles until every wire connects and the whole tree is lit. Aglow keeps that puzzle exactly and rebuilds everything around it: the light, the sound, the scenes and the feel of a solve. There is no framework, only TypeScript and one Canvas 2D renderer. Around the game there is now a radio, a leaderboard whose times the server checks by replaying every run, and a Daily Tree that everyone plays.
 
 <Figure
   n={1}
@@ -33,9 +33,9 @@ Christmas Tree Light Up is an old browser puzzle: a tree-shaped board of wire ti
 
 ## The same puzzle
 
-The board is the original's: 97 tiles in rows of 3, 5, 7 and up to 17, with the source under the trunk. A new tree is a randomized Prim's spanning tree over those tiles, so every tile is needed, there are no loops, and there is exactly one way to connect them. Each tile then gets a random orientation of its own shape (end, straight, bend, T or cross), which means a tile can start already correct, as it could in the original. Lighting is a breadth-first search from the root, a turn is always 90 degrees clockwise, and the score is 50,000 minus 100 for every whole second.
+The board is the original's: 97 tiles in rows of 3, 5, 7 and up to 17, with the source under the trunk. A new tree is a randomized Prim's spanning tree over those tiles, so every tile is needed, there are no loops, and there is exactly one way to connect them. Each tile then gets a random orientation of its own shape (end, straight, bend, T or cross), which means a tile can start already correct, as it could in the original. Lighting is a breadth-first search from the root, and a click turns a tile 90 degrees clockwise. The original scored 50,000 minus 100 for every whole second; Aglow shows only the time.
 
-Three things changed on purpose, all about feel. A turn takes 120 ms with a slight overshoot instead of a linear 200 ms. Taps on a tile that is still turning are buffered, up to three, so a quick double tap becomes one fluid half turn instead of a lost input. And the clock starts when the board becomes playable and stops while the game is paused, so times are fair but not comparable with the original's.
+A few things changed on purpose, all about feel. A turn takes 120 ms with a slight overshoot instead of a linear 200 ms. Taps on a tile that is still turning are buffered, up to three, so a quick double tap becomes one fluid half turn instead of a lost input. A right-click turns a tile back, counter-clockwise, through the same queue. And the clock starts when the board becomes playable and stops while the game is paused, so times are fair but not comparable with the original's.
 
 <Flow
   n={2}
@@ -56,7 +56,7 @@ Three things changed on purpose, all about feel. A turn takes 120 ms with a slig
 
 Every tile that becomes lit fills in 30 ms, starting when its parent finishes, so a connection runs out through the tree as a visible wave led by a white-hot point. Bulbs overshoot to almost twice their brightness when they light, then settle. The glow is three blurred copies of a half-resolution glow layer, added on top of the scene: a tight halo, a soft glow and a faint atmosphere. An auto-exposure term pulls the wide passes down as more of the tree lights, so a nearly solved tree loses its fog first and stays legible instead of washing out. Lit light falls on its surroundings too: the floor or snow under the tree brightens, the presents warm, and on Fireside the lights reflect in the floor.
 
-There are three light paths. Filament is a warm wire with a gentle shimmer that drifts outward from the source. Fairy lights are micro-LEDs on copper wire that twinkle out of phase. Neon is a glass tube that stutters on as gas fills it.
+There are four light paths. Filament is a warm wire with a gentle shimmer that drifts outward from the source. Fairy lights are micro-LEDs on copper wire that twinkle out of phase. Neon is a soft, steady glass tube, and Neon bright, which is earned, is a brighter one that stutters on as gas fills it.
 
 <Figure
   n={3}
@@ -78,9 +78,9 @@ There are three light paths. Filament is a warm wire with a gentle shimmer that 
   source="Screenshot of aglow.lukeghanna.com at 1440×900, 1 October 2026, before the radio pill and the account chip were added."
 />
 
-## Three scenes
+## Six scenes
 
-The scene follows the local time unless the player picks one: Frost from 07:00, Fireside from 16:00, Midnight from 20:00. All three share a procedural fir, drawn once per layout in three passes of needles and lit from the scene's side. Frost was the hard one. Glow on a pale daylight background barely shows, and dark wires on a dark fir barely show either, so unlit paths on Frost get their own treatment per light path, a two-tone wire or a soft snow glint, while lit light stays the brightest and warmest thing on screen.
+A new player starts in Fireside; the other five are earned. Midnight is a snowy night sky. Sash puts the tree in front of an arched sash window with snow falling behind the glass. Parlour is a Victorian parlour whose mantel clock shows the real time, and Town square is a square at blue hour with a skating rink that reflects the tree. Each is painted once, and only its lights, flames and snow are drawn per frame. The fir is procedural, drawn once per layout in three passes of needles and lit from the scene's side. Frost, a pale daylight scene, was the hard one. Glow on a pale daylight background barely shows, and dark wires on a dark fir barely show either, so unlit paths on Frost get their own treatment per light path, a two-tone wire or a soft snow glint, while lit light stays the brightest and warmest thing on screen.
 
 <Figure
   n={5}
@@ -109,7 +109,7 @@ Everything is drawn in one Canvas 2D context, and the blur that makes the glow i
 
 ## Winning
 
-On the last connection the star ignites, a brightness wave sweeps the bulbs from the bottom up, the garland blazes, and gold flecks and snow fall over the tree. Then a gift tag gives the time, the score, a new-best badge, and the solved count, average time and daily streak. Share renders the player's own lit tree in their scene as a 1080×1350 image with the time on it, through the share sheet on a phone or the clipboard on a desktop. A game in progress is saved on every turn, so closing the tab and coming back resumes the same tree with a "Welcome back" and the clock where it was.
+The win lands with the last turn: the light still travelling runs four times faster, the topper flares, a brightness wave sweeps the bulbs from the bottom up, the garland blazes, and gold flecks and snow fall over the tree. Half a second later a gift tag gives the time, a new-best badge, and the solved count, average time and daily streak. Share renders the player's own lit tree in their scene as a 1080×1350 image with the time on it, through the share sheet on a phone or the clipboard on a desktop. A game in progress is saved on every turn, so closing the tab and coming back resumes the same tree with a "Welcome back" and the clock where it was.
 
 <Figure
   n={7}
@@ -117,22 +117,30 @@ On the last connection the star ignites, a brightness wave sweeps the bulbs from
   width={2880}
   height={1800}
   alt="The solved tree on Fireside with the star lit and gold confetti falling, and a cream gift tag in front reading 'Lit in 0:26', 'Merry & bright', score 47,400, a New best badge, one solved, 0:26 average, one-day streak, and New tree and Share buttons"
-  caption="The gift tag after a win. 0:26 is not a real solve: the last tiles were finished by the test hook."
+  caption="The gift tag after a win. 0:26 is not a real solve: the last tiles were finished by the test hook. The tag no longer shows a score."
   source="Screenshot of aglow.lukeghanna.com at 1440×900, 1 October 2026, before the radio pill and the account chip were added."
 />
 
 ## A leaderboard that replays every run
 
-Playing never needs an account, but a time only ranks if the server can check it. When a tree starts, the Worker picks its seed, stamps the start and returns a game id. The browser builds the same tree from that seed and logs every tap and pause with its time. On the last connection it sends the log, and the Worker rebuilds the board from the seed and plays the log through the game's own rules code: turns finish at their exact times, and each tap goes in when it happened. A tap before the reveal ends, during a pause or after the solve, a tap the three-deep queue would have dropped, or a tree that never gets solved makes the log unverifiable, and the game is deleted.
+Playing never needs an account, but a time only ranks if the server can check it. When a tree starts, the Worker picks its seed, stamps the start and returns a game id. The browser builds the same tree from that seed and logs every tap and pause with its time. On the last connection it sends the log, and the Worker rebuilds the board from the seed and plays the log through the game's own rules code: turns finish at their exact times, and each tap goes in when it happened. A tap before the reveal ends, during a pause or after the solve, a tap the three-deep queue would have dropped, or a tree that never gets solved makes the log unverifiable, and the run is refused.
 
 The time comes from the replay: the solve, minus pauses, minus the 900 ms reveal. It has to agree with the server's own clock to within three seconds, so a log cannot claim a faster solve than the server saw, and a made-up log takes as long to submit as the time it claims. A verified run still doesn't rank if it was paused for more than ten minutes or more than 20 times, took under five seconds, or had more than a tenth of its taps under 40 ms apart. A win played signed out is verified and kept for 90 days, and ranks once the player signs in on that browser and claims it.
 
-Sign-in is Google's OpenID Connect flow, done on the server with PKCE. The board shows the top 50 for Today, This week or All time, in the viewer's own calendar, and pins the player's best under the list when it is further down. Your games lists the account's recent runs with its solved count, average and streaks, which match on every device. One path skips the replay: an admin-only import that brings a device's history from before accounts existed onto my account, as runs with no log that rank like any other.
+Sign-in is Google's OpenID Connect flow, done on the server with PKCE. The board shows the top 50 for the Daily Tree, Today, This week or All time, in the viewer's own calendar, and pins the player's best under the list when it is further down. Your games lists the account's recent runs with its solved count, average and streaks, which match on every device. One path skips the replay: an admin-only import that brings a device's history from before accounts existed onto my account, as runs with no log that rank like any other.
+
+## A tree a day, replays and a wardrobe
+
+The game opens on the Daily Tree, the same tree for everyone on a given date. Its seed is the first 32 bits of an HMAC-SHA256 of the date under a server secret, so no one can know a day's tree in advance; a seed whose tree starts fully dark is skipped, up to 64 tries. The date is the player's own, accepted only within a day of the server's UTC date, so the tree turns over at each player's midnight. Only a player's first attempt can go on the day's own board, so abandoning it forfeits the day; later attempts are unranked. Once the date has ended everywhere, at UTC midnight two days on, its tree opens again as an unranked past day.
+
+Every verified run keeps its log, so it can be watched: the server returns the seed and the log it checked at the finish, and the browser plays it through the same rules code at 1× or 2×, skipping pauses. Others can watch a named player's ranked runs, or a Daily run once its date has closed. On a Daily Tree you have lit before, your fastest run on it races you as a ghost: a pill showing the share of the tree it had lit at your clock, then its time.
+
+Looks are now earned. A new player gets Fireside, filament and a snowflake topper; 71 more items come from 64 goals: trees lit, times, turns close to a tree's minimum, feats read from the log, Daily streaks and a few secrets. Signed in, the server works them out from verified runs, trusting the browser only for the time zone, station and egg behind the holiday and secret goals; a guest earns the trees-lit goals alone. From 1 to 24 December each day's tree opens an Advent door, and a missed door opens by playing that day's tree later.
 
 ## Radio, and a few eggs
 
-The radio has two stations, Christmas Jazz and Christmas Classics, streamed from Cloudflare R2 and edited at /admin, which signs in with Google and opens only for the admin account. Tracks crossfade over three seconds. Two more sources are synthesized in the browser with no audio files, a music box playing public-domain carols and a procedural fireplace, and a Spotify or Apple Music playlist plays through the official embed. After a win, a light show pulses the bulbs up the tree on the beat and breathes the glow with the low end. There are also easter eggs: five quick taps on the star, or typing "hohoho", swap it for my head in a Santa hat and bring in a secret aurora scene with its own station, and typing "kevin" turns the room into the house from Home Alone.
+The radio has two stations, Christmas Jazz and Christmas Classics, streamed from Cloudflare R2 and edited at /admin, which signs in with Google and opens only for the admin account. Tracks crossfade over three seconds. Four more are synthesized in the browser with no audio files: a music box playing public-domain carols, a fireplace that crackles and settles, and Rain and Storm, which are earned; and a Spotify or Apple Music playlist plays through the official embed. After a win, a light show pulses the bulbs up the tree on the beat and breathes the glow with the low end. There are also easter eggs: five quick taps on the topper, or typing "hohoho", swap it for my head in a Santa hat and bring in a secret aurora scene with its own station, and typing "kevin" turns the room into the house from Home Alone.
 
 ## Status
 
-Live at aglow.lukeghanna.com, served as Cloudflare Workers static assets with a Worker on `/api/*` only, over D1 for accounts and games and R2 for the radio's music; every other path comes straight from the assets. Three scenes, three light paths, synthesized sound effects, saved games, stats and sharing; the radio added on 4 October 2026 and its admin on 5 October, accounts and the leaderboard from 7 October, and the Today and This week boards on 14 October. 1,079 Vitest tests across 108 files, including a generator property test over a thousand seeded trees and Worker tests against a real local D1, and 167 Playwright tests (137 desktop, 30 on a Pixel 7 profile) against the real Worker with a fake sign-in that only works on localhost.
+Live at aglow.lukeghanna.com, served as Cloudflare Workers static assets with a Worker on `/api/*` only, over D1 for accounts and games and R2 for the radio's music; every other path comes straight from the assets. Six scenes, four light paths, synthesized sound effects, saved games, stats and sharing; the radio added on 4 October 2026 and its admin on 5 October, accounts and the leaderboard from 7 October, the Today and This week boards on 14 October, and between 4 and 7 November right-click and pause keys, three new scenes, the wardrobe, the Daily Tree, Advent and replays. 1,664 Vitest tests across 156 files (six run only with a build or performance flag), including a generator property test over a thousand seeded trees and Worker tests against a real local D1, and 230 Playwright tests (200 desktop, 30 on a Pixel 7 profile) against the real Worker with a fake sign-in that only works on localhost.

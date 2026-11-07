@@ -1,7 +1,7 @@
 export const meta = {
   title: 'BJS',
   line: 'A rule-aware blackjack trainer where the numbers have to be right.',
-  status: 'Six of eight rebuild steps merged · shoe simulator next · not released',
+  status: 'Seven of eight rebuild steps merged · launch prep in progress · not released',
   role: 'Design, build',
   stack: 'Swift 6.2, SwiftUI, SwiftData, Swift Testing, XCTest UI tests',
   source: 'Public. MIT.',
@@ -12,8 +12,8 @@ export const meta = {
     { label: 'Rule variants', value: 'H17/S17 · DAS · RSA · surrender · decks' },
     { label: 'Edge baseline', value: '0.45% (8-deck S17 DAS 3:2)' },
     { label: 'Third-party deps', value: '0' },
-    { label: 'Tests', value: '263 engine · 233 app · 6 UI' },
-    { label: 'Rebuild', value: '6 of 8 steps' },
+    { label: 'Tests', value: '292 engine · 264 app · 7 UI' },
+    { label: 'Rebuild', value: '7 of 8 steps' },
     { label: 'Released', value: 'not yet' },
   ],
 }
@@ -32,8 +32,8 @@ The edge calculator looks the configured rules up in Wizard of Odds' house-edge 
 
 <Flow
   n={1}
-  caption="What is on main. The package modules are built and tested; above them, every screen but the shoe simulator is built."
-  source="Drawn from BJSCore/Sources/BJSCore, BJS/Features and the README on main at dc16759, 4 October 2026."
+  caption="What is on main. The package modules are built and tested, and every screen above them is built; launch prep is the last step."
+  source="Drawn from BJSCore/Sources/BJSCore, BJS/Features and the README on main at df1854c, 7 November 2026."
   steps={[
     [
       { title: 'Models and Rules', detail: 'cards, hands, shoes, the table’s configuration' },
@@ -50,10 +50,11 @@ The edge calculator looks the configured rules up in Wizard of Odds' house-edge 
       { title: 'Counting and Edge', detail: 'card-value, running-count and true-count drills; the house edge with its breakdown' },
       { title: 'Progress', detail: 'session history, a strategy heat map, session detail' },
     ],
-    { title: 'Shoe simulation · launch prep', detail: 'shoe simulation is next; launch prep is in progress', note: 'not on main' },
+    { title: 'Shoe simulation', detail: 'a dealt shoe played hand by hand, every decision graded, running- and true-count checks along the way' },
+    { title: 'Launch prep', detail: 'accessibility pass, App Store metadata, TestFlight', note: 'in progress, not on main' },
   ]}
 />
 
 ## Status
 
-The original app layer was discarded on 23 September 2026 and is being rebuilt on the package, in eight steps: engine completion, a design system, the strategy trainer, counting, the edge calculator, progress, shoe simulation, and launch prep with a TestFlight build last. The first six are merged to main on GitHub. The engine gained a round engine with splits, surrender and peek, property tests over a hundred thousand seeded rounds, and strategy decoded from Wizard of Odds; the Felt design system has tokens with tested contrast pairs, shared components and a debug catalogue; the strategy trainer, the counting drills, the edge calculator and progress work end to end. The shoe simulator is next, and launch prep is in progress. The README on main counts 263 engine tests, 233 app tests and 6 UI tests as of Step 6, with no third-party dependencies. Nothing has been released, on TestFlight or the App Store, and there are no screenshots here until the app is worth capturing.
+The original app layer was discarded on 23 September 2026 and is being rebuilt on the package, in eight steps: engine completion, a design system, the strategy trainer, counting, the edge calculator, progress, shoe simulation, and launch prep with a TestFlight build last. The first seven are merged to main on GitHub. The engine gained a round engine with splits, surrender and peek, property tests over a hundred thousand seeded rounds, and strategy decoded from Wizard of Odds; the Felt design system has tokens with tested contrast pairs, shared components and a debug catalogue; the strategy trainer, the counting drills, the edge calculator and progress work end to end. The shoe simulator deals a shoe at a chosen penetration, 60 to 85 per cent, self-paced or at a dealer's pace of 0.5 to 2 seconds a card, grades every decision, and stops to check the running and true count. Launch prep is in progress on its own branch. As of Step 7 there are 292 engine tests, 264 app tests and 7 UI tests, with no third-party dependencies. Nothing has been released, on TestFlight or the App Store, and there are no screenshots here until the app is worth capturing.
