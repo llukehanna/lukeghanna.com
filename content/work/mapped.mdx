@@ -11,15 +11,15 @@ export const meta = {
   ],
   glance: [
     { label: 'Countries', value: '197' },
-    { label: 'Games', value: '3 topics × 3 modes' },
-    { label: 'Leaderboards', value: '63, replay-checked' },
+    { label: 'Games', value: '4 topics × 3 modes' },
+    { label: 'Leaderboards', value: '66, replay-checked' },
     { label: 'Flag lookalikes', value: '37 groups' },
     { label: 'Worker runs for', value: '/api/* only' },
-    { label: 'Tests', value: '341 unit · 40 e2e' },
+    { label: 'Tests', value: '397 unit · 53 e2e' },
   ],
 }
 
-Mapped asks how well you know the map. The world fills the screen, and you name every country, click the one it asks for, or name the one that lights up, across three topics: Countries, Flags and Capitals. Anyone can play without an account; signing in with Google saves your games and puts them on 63 public leaderboards. The interesting part is keeping those boards honest: the browser and the server run the same game code, and the server replays every finished game before it ranks it.
+Mapped asks how well you know the map. The world fills the screen, and you name every country, click the one it asks for, or name the one that lights up, across four topics: Countries, Flags, Capitals, and Seas, which plays the same games on the oceans. Anyone can play without an account; signing in with Google saves your games and puts them on 66 public leaderboards. The interesting part is keeping those boards honest: the browser and the server run the same game code, and the server replays every finished game before it ranks it.
 
 <Figure
   n={1}
@@ -39,15 +39,16 @@ Typos are only forgiven on Enter, and only when one name is that close. A name o
 
 Hints are there in every game, and every one counts against you. A board ranks by most found, then fewest hints, then fastest, so an unfinished run still ranks behind everyone who found more.
 
-## Nine games from one table
+## Twelve games from one table
 
-A topic changes what you are shown and how you answer; the answer is always a country, so the engine barely changes. One rules table gives each of the nine games three facts: whether targets come one at a time from a seeded queue or in any order, what the prompt is, and how you answer. The reducer, the input, the prompts and the hint ladders all read those facts instead of branching on names.
+A topic changes what you are shown and how you answer; the answer is always one place on the map, so the engine barely changes. One rules table gives each of the twelve games three facts: whether targets come one at a time from a seeded queue or in any order, what the prompt is, and how you answer. The reducer, the input, the prompts and the hint ladders all read those facts instead of branching on names.
 
 | | Type | Locate | Identify |
 |---|---|---|---|
 | Countries | Name them all, any order | Given a name, click the country | A country lights up; type its name |
 | Flags | A flag; type its country | A flag; click its country | A country lights up; pick its flag from 4 |
 | Capitals | A named country; type its capital | A capital; click its country | A named country; pick its capital from 4 |
+| Seas | Name them all, any order | Click the named sea | Name the lit-up sea |
 
 The wrong flags are chosen to be hard. 37 hand-made groups hold the flags people confuse, from Chad, Romania, Andorra and Moldova to the Nordic crosses, and Flags · Identify takes decoys from the target's groups first, then its subregion, its continent, and anywhere. Capitals · Identify does the same with the target's neighbours, so Kampala's decoys are capitals of countries Uganda borders. Both are seeded by the game and the target, so a reload shows the same four.
 
@@ -63,12 +64,30 @@ The wrong flags are chosen to be hard. 37 hand-made groups hold the flags people
 
 Capitals needed a second try. It launched asking for every capital in a region from memory, and its first two games found about 1 per cent. Now Capitals · Type and Identify name the country and light it up, and only Locate, which gives a capital and asks you to click its country, stays hard. Runs under the old rules stay in their owners' history as "Unranked: older rules" and left the boards.
 
+## Seas
+
+Seas turns the map over: the 55 oceans and seas are the board, and land is a dark backdrop that takes no clicks. The answers come from Natural Earth's 1:50m marine polygons and are grouped into basins: 20 in the Pacific, 9 in the Arctic, 7 in the Atlantic, 7 in the Mediterranean, 6 in the Indian Ocean, 5 in the Southern Ocean, and the Caspian on its own. All three modes work, on the World only: no region picker, no Learn, and three boards.
+
+Natural Earth also names 59 bodies of water that are not on the list: 24 gulfs, 13 bays, 10 straits, 5 channels, a sound, 3 seas and 3 rivers. 56 of them are drawn hatched and none can be clicked; the other three have no shape of their own. Typing any of them gets a note such as "a gulf, not on the list" and counts for nothing. Water that no feature covers is folded into the neighbouring sea it shares the longest boundary with, and the Southern Ocean is rebuilt as a full band south of 60°S. Sea names go through the same matching as countries, which also accepts short forms like "Pacific" and 11 alternates such as East Sea and Bohai. Locate hints name the basin first, then the coast.
+
+<Figure
+  n={3}
+  src="/work/mapped/seas.webp"
+  width={2880}
+  height={1620}
+  alt="A world map with near-black land and lighter brown seas: the Black Sea glowing gold, the Aegean, Philippine, Sulu, Java and Coral Seas and two Antarctic seas filled in muted gold, the Gulf of Mexico, Hudson Bay and the Bay of Bengal hatched, a score of 8 / 55 and a prompt reading 'Find Greenland Sea'"
+  caption="World · Seas · Locate, 8 seas in, now asking for the Greenland Sea. The Black Sea was the last one found and still glows. The hatched gulfs and bays are drawn but are not answers."
+  source="Screenshot of mapped.lukeghanna.com at 1440×810, 7 November 2026. Each answer was clicked by a script that read the target from the page, so the clock reads 0:07; game starts were blocked, so the game ran offline and nothing reached the live database."
+/>
+
+The geometry is the heavy part: 599 KB, against its own 600 KB budget in the size check, and it is fetched only once Seas is picked, so no other game's page load pays for it. When the map frames a sea that its edge cuts in two, it frames the larger side, so the Bering and Chukchi Seas are not slivers on a phone.
+
 ## The server replays every game
 
 A leaderboard where the browser reports its own score is a leaderboard of edited requests. So the game engine is one pure reducer with no DOM and an injected clock, imported by both the React app and the Worker, and every action the player takes is logged with its time.
 
 <Flow
-  n={3}
+  n={4}
   caption="One game from start to the board."
   source="Drawn from worker/games.ts, worker/replay.ts, src/game/reducer.ts and src/game/ranking.ts."
   steps={[
@@ -83,19 +102,19 @@ A leaderboard where the browser reports its own score is a leaderboard of edited
   ]}
 />
 
-Found, hints, time and how the game ended all come from the server's replay, never from the browser. The seeded order had one trap. The pool used to be sorted by name with `localeCompare`, whose order depends on the runtime's language, so a browser set to another language could shuffle a different order from the same seed than the Worker did. It is now sorted by country id with a plain code-unit comparison.
+Found, hints, time and how the game ended all come from the server's replay, never from the browser. The seeded order had one trap. The pool used to be sorted by name with `localeCompare`, whose order depends on the runtime's language, so a browser set to another language could shuffle a different order from the same seed than the Worker did. It is now sorted by country id with a plain code-unit comparison, and a Seas game is replayed over the 55 sea ids, sorted the same way.
 
 Pause was cut for the same reason. It let a player stop the clock and look answers up in another tab, so now the clock always runs: Esc asks "Give up?" and the clock keeps going while it asks. The reducer still understands a pause, so a log that contains one is marked unranked rather than trusted.
 
 The known gap is written down: a bot that submits a made-up log at a believable human pace passes. There is no admin screen; removing a run is a D1 delete and a script that rebuilds the bests.
 
 <Figure
-  n={4}
+  n={5}
   src="/work/mapped/leaderboards.webp"
   width={2880}
   height={1620}
   alt="A Leaderboards card over the dimmed map with the Flags tab selected among Countries, Flags and Capitals, the Type tab among Type, Locate and Identify, the World chip among the region chips, and a table with one player: Luke Hanna, 195 of 197 found, 334 hints, 1:14:43, Oct 14"
-  caption="The World · Flags · Type board, with one player. Flags is one of the three topic tabs above the mode tabs and region chips. Boards are public and need no sign-in; only the display name a player picks is ever shown."
+  caption="The World · Flags · Type board, with one player. Flags is one of the topic tabs above the mode tabs and region chips; there were three when this was taken. Boards are public and need no sign-in; only the display name a player picks is ever shown."
   source="Screenshot of mapped.lukeghanna.com/leaderboards/flags/type/world at 1440×810, 15 October 2026, signed out."
 />
 
@@ -105,14 +124,14 @@ An account is never needed to play. A game started signed out gets a claim token
 
 Sign-in is Google's OpenID Connect flow, done entirely on the server with PKCE, so there is no Google script on the page and the content security policy stays strict. Sessions, claim tokens and IP addresses are stored only as HMACs.
 
-The whole thing runs on Cloudflare's free plan, and its limits shaped the code. The Worker runs only for `/api/*`; the app, the map and the flags are static assets, which cost no Worker requests. A whole-world replay stays under 5 ms in the tests, against a 10 ms CPU limit. D1 allows 50 queries per invocation, so claims go up eight at a time, and Your games, which shows a best and a rank for each of the 63 boards, computes every rank inside one query instead of one query per board, which used to blow through the limit.
+The whole thing runs on Cloudflare's free plan, and its limits shaped the code. The Worker runs only for `/api/*`; the app, the map and the flags are static assets, which cost no Worker requests. A whole-world replay stays under 5 ms in the tests, against a 10 ms CPU limit. D1 allows 50 queries per invocation, so claims go up eight at a time, and Your games, which shows a best and a rank for each of the 66 boards, computes every rank inside one query instead of one query per board, which used to blow through the limit.
 
 ## Learn
 
 Playing Flags well means knowing 197 flags, so Flags has an opt-in Learn switch on the setup card. It is a drill, not a game: no timer pressure, no hints, no board, and nothing sent to the server. A flag appears with four names below it, lookalikes again. A miss shows the right answer and that flag comes back three cards later; two right in a row and it is learned and leaves the round. Learned flags are kept in this browser, fill in on the map as they are learned, and the next round asks only the ones still left.
 
 <Figure
-  n={5}
+  n={6}
   src="/work/mapped/learn.webp"
   width={2880}
   height={1620}
@@ -125,4 +144,4 @@ Learn is its own small reducer beside the game's, deterministic for a seed, and 
 
 ## Status
 
-Live at mapped.lukeghanna.com, built from 5 to 14 October 2026 in four specs: the map and the three modes, then accounts and leaderboards, then Flags and Capitals, then hints, easier Capitals and Learn. 197 countries drawn from Natural Earth 1:50m outlines at full detail in a 678 KB file, with 56 territories drawn but never guessable, and self-hosted flag SVGs so the page makes no third-party requests beyond Cloudflare's analytics. Light and dark themes, keyboard play throughout, and a phone layout where the cards become bottom sheets. 341 Vitest tests across 31 files, including Worker tests against a real local D1, and 40 Playwright tests (35 desktop, 5 on a Pixel 7 profile) against the real Worker with a fake sign-in that only works on localhost.
+Live at mapped.lukeghanna.com, built from 5 to 14 October 2026 in four specs: the map and the three modes, then accounts and leaderboards, then Flags and Capitals, then hints, easier Capitals and Learn. A fifth spec, Seas, was built on 4 and 5 November. 197 countries drawn from Natural Earth 1:50m outlines at full detail in a 679 KB file, with 57 territories that are never guessable, 41 of them drawn with their own shape, and self-hosted flag SVGs so the page makes no third-party requests beyond Cloudflare's analytics. Light and dark themes, keyboard play throughout, and a phone layout where the cards become bottom sheets. 397 Vitest tests across 34 files, including Worker tests against a real local D1, and 53 Playwright tests (48 desktop, 5 on a Pixel 7 profile) against the real Worker with a fake sign-in that only works on localhost.

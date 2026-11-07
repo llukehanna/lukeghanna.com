@@ -13,7 +13,7 @@ export const meta = {
     { label: 'Ledger', value: 'append-only SQLite' },
     { label: 'Money', value: 'integer cents' },
     { label: 'Interface', value: 'Claude, over MCP' },
-    { label: 'Tests', value: '3,144 unit · 352 UI' },
+    { label: 'Tests', value: '3,229 unit · 19 UI specs' },
   ],
 }
 
@@ -128,7 +128,7 @@ The last family exists because the model's own inputs decay. Card terms change m
 
 The failure mode is a financial mistake I cannot undo, so this is the part that got the most time.
 
-- **Writes are gated by provenance, not by surface.** Three surfaces can propose a change. Every mutation carries an actor, and only four validated write tools exist on the MCP side. A model session can propose; it can never recompute or apply.
+- **Writes are gated by provenance, not by surface.** Three surfaces can propose a change. Every mutation carries an actor, and only six validated write tools exist on the MCP side. A model session can propose; it can never recompute or apply.
 - **The system of record is one SQLite file** on an always-on VM, reached only through the tunnel. A startup assertion refuses to open a database inside a synced folder, because that failure mode is silent.
 - **The offsite backup is written with a key the host cannot use to delete.** A compromised host can stop backups; it cannot destroy them. The restore drill is a CLI command that runs the same import-and-recompute path the fallback ingest exercises every day.
 - **Staleness is surfaced, not hidden.** Every response carries an as-of time and the last successful sync. A freshness ladder fires per source, and a dead-man's switch fires when the timers stop.
@@ -145,4 +145,6 @@ The failure mode is a financial mistake I cannot undo, so this is the part that 
 
 Milestone v1.0 shipped in August 2026: foundation, credit derivation and gates, the MCP server, statement and credit-report backfill, the merchant map, the live Plaid feed. Milestone v2.0, the wealth model, opened 13 August 2026 and shipped: versioned assumptions, the comparator, the twenty rules, the tax engine and projection. Three Plaid production items and one SimpleFIN connection sync daily on the host; the first frozen projection snapshot is in the production ledger, and its monthly scoring cannot be evaluated until snapshotted months elapse.
 
-As of the public docs: 1,400+ commits since 6 August 2026, 37 migrations, 285 test files, 3,144 unit tests and 352 Playwright checks across four viewports.
+Since the public docs were written, the changes are about using it day to day rather than new math. "Which card" answers by merchant in one line, with the reasoning one tap away. A guard test reads every screen for machine vocabulary. A read-only MCP server, read-only by construction, lets Claude on claude.ai see the ledger: it verifies the Cloudflare Access token at the origin and refuses to start without the gate. A card's product change now keeps its account id instead of opening a new account.
+
+As of 8 October 2026: 1,567 commits since 6 August 2026, 43 migrations, 327 test files and 3,229 unit tests, with Playwright checks across four viewports. The public docs date from September and lag these numbers.

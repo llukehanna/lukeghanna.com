@@ -1,19 +1,19 @@
 export const meta = {
   title: 'BJS',
   line: 'A rule-aware blackjack trainer where the numbers have to be right.',
-  status: 'Engine done · strategy trainer built on a working branch · counting next',
+  status: 'Six of eight rebuild steps merged · shoe simulator next · not released',
   role: 'Design, build',
-  stack: 'Swift 6.2, SwiftUI, SwiftData, Swift Testing, XCTest UI tests, GitHub Actions',
+  stack: 'Swift 6.2, SwiftUI, SwiftData, Swift Testing, XCTest UI tests',
   source: 'Public. MIT.',
   links: [
     { label: 'Source', handle: 'github', href: 'https://github.com/llukehanna/Blackjack-Strategy' },
   ],
   glance: [
     { label: 'Rule variants', value: 'H17/S17 · DAS · RSA · surrender · decks' },
-    { label: 'Edge baseline', value: '0.43% (8-deck S17 DAS 3:2)' },
+    { label: 'Edge baseline', value: '0.45% (8-deck S17 DAS 3:2)' },
     { label: 'Third-party deps', value: '0' },
-    { label: 'Tests', value: '328 · 4 UI' },
-    { label: 'Rebuild', value: '3 of 8 steps' },
+    { label: 'Tests', value: '263 engine · 233 app · 6 UI' },
+    { label: 'Rebuild', value: '6 of 8 steps' },
     { label: 'Released', value: 'not yet' },
   ],
 }
@@ -26,31 +26,34 @@ Every other trainer I tried either taught generic strategy that was wrong for th
 
 ## The engine
 
-All of the math lives in a pure Swift package with no UI dependency, so it is tested in isolation and can be reused by any front end. Strategy is resolved against the configured rules rather than looked up from one generic chart. The edge calculator starts from a published baseline for an eight-deck, stand-on-17, double-after-split, 3:2 game and applies per-rule deltas scaled by deck count; its own doc comment claims agreement with the reference values within 0.02%. Randomness is injectable, so shoe shuffles are reproducible in tests.
+All of the math lives in a pure Swift package with no UI dependency, so it is tested in isolation and can be reused by any front end. Strategy is decoded from Wizard of Odds' published basic-strategy charts and matches them cell for cell across 48 rule combinations, so the play shown is the one for the configured table, not one generic chart. Randomness is injectable, so shoe shuffles are reproducible in tests.
+
+The edge calculator looks the configured rules up in Wizard of Odds' house-edge table for basic strategy dealt with a cut card. Two rules the table doesn't offer are derived: a 2:1 payout exactly, from the 3:2 and 6:5 figures, and early surrender from Wizard of Odds' rule-variation figures. The breakdown starts from the 8-deck baseline game, 0.45% for stand on soft 17, double after split and 3:2, and changes one rule at a time in a fixed order, so each rule's step is a real difference between two table entries and the steps add up to the total. It replaced an earlier model that added a fixed delta per rule, which was off by up to 0.4 percentage points; 38 reference cases from the Wizard of Odds calculator now check it, each to within 0.00001.
 
 <Flow
   n={1}
-  caption="What exists today. The package modules are built and tested; above them, the hub, settings and strategy trainer are built and the rest are placeholders."
-  source="Drawn from BJSCore/Sources/BJSCore and BJS/App on the working branch as of 24 September 2026; not yet merged to main."
+  caption="What is on main. The package modules are built and tested; above them, every screen but the shoe simulator is built."
+  source="Drawn from BJSCore/Sources/BJSCore, BJS/Features and the README on main at dc16759, 4 October 2026."
   steps={[
     [
-      { title: 'Models', detail: 'cards, hands, shoes' },
-      { title: 'Rules', detail: 'the table’s configuration' },
-      { title: 'Strategy', detail: 'rule-variant-aware tables' },
+      { title: 'Models and Rules', detail: 'cards, hands, shoes, the table’s configuration' },
+      { title: 'Round', detail: 'one round with splits, surrender and peek' },
+      { title: 'Strategy', detail: 'decoded from Wizard of Odds charts' },
     ],
     [
-      { title: 'Counting', detail: 'Hi-Lo, true count' },
-      { title: 'Edge', detail: 'baseline plus per-rule deltas' },
+      { title: 'Counting', detail: 'Hi-Lo running and true count, drills' },
+      { title: 'Edge', detail: 'Wizard of Odds table, one rule at a time' },
       { title: 'Explain', detail: 'why a play is correct' },
     ],
     [
-      { title: 'Hub and Settings', detail: 'built on the Felt design system' },
-      { title: 'Strategy trainer', detail: 'session state machine, graded decisions, the Why sheet, saved sessions' },
+      { title: 'Strategy trainer', detail: 'learn, test, speed and weak-spot modes, graded decisions, the Why sheet, saved sessions' },
+      { title: 'Counting and Edge', detail: 'card-value, running-count and true-count drills; the house edge with its breakdown' },
+      { title: 'Progress', detail: 'session history, a strategy heat map, session detail' },
     ],
-    { title: 'Counting · Edge · Shoe sim · Progress', detail: 'placeholder screens; counting is next, edge can run alongside it', note: 'not started' },
+    { title: 'Shoe simulation · launch prep', detail: 'shoe simulation is next; launch prep is in progress', note: 'not on main' },
   ]}
 />
 
 ## Status
 
-The original app layer was discarded on 23 September 2026 and is being rebuilt on the package, in eight steps: engine completion, a design system, the strategy trainer, counting, the edge calculator, progress, shoe simulation, and a TestFlight build last. The first three are done on a working branch that is not yet merged: the engine gained a round engine with splits, surrender and peek, property tests over a hundred thousand seeded rounds, and two corrected strategy cells (hard 16 against a ten without surrender, and hard 15 against a ten when the dealer hits soft 17); the design system is built with its freeze still pending review; the strategy trainer works end to end. 231 engine tests and 97 app tests plus four UI tests are green in CI on two iPhone sizes, with no third-party dependencies. Nothing has been released, and there are no screenshots here until the app is worth capturing.
+The original app layer was discarded on 23 September 2026 and is being rebuilt on the package, in eight steps: engine completion, a design system, the strategy trainer, counting, the edge calculator, progress, shoe simulation, and launch prep with a TestFlight build last. The first six are merged to main on GitHub. The engine gained a round engine with splits, surrender and peek, property tests over a hundred thousand seeded rounds, and strategy decoded from Wizard of Odds; the Felt design system has tokens with tested contrast pairs, shared components and a debug catalogue; the strategy trainer, the counting drills, the edge calculator and progress work end to end. The shoe simulator is next, and launch prep is in progress. The README on main counts 263 engine tests, 233 app tests and 6 UI tests as of Step 6, with no third-party dependencies. Nothing has been released, on TestFlight or the App Store, and there are no screenshots here until the app is worth capturing.

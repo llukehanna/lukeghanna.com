@@ -3,7 +3,7 @@ export const meta = {
   line: 'Skill-rating ladders for a house league, scored from a phone at the table.',
   status: 'Live and in use',
   role: 'Design, build, operate',
-  stack: 'Next.js 16, React 19, Postgres on Neon, OpenSkill, Tailwind 4',
+  stack: 'Next.js 16, React 19, Postgres on Neon, OpenSkill, Tailwind 4, Cloudflare Workers',
   source: 'Public. MIT.',
   app: { label: 'die.lukeghanna.com', href: 'https://die.lukeghanna.com' },
   links: [
@@ -15,11 +15,13 @@ export const meta = {
     { label: 'Provisional until', value: '10 games' },
     { label: 'PIN guesses', value: '20 a day, global' },
     { label: 'Sports', value: 'beer die · spikeball' },
-    { label: 'Tests', value: '683 across 49 files' },
+    { label: 'Tests', value: '738 across 57 files' },
   ],
 }
 
-Two games, two ladders. Beer die is 2v2 or 3v3, first to 21; spikeball is 2v2 to 25, 15 or 11, picked game by game. Both are win by 2 and the winners stay on. Someone at the table taps who won and what the losers finished on. Everyone else's phone shows the rankings, a game log, head-to-heads and badges, and a pill in the top bar switches sport, each with its own colours and its own live night. Ratings are OpenSkill, replayed per sport from that sport's game history on every change.
+Two games, two ladders. Beer die is 2v2 or 3v3, first to 21; spikeball is 2v2 to 25, 15 or 11, picked game by game. Both are win by 2 and the winners stay on. Someone at the table taps who won and what the losers finished on. Everyone else's phone shows the rankings, a game log, head-to-heads and badges, and a pill in the top bar switches sport, each with its own colours and its own live night. Ratings are OpenSkill, replayed per sport from that sport's game history on every change. On the roster, tapping a name opens that player's profile, which is also where a signed-in phone edits the name and nicknames.
+
+Since the 29 September restyle there is a desktop layout, with a rail down the left and two-column pages, and the phone's tab bar is a glass capsule along the bottom.
 
 <Figure
   n={1}
@@ -30,8 +32,18 @@ Two games, two ladders. Beer die is 2v2 or 3v3, first to 21; spikeball is 2v2 to
   height={844}
   frame="phone"
   alt="Logging a game at the table: pick the winners, tap the losing score, pick the next challengers, and the rankings update"
-  caption="Logging a game at the table: pick the winners, tap the losing score, pick the next challengers, and the rankings update."
+  caption="Logging a game at the table: pick the winners, tap the losing score, pick the next challengers, and the rankings update. This recording predates spikeball and the 29 September restyle."
   source="Recorded from the real app against a local database of made-up players, before spikeball was added."
+/>
+
+<Figure
+  n={2}
+  src="/work/shed/desktop.webp"
+  width={1440}
+  height={900}
+  alt="Beer die power rankings on a laptop: a glass rail on the left with the Die / Spike switch and the Ranks, Games, H2H, Table and Me links, the standings in the middle with a live chip and two provisional players, and a column of longest runs, most carried and the Shed of shame on the right"
+  caption="The desktop layout: the rail on the left, the standings, and a second column of longest runs, who carries whom, and the Shed of shame."
+  source="From the Shedquarters repository's docs/media (desktop.png, commit c89c2fc, 29 September 2026): a production build against a local database of made-up players, 1440×900."
 />
 
 ## Built for bad party wifi
@@ -41,7 +53,7 @@ Every game is written to a queue in local storage first and shown immediately, t
 The queue tells a transient failure (a database cold start, a dropped connection: keep it and retry) from a permanent one (a malformed or refused game: set it aside and say so), because retrying a permanent failure forever blocks every game behind it. The server maps errors to status codes through an explicit allowlist, so anything unexpected is retryable by default. A stuck queue can be recovered. A discarded game cannot.
 
 <Flow
-  n={2}
+  n={3}
   caption="The offline write path. The phone never waits on the network to show a result."
   source="Drawn from lib/client/queue.ts, app/api/games and docs/OFFLINE.md in the repository."
   steps={[
@@ -63,25 +75,25 @@ The games table is append-only apart from a voided flag. Ratings, per-game ratin
 Margin of victory counts, but only past a point, and the point scales with the target: five for a game to 21, six to 25, four to 15, three to 11. Inside that margin a win is an ordinary win; beyond it the extra weight grows logarithmically, so a skunk counts for more without dominating a season. New players are provisional until ten games, and the rankings say so instead of hiding them.
 
 <Figure
-  n={3}
-  src="/work/shed/ranks-die.webp"
+  n={4}
+  src="/work/shed/rankings.webp"
   width={780}
   height={1688}
   frame="phone"
-  alt="Beer die power rankings: rank, name, record, streak and rating for each player, with a Die / Spike pill in the top bar and a live dot on Spike"
-  caption="The beer die ladder. The pill in the top bar switches sport; the dot on Spike means a spikeball night is live right now."
-  source="Screenshot of the app running locally against a database of made-up players, 24 September 2026."
+  alt="Beer die power rankings on a phone: rank, name, record, streak, rating and rank movement for each player, a provisional label on the eighth, a Die / Spike pill and a live chip in the top bar, and a glass tab bar at the bottom"
+  caption="The beer die ladder on a phone. The pill in the top bar switches sport, the chip says a night is live, and a player under ten games is ranked and marked provisional."
+  source="From the Shedquarters repository's docs/media (rankings.png, commit c89c2fc, 29 September 2026): a production build against a local database of made-up players."
 />
 
 <Figure
-  n={4}
-  src="/work/shed/player-spike.webp"
+  n={5}
+  src="/work/shed/player.webp"
   width={780}
   height={1688}
   frame="phone"
-  alt="A player page with two cards, one per sport: beer die rating, rank, record, win percentage, streak and point differential, then the same for spikeball marked provisional, followed by badges and a head-to-head table with a column per sport"
-  caption="One player, two ladders. A beer die rating says nothing about someone's spikeball, so each sport gets its own card, its own badges and its own head-to-head column."
-  source="Screenshot of the app running locally against a database of made-up players, 24 September 2026."
+  alt="A player profile with nicknames and an Edit name and nicknames button, then two cards, one per sport: beer die rating, rank, record, win percentage, streak and point differential, then the same for spikeball marked provisional, followed by a spikeball badge and a head-to-head table with a column per sport"
+  caption="One player, two ladders. A beer die rating says nothing about someone's spikeball, so each sport gets its own card, its own badges and its own head-to-head column. Editing the name sits here, on the profile."
+  source="From the Shedquarters repository's docs/media (player.png, commit c89c2fc, 29 September 2026): a production build against a local database of made-up players."
 />
 
 ## A four-digit PIN that stays safe on the open internet
@@ -91,27 +103,27 @@ The house wanted a PIN, not accounts. With ten thousand possibilities, the desig
 The session cookie holds a signature, never the PIN, so hammering the write API with every possible cookie value earns ten thousand rejections and learns nothing. Changing the PIN or resetting the invite link signs out every device at once, because both are inside every signature.
 
 <Figure
-  n={5}
-  src="/work/shed/table-spike.webp"
+  n={6}
+  src="/work/shed/table-die.webp"
   width={780}
   height={1688}
   frame="phone"
-  alt="Spikeball table mode: a Game To picker with 25, 15 and 11, the pair holding the net with a one-game run, the challengers, and undo and change-teams buttons"
-  caption="Table mode on a spikeball night: pick what this game is played to, tap who won, and the winners hold the net."
-  source="Screenshot of the app running locally against a database of made-up players, 24 September 2026."
+  alt="Beer die table mode, 3v3: the three holding the table on a two-game run, the three challengers, a They won button on each side, undo and change-teams buttons, and an all synced indicator"
+  caption="Table mode on a beer die night: tap the side that won, and the winners hold the table. “All synced” under the sport pill means no game is waiting in the local queue or was refused."
+  source="From the Shedquarters repository's docs/media (table.png, commit c89c2fc, 29 September 2026): a production build against a local database of made-up players."
 />
 
 <Figure
-  n={6}
-  src="/work/shed/games-spike.webp"
+  n={7}
+  src="/work/shed/game-log.webp"
   width={780}
   height={1688}
   frame="phone"
-  alt="Spikeball game log grouped by night: each game shows the winning pair, the losing pair, the score, and each side's rating change"
-  caption="The spikeball game log, grouped by night, with per-game rating changes. Games to 25 and to 11 sit in the same night."
-  source="Screenshot of the app running locally against a database of made-up players, 24 September 2026."
+  alt="Beer die game log grouped by night: each game shows the winning three, the losing three, the score, and each side's rating change"
+  caption="The beer die game log, grouped by night, with each side's rating change for every game."
+  source="From the Shedquarters repository's docs/media (game-log.png, commit c89c2fc, 29 September 2026): a production build against a local database of made-up players."
 />
 
 ## Status
 
-Live and in use. Rankings, the game log and player pages are public; changing anything needs the house PIN or an invite link. Merging to main deploys to production, with schema migrations run in the build, and there are no preview deploys. A nightly job writes a JSON backup to blob storage. Known gaps: beer die (2v2, 3v3) and spikeball (2v2) only, each rated separately, and no rating decay, so a badge marks inactive players instead. 683 tests across 49 files run in CI against Postgres 17, including component tests in jsdom.
+Live and in use. Rankings, the game log and player pages are public; changing anything needs the house PIN or an invite link. It runs on Cloudflare Workers with Postgres on Neon. Deploys are run by hand with `npm run deploy`, which applies the schema migration first and then ships to Workers; merging to main does not deploy. Production at die.lukeghanna.com runs local main, six commits ahead of GitHub's main and not yet pushed: October's fixes to stay under the Workers CPU limit. Every night at 09:00 UTC a Cloudflare Cron Trigger writes a JSON backup to Workers KV. Known gaps: beer die (2v2, 3v3) and spikeball (2v2) only, each rated separately, and no rating decay, so a badge marks inactive players instead. 738 tests across 57 files passed in CI against Postgres 17, including component tests in jsdom, on 22cfc9e; the six unpushed commits have not been through CI.

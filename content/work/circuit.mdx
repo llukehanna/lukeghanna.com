@@ -33,7 +33,7 @@ The success bar was set before any code: about twenty friends and I play most mo
 
 ## A puzzle plays only after someone approves it
 
-Nothing is drawn on request. Each puzzle is generated ahead of time and stored, and it moves through three states: a **draft** until a reviewer approves it on the admin page, **approved** until its day arrives, and **live** from then on. A Cron Trigger runs at 05:01 UTC, one minute after the day turns, promotes everything approved up to today, and drafts the next 14 days for any game that has none.
+Nothing is drawn on request. Each puzzle is generated ahead of time and stored, and it moves through three states: a **draft** until a reviewer approves it on the admin page, **approved** until its day arrives, and **live** from then on. A Cron Trigger runs at 05:01 UTC, one minute after the day turns, promotes everything approved up to today, and drafts the next 14 days for any game that has none. A second run at 05:31 promotes again, so a failed first run is covered.
 
 <Flow
   n={2}
@@ -96,8 +96,10 @@ Ten games a day for months is a lot of content. Agents drafted the questions, a 
 
 ## Free tiers as the design brief
 
-Circuit runs on Cloudflare Workers Free and Neon Free, so its limits shaped the code. A request gets 10 ms of CPU, and the gzipped Worker stays under 2,050 KiB. Question text and answers live in Postgres, reached through Hyperdrive. Only small id indexes and par tables are bundled, so the runtime never runs a solver. The games list and today's live set are remembered per isolate for 60 seconds.
+Circuit runs on Cloudflare Workers Free and Neon Free, so its limits shaped the code. A request gets 10 ms of CPU, and the gzipped Worker stays under 2,050 KiB. Fathom's and Keystone's question text lives in Postgres, reached through Hyperdrive; only indexes, par tables and the attribute games' fact tables are bundled, so the runtime never runs a solver. The cap applies to cron runs too: six games' first draws in one run measured about 9 ms, so generation is split between the 05:01 and 05:31 runs, each game in exactly one. The games list and today's live set are remembered per isolate for 60 seconds.
 
 The deploy script exists because of a trap in the adapter. OpenNext copies every `.env` file it finds into the bundle as fallback values, so a plain deploy could ship a laptop's secrets as production's defaults. The script blanks them before upload, so a missing secret fails closed. The same rule runs through the rest: the admin allowlist means nobody when it's unset, and the cron route returns an error and does nothing without its token.
 
-What isn't done yet is written down too. I have no usage numbers worth citing. New clues for Hardwood and Atlas and a redesign of the Hivemind and Outlier boards are in progress, not live.
+The games keep changing after launch without breaking anyone's day. Hardwood's card now has six clues, from height and rookie year to latest team and conference, and a play begun on the old card finishes on it. Hivemind and Outlier now play one stage at a time. The new cell colours are tested for contrast and for colour-blind players.
+
+What isn't done yet is written down too. I have no usage numbers worth citing, and Fathom's 116-question bank is due a top-up before its first repeats come round.

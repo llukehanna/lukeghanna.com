@@ -3,17 +3,19 @@ export const meta = {
   line: 'Ad-free Klondike where every deal is proven winnable before it is dealt.',
   status: 'Live · installable, plays offline',
   role: 'Design, build, operate',
-  stack: 'React 19, TypeScript, Vite, Web Workers, vite-plugin-pwa, Geist, Vitest, Playwright',
-  source: 'Private, no git remote.',
+  stack: 'React 19, TypeScript, Vite, Web Workers, vite-plugin-pwa, Geist, Cloudflare Workers static assets, Vitest, Playwright',
+  source: 'Public, no licence file.',
   app: { label: 'solitaire.lukeghanna.com', href: 'https://solitaire.lukeghanna.com' },
-  links: [],
+  links: [
+    { label: 'Source', handle: 'github', href: 'https://github.com/llukehanna/Solitaire' },
+  ],
   glance: [
     { label: 'Deal bank', value: '2,000 per draw mode' },
     { label: 'Solver', value: 'DFS + transposition table' },
     { label: 'Hint budget', value: '1.5 s, in a worker' },
     { label: 'Repeats skipped', value: 'last 200 deals' },
     { label: 'Tables', value: 'Studio · Felt · Paper' },
-    { label: 'Tests', value: '183 unit · 34 e2e' },
+    { label: 'Tests', value: '203 unit · 53 e2e' },
   ],
 }
 
@@ -114,6 +116,10 @@ All 52 cards are absolutely positioned elements keyed by card id, and each card'
 
 The game is saved after every move as the seed plus the list of turns, and replayed on load, so undo, redo, the timer and the score survive a reload. Every read from storage is validated, settings from older versions migrate once on load, and the app still works when storage is unavailable. The sounds are synthesized with Web Audio, so there are no audio files.
 
+## On a phone
+
+Version 1.3, on 1 October 2026, gave phones their own layout. A phone is one condition, portrait and at most 640 px wide, shared by the CSS and the layout code. Seven columns cap how wide a card can be, so on a phone the margins and the gaps between columns drop to 3 px, and the tableau fans run taller: each face-up card steps down 40% of a card's height instead of 26%. Cards show rank and suit side by side in one big index, and the waste fans wider so the whole index shows. The toolbar shrinks to a 30 px strip that only reads out the score, moves, time and draw mode, and the controls move to a thumb bar at the bottom: New, Undo, Hint, Redo and More. New opens a Game sheet (new game, restart this deal, draw one or three) and More opens Stats, Settings and Winnable?; on a phone the table is picked in Settings. Every dialog becomes a bottom sheet that closes when dragged down 80 px or flicked. The installed app locks to portrait, an install hint appears only after the first finished game, and on Android a rejected tap and a win buzz, following the sound setting; iOS Safari has no vibration.
+
 ## Status
 
-Live at solitaire.lukeghanna.com as static files on Cloudflare, installable as an app, and fully playable offline once loaded; a new deploy takes over open tabs as soon as it installs. On an iPhone home screen it runs full-bleed under a translucent status bar, with the page behind the safe areas matching the table, and a gold-spade icon on leather. Draw one and draw three, standard, Vegas or no scoring, and stats per draw mode, with a one-time import from solitaired.com. Klondike only for now; the engine is structured for FreeCell and Spider next. 183 unit tests across 25 files and 34 Playwright tests, run on desktop and a Pixel 7 profile, including one that plays a banked deal to a win, one that moves cards with the keyboard alone, and one that checks a tap with no move shakes and moves nothing.
+Live at solitaire.lukeghanna.com as Cloudflare Workers static assets with no Worker script, installable as an app, and fully playable offline once loaded; a new deploy takes over open tabs as soon as it installs. On an iPhone home screen it runs full-bleed under a translucent status bar, with the page behind the safe areas matching the table, and a gold-spade icon on leather. Draw one and draw three, standard, Vegas or no scoring, and stats per draw mode, with a one-time import from solitaired.com. Klondike only for now; the engine is structured for FreeCell and Spider next. The source is on GitHub, where CI runs the unit tests and the build on every push to main and every pull request. 203 unit tests across 28 files and 53 Playwright tests, 86 runs across a desktop and a Pixel 7 profile, including one that plays a banked deal to a win, one that moves cards with the keyboard alone, and one that checks a tap with no move shakes and moves nothing.
