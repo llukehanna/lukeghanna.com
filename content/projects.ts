@@ -36,7 +36,7 @@ export const projects: Project[] = [
     selected: true,
     where: 'beacon.lukeghanna.com',
     href: '/work/beacon',
-    description: 'A deal-sourcing workbench that learns its screening rules from the analysts who reject firms.',
+    description: 'A deal-sourcing workbench that cites every value and learns its screening rules from the firms analysts pass on.',
     stack: 'React · Postgres · Claude',
     screenshot: { src: '/shots/beacon.webp', width: 2880, height: 1620 },
   },
