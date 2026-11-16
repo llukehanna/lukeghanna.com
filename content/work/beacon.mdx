@@ -12,12 +12,12 @@ export const meta = {
     { label: 'Case study', handle: 'docs · Foundry to open stack', href: 'https://github.com/llukehanna/beacon/blob/main/docs/foundry-origins.md' },
   ],
   glance: [
-    { label: 'Grounded values', value: '6,455 of 6,472 quote their source' },
-    { label: 'Settled values right', value: '93.2%, against synthetic truth' },
+    { label: 'Grounded values', value: '6,228 of 6,523 quote their source' },
+    { label: 'Settled values right', value: '93.3%, against synthetic truth' },
     { label: 'Rubric', value: '9 axes, 18 points' },
     { label: 'Ontology', value: '18 object types · 18 actions' },
     { label: 'Demo universe', value: '700 synthetic firms' },
-    { label: 'Tests', value: '1,100+ unit · 161 end-to-end' },
+    { label: 'Tests', value: '1,200+ unit · 176 end-to-end' },
   ],
 }
 
@@ -30,9 +30,9 @@ The problem it takes on is the stretch between a thesis and a short list a team 
   src="/work/beacon/desk.webp"
   width={2880}
   height={1620}
-  alt="Beacon's enrichment desk for Ainsley Advisors: a grid of axes against four sources, one conflict on deals per managing director between Deal DB (5.3) and Web search (3.9), three proposed values, axes marked 'No source had it. Beacon abstained instead of guessing', and an evidence panel showing the Deal DB record with the supporting sentence highlighted and three grounding checks passed"
-  caption="The enrichment desk. Deal DB and Web search disagree on deals per managing director, so both positions go to the analyst; the evidence panel opens the source record at the quoted line and shows the grounding checks it passed. Seven axes have no source, and the grid says so."
-  source="Screenshot of the live demo at beacon.lukeghanna.com, 1440×810, 6 November 2026. Every firm name is invented; every source is a mock."
+  alt="Beacon's enrichment desk for Archdale & Pollard Advisors: a score of 10 out of 18, tier B, then a grid of axes against four sources, one conflict on firm age between the internal CRM and Deal DB (24 years) and Filings (33), proposed values, axes marked 'No source had it. Beacon abstained instead of guessing', and an evidence panel showing the CRM record with the supporting sentence highlighted and three grounding checks passed"
+  caption="The enrichment desk. The internal CRM and Deal DB put the firm at 24 years old and Filings at 33, so both positions go to the analyst; the evidence panel opens the source record at the quoted line and shows the grounding checks it passed. Where no source has a value, the grid says so."
+  source="Screenshot of the live demo at beacon.lukeghanna.com, 1440×810, 15 November 2026. Every firm name is invented; every source is a mock."
 />
 
 ## What it does
@@ -48,7 +48,7 @@ The home page is a start-of-day page rather than a dashboard: every card and num
   src="/work/beacon/home.webp"
   width={2880}
   height={1620}
-  alt="Beacon's home page: an introduction with three claims (cites every value, says when it doesn't know, learns from your passes) and a tour button, then '54 items need you', four trust cards (100% of agent values grounded in a source, 23% honest abstention, 93% analyst agreement, 697 firms in coverage), the pipeline funnel from Discovered to Passed, and an agent activity feed"
+  alt="Beacon's home page: an introduction with three claims (cites every value, says when it doesn't know, learns from your passes) and a tour button, then '60 items need you', four trust cards (95.5% of extracted values passed grounding, 23% honest abstention, 94% analyst agreement, 697 firms in coverage), the pipeline funnel from Discovered to Passed, and an agent activity feed"
   caption="Home after a reset: what needs the analyst today, the trust figures for the agent's work, the funnel, and the agent's latest runs."
   source="Screenshot of the live demo, viewed as the analyst persona, so the three restricted firms are not counted. The numbers are one day's synthetic history and change after every reset."
 />
@@ -57,7 +57,7 @@ The home page is a start-of-day page rather than a dashboard: every card and num
 
 Claude Haiku 4.5 reads each firm's four source records and returns every value with the exact sentence that supports it. A value survives only if the quote appears word for word in the record and contains the value. A reconciliation step then has three outcomes, and never picks a winner in a conflict: no source has it, and the axis is an abstention; the sources agree, and it is one proposed finding; they disagree, and the analyst sees both.
 
-The extraction for all 700 firms ran once through the Message Batches API and was committed as fixtures, so the demo, the seed and CI need no API key. It cost $1.39, and 6,455 of the 6,472 values it returned passed the grounding check.
+The extraction for all 700 firms ran once through the Message Batches API and was committed as fixtures, so the demo, the seed and CI need no API key. It cost $1.49, and 6,228 of the 6,523 values it returned passed the grounding check.
 
 <Flow
   n={3}
@@ -85,17 +85,17 @@ Because the universe is generated, every firm has a hidden true value for every 
 
 | Measure, against synthetic truth | Value |
 |---|---|
-| Settled values that match the truth | 93.2%, on 68.3% of axes |
-| Conflicts where the more trusted source was right | 90.8% |
-| Abstentions where no source had the value | 100% |
+| Settled values that match the truth | 93.3%, on 68.7% of axes |
+| Conflicts where the more trusted source was right | 86.6% |
+| Abstentions where no source had the value | 98.5% |
 | Planted rejection patterns recovered as rules | 4 of 4 |
 
 | Provider | Coverage | Precision |
 |---|---|---|
-| BeaconDB, most trusted | 25.8% | 98.5% |
-| Deal DB | 70.9% | 97.1% |
-| Filings | 54.4% | 95.2% |
-| Web search, least trusted | 51.1% | 82.3% |
+| BeaconDB, most trusted | 25.5% | 98.5% |
+| Deal DB | 64.7% | 97.2% |
+| Filings | 58.4% | 95.3% |
+| Web search, least trusted | 45.1% | 81.1% |
 
 ## The rubric
 
@@ -112,8 +112,8 @@ A pass carries a reason. Reasons are clustered into candidate rules of the form 
   src="/work/beacon/rules.webp"
   width={2880}
   height={1620}
-  alt="Beacon's rules page: three proposed hard-screen rules (coverage model is Generalist, average deal size below $20m, fewer than 1.5 deals per managing director), each with the analysts' notes behind it and how many firms it would screen, above one active rule, employees under 10, screening 90 firms"
-  caption="Three proposed rules clustered from pass reasons, each quoting the analysts' notes that support it and how many firms it would screen, above one approved rule already screening the queue."
+  alt="Beacon's rules page: two proposed hard-screen rules (average deal size below $25m, fewer than 2 deals per managing director over three years), each with the analysts' notes behind it and how many firms it would screen, above one active rule, employees under 10, screening 90 firms"
+  caption="Two proposed rules clustered from pass reasons, each quoting the analysts' notes that support it and how many firms it would screen, above one approved rule already screening the queue."
   source="Screenshot of the live demo, synthetic data."
 />
 
@@ -128,8 +128,8 @@ Every decision snapshots the score it was made on. New evidence rescores the fir
   src="/work/beacon/review.webp"
   width={2880}
   height={1620}
-  alt="Beacon's drift queue: eleven firms that moved since their decision, among them passed firms acquired by a competitor, passed firms whose reason no longer holds (one from B 11 to A 17), and qualified firms that fell a tier; the side panel shows a passed firm with the original pass reason and 'Acquired by competitor, synthetic market signal', with Re-engage and Keep passed buttons"
-  caption="The drift queue. A firm passed for a generalist coverage model has since been acquired by a competitor, so the outcome diverged from the decision; others have moved tier on new evidence."
+  alt="Beacon's drift queue: eleven firms that moved since their decision, among them passed firms acquired by a competitor, passed firms whose reason no longer holds (one from B 13 to A 17), and qualified firms that fell a tier; the side panel shows Brereton, Wexler & Onslow, qualified at 15 out of 18, tier A, now 13, tier B, after a synthetic market signal on its fee-earning heads, with Keep in pipeline and Pass buttons"
+  caption="The drift queue. A qualified firm fell from tier A to B on a synthetic market signal, so the decision is back in front of the analyst; passed firms acquired by a competitor, or whose reason for passing no longer holds, wait below it."
   source="Screenshot of the live demo, synthetic data and synthetic market signals."
 />
 
@@ -148,7 +148,7 @@ The finance track turns the desk's work into things a deal team uses elsewhere, 
   src="/work/beacon/tearsheet.webp"
   width={2880}
   height={1620}
-  alt="A Beacon tear sheet for Dalrymple & Wadsworth Advisory: an overview of profile fields, then a score of 13 out of 18, tier B, with the points for each axis and an unknown services axis stated plainly, and a Print / Save as PDF button"
+  alt="A Beacon tear sheet for Beatrice Everly Partners: an overview of profile fields, then a score of 10 out of 18, tier B, with the points for each axis, an unknown deal-size axis and an unresolved firm-age conflict stated plainly, and a Print / Save as PDF button"
   caption="A tear sheet on screen. Printed, it drops the app's chrome and keeps each section whole on the page."
   source="Screenshot of the live demo, synthetic data."
 />
@@ -170,4 +170,4 @@ The database enforces what the app never writes: required columns, foreign keys,
 
 ## Status
 
-Ported in September 2026 and public under MIT since November. Over 1,100 unit and integration tests run against in-memory Postgres, 161 Playwright tests drive the app, and the evaluation runs on every CI build. Ten decision records explain the choices that matter. Everything on the live site is synthetic: firm names are generated from invented words, sources are mocks, market signals are invented news, and the captures here show one day's seeded history, which the next reset replaces.
+Ported in September 2026 and public under MIT since November. Over 1,200 unit and integration tests run against in-memory Postgres, 176 Playwright tests drive the app, and the evaluation runs on every CI build. Ten decision records explain the choices that matter. Everything on the live site is synthetic: firm names are generated from common surnames and coined place words, sources are mocks, market signals are invented news, and the captures here show one day's seeded history, which the next reset replaces.
