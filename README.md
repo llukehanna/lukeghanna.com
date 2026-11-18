@@ -7,4 +7,4 @@ Personal site. Next.js App Router, exported as static files (`output: 'export'`)
 - `npm run test:e2e` — Playwright (desktop + mobile, includes axe); set `PW_CHROMIUM=/path/to/chrome` to use a pre-installed browser
 - `./scripts/lighthouse.sh` — production build + Lighthouse gate (≥95 everywhere)
 
-Design: `docs/superpowers/specs/2026-09-22-personal-site-design.md`, amended by `docs/superpowers/specs/2026-09-23-write-ups-v2.md`. Infra steps: `docs/INFRA.md`. Quality log: `docs/QUALITY.md`.
+Infra steps: `docs/INFRA.md`. Quality log: `docs/QUALITY.md`.
