@@ -3,7 +3,7 @@ export const meta = {
   line: 'A deal-sourcing workbench where every value carries its source, and the reasons analysts pass on firms become the next search’s screening rules.',
   status: 'Live · synthetic data, resets daily',
   role: 'Design, build, operate',
-  stack: 'React 18, TypeScript, Postgres on Neon (PGlite locally), Cloudflare Workers, TanStack Query, Claude Haiku 4.5, Playwright',
+  stack: 'React 18, TypeScript, Postgres on Neon (PGlite locally), Cloudflare Workers, TanStack Query, Claude Haiku 4.5 and Opus 5.5, Playwright',
   source: 'Public. MIT. Sanitized: no employer, vendor, or real firm names.',
   app: { label: 'beacon.lukeghanna.com', href: 'https://beacon.lukeghanna.com' },
   links: [
@@ -15,7 +15,7 @@ export const meta = {
     { label: 'Grounded values', value: '6,228 of 6,523 quote their source' },
     { label: 'Settled values right', value: '93.3%, against synthetic truth' },
     { label: 'Rubric', value: '9 axes, 18 points' },
-    { label: 'Ontology', value: '18 object types · 18 actions' },
+    { label: 'Ontology', value: '21 object types · 18 actions' },
     { label: 'Demo universe', value: '700 synthetic firms' },
     { label: 'Tests', value: '1,200+ unit · 176 end-to-end' },
   ],
@@ -99,13 +99,13 @@ Because the universe is generated, every firm has a hidden true value for every 
 
 ## The rubric
 
-Nine axes, each scored 0 to 2, for a maximum of 18. Two models share six axes and differ on three: corporate-finance firms are read on coverage model, services and managing-director experience; capital-solutions firms on balance sheet, services fit and managing-director experience. Tiers are A, B and C, with hard rejects above the score: a generalist coverage model or conflicted services on one side, an advisory conflict or a firm that invests its own balance sheet on the other.
+In the demo's workspace, nine axes, each scored 0 to 2, for a maximum of 18. Two models share six axes and differ on three: corporate-finance firms are read on coverage model, services and managing-director experience; capital-solutions firms on balance sheet, services fit and managing-director experience. Tiers are A, B and C, with hard rejects above the score: a generalist coverage model or conflicted services on one side, an advisory conflict or a firm that invests its own balance sheet on the other.
 
-One module computes the score. The server records with it and the desk previews with it, so the two cannot drift.
+The rubric is data, not code: a catalog of the traits a workspace tracks and a versioned rubric definition, scored by one engine. The server records with that engine and the desk previews with it, so the two cannot drift, and another team's thesis is a new definition rather than new code; a parity test holds the advisory rubric above to the hand-written module it replaced. Each stored score names the rubric version that produced it, and a firm's trait values are append-only revisions, each with who set it, when, and the finding behind it.
 
 ## Rules grounded in passes
 
-A pass carries a reason. Reasons are clustered into candidate rules of the form axis, operator, threshold, by Claude when it is enabled and by a keyword heuristic otherwise. A candidate counts a pass as support only if that firm actually satisfies the predicate, and it needs at least four distinct firms. Each proposal quotes the notes behind it and says how many firms it would screen, and nothing applies until an analyst approves it.
+A pass carries a reason. Reasons are clustered into candidate rules of the form axis, operator, threshold, by Claude Opus 5.5 when it is enabled and by a keyword heuristic otherwise. The demo's proposals come from one recorded Claude call, re-recorded with Opus 5.5 on 16 November for $0.0355, which the seed replays. A candidate counts a pass as support only if that firm actually satisfies the predicate, and it needs at least four distinct firms. Each proposal quotes the notes behind it and says how many firms it would screen, and nothing applies until an analyst approves it.
 
 <Figure
   n={4}
@@ -114,7 +114,7 @@ A pass carries a reason. Reasons are clustered into candidate rules of the form 
   height={1620}
   alt="Beacon's rules page: two proposed hard-screen rules (average deal size below $25m, fewer than 2 deals per managing director over three years), each with the analysts' notes behind it and how many firms it would screen, above one active rule, employees under 10, screening 90 firms"
   caption="Two proposed rules clustered from pass reasons, each quoting the analysts' notes that support it and how many firms it would screen, above one approved rule already screening the queue."
-  source="Screenshot of the live demo, synthetic data."
+  source="Screenshot of the live demo, 15 November 2026, synthetic data. It predates the clustering re-recorded the next day, whose productivity rule now reads one deal or fewer per managing director."
 />
 
 > Unknown is not a failure. It is the reason the firm is on the desk at all.
@@ -157,7 +157,7 @@ The finance track turns the desk's work into things a deal team uses elsewhere, 
 
 | On Foundry | Now |
 |---|---|
-| Ontology Manager, 12 object types | One schema declaration, 18 object types and 18 named actions; the DDL, API validation, typed hooks and a generated ontology reference all derive from it |
+| Ontology Manager, 12 object types | One schema declaration, 21 object types and 18 named actions; the DDL, API validation, typed hooks and a generated ontology reference all derive from it |
 | Generated SDK and its React hooks | Hooks with the same names over TanStack Query, so screens changed only their imports |
 | Actions and Functions | Named actions, each validated and run in one transaction, and query functions, behind a handful of API routes on a Cloudflare Worker |
 | AIP Logic | Claude extraction with a grounding check, recorded as fixtures; clustering behind a flag with a hard budget |
@@ -166,8 +166,8 @@ The finance track turns the desk's work into things a deal team uses elsewhere, 
 
 The demo is open and writable. A single shared analyst can run every action, a nightly job restores the seeded world at 04:00 UTC, and a Reset button does the same on demand, throttled to once every five minutes; the reset is one transaction. The seed builds the history through the real actions, which makes it an end-to-end test as well as a demo. A pre-publish check fails the build if any file mentions the original employer, the licensed data vendors, the real firm names from the original data or the original rubric wording; its patterns are stored as salted hashes so the check itself gives nothing away.
 
-The database enforces what the app never writes: required columns, foreign keys, one rule per predicate, and history tables (scores, decisions, findings) that refuse UPDATE and DELETE. The schema changes only through numbered SQL migrations, and the Worker refuses API requests while the database is behind the build. Action parameters are declared once and type both the client call and the server handler, and the screens reach the server through one documented data adapter, the seam a Foundry adapter would replace. Cloudflare Hyperdrive pools the Worker's database connections, which roughly halved the median API response (1.03 s to 0.54 s in ten calls from Los Angeles), and a daily check exercises the live demo an hour after the nightly reset.
+The database enforces what the app never writes: required columns, foreign keys, one rule per predicate, and history tables (scores, decisions, findings, published rubric versions and firm trait values) that refuse to be rewritten or deleted. The schema changes only through numbered SQL migrations, and the Worker refuses API requests while the database is behind the build. Action parameters are declared once and type both the client call and the server handler, and the screens reach the server through one documented data adapter, the seam a Foundry adapter would replace. Cloudflare Hyperdrive pools the Worker's database connections, which roughly halved the median API response (1.03 s to 0.54 s in ten calls from Los Angeles), and a daily check exercises the live demo an hour after the nightly reset.
 
 ## Status
 
-Ported in September 2026 and public under MIT since November. Over 1,200 unit and integration tests run against in-memory Postgres, 176 Playwright tests drive the app, and the evaluation runs on every CI build. Ten decision records explain the choices that matter. Everything on the live site is synthetic: firm names are generated from common surnames and coined place words, sources are mocks, market signals are invented news, and the captures here show one day's seeded history, which the next reset replaces.
+Ported in September 2026 and public under MIT since November. Over 1,200 unit and integration tests run against in-memory Postgres, 176 Playwright tests drive the app, and the evaluation runs on every CI build. Eleven decision records explain the choices that matter. Everything on the live site is synthetic: firm names are generated from common surnames and coined place words, sources are mocks, market signals are invented news, and the captures here show one day's seeded history, which the next reset replaces.

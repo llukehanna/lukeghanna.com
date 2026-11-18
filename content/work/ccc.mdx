@@ -15,7 +15,7 @@ export const meta = {
     { label: 'History', value: '6 full seasons, league-wide' },
     { label: 'Seasons', value: '2019-20 → 2026-27' },
     { label: 'Running cost', value: '$0 on free tiers' },
-    { label: 'Tests', value: '652, plus 16 for the hub' },
+    { label: 'Tests', value: '778, plus 16 for the hub' },
   ],
 }
 
@@ -86,16 +86,18 @@ Around the score: a game-flow chart with a model win probability, always labeled
 
 The runner tracked the season opener on 21 October, a 121–96 win over Sacramento: 746 live-state updates, 586 plays, and the game finalized when it ended (Actions run 39706347013). It did the same for the Lakers on 23 October and Oklahoma City on 25 October. Around 27 October cdn.nba.com started answering the runner with 403s, every tick failed, and the 28 and 30 October and 2 and 4 November games got no live state; the browser's ESPN fallback showed a bare score. GitHub also dropped scheduled runs: the 1 November game was never launched, and the 28 October run started four hours after tip.
 
-The fixes merged between 3 and 5 November. The runner falls back to ESPN after the first 403, and the scoreboard request now raises the error that triggers the fallback, which it did not on 4 November. A launch picks up any game tipping within five hours and sleeps until tip, and a run that hits its time limit mid-game starts its own successor. A running runner checks main every two minutes and hands the game to a fresh run when the code it runs has changed, because on 4 November a fix merged 28 minutes after tip never reached the run already under way. None of this has run during a real game yet; the next is New Orleans on 8 November.
+The fixes merged between 3 and 5 November. The runner falls back to ESPN after the first 403, and the scoreboard request now raises the error that triggers the fallback, which it did not on 4 November. A launch picks up any game tipping within five hours and sleeps until tip, and a run that hits its time limit mid-game starts its own successor. A running runner checks main every two minutes and hands the game to a fresh run when the code it runs has changed, because on 4 November a fix merged 28 minutes after tip never reached the run already under way.
+
+The next four games ran on those fixes. On 8, 10, 13 and 15 November the runner launched ahead of tip, slept until ten minutes before it, met the CDN's 403 on its first scoreboard request, switched to ESPN, and followed the game to the final (Actions runs 42536727605, 42903773514, 43546507078 and 43757911590). On 10 November it hit its time limit in the second quarter and the run it dispatched picked the game up from the stored state (run 42948670634). What still failed was the step after the buzzer: the CDN refused the box score and the stats.nba.com fallback timed out from GitHub's runners, three attempts in three minutes, so stats and insights waited for the next day's scheduled post-game run, which finalized each game. Since 15 November (PR #39) the runner keeps retrying finalization every fifteen minutes while it has time left and starts the post-game job as soon as one succeeds. And because the CDN scoreboard can still read "scheduled" ten minutes or more into the first quarter, a runner past the scheduled tip now also asks the box score whether the game has started (PR #42, 17 November).
 
 ## Pipeline
 
-Separate scripts, one job each: sync the schedule and attach NBA game ids, sync the odds, run the live game night, sync every NBA game's box scores league-wide (the last three days nightly, or a whole season on demand), finalize games, compute stats incrementally (possessions, pace, offensive and defensive rating, shooting efficiency, five- and ten-game rolling windows), generate insights, verify insights, and backfill. Every write is an idempotent upsert, so any script can be re-run. GitHub Actions drives them: the schedule daily, odds every six hours, news every fifteen minutes, the game-night runner, and a post-game job that syncs, finalizes, computes, ingests play-by-play, builds the record book, generates and verifies, in that order. The runner dispatches the post-game job the moment a game goes final; its nightly cron stays as a backup. No queue, no workflow engine. Cron authentication fails closed with a constant-time compare, failures return real error codes instead of a quiet 200, and CI runs typecheck, lint and 652 Vitest cases (plus 34 marked todo) across 63 files against a Postgres service, and the hub's 16 tests separately (run 42135304934). The whole thing runs on free tiers: Cloudflare Workers and Durable Objects, Neon Free and GitHub Actions.
+Separate scripts, one job each: sync the schedule and attach NBA game ids, sync the odds, run the live game night, sync every NBA game's box scores league-wide (the last three days nightly, or a whole season on demand), finalize games, compute stats incrementally (possessions, pace, offensive and defensive rating, shooting efficiency, five- and ten-game rolling windows), generate insights, verify insights, and backfill. Every write is an idempotent upsert, so any script can be re-run. GitHub Actions drives them: the schedule daily, odds every six hours, news every fifteen minutes, the game-night runner, and a post-game job that syncs, finalizes, computes, ingests play-by-play, builds the record book, generates and verifies, in that order. The runner dispatches the post-game job as soon as it has finalized the game; its nightly cron stays as a backup. No queue, no workflow engine. Cron authentication fails closed with a constant-time compare, failures return real error codes instead of a quiet 200, and CI runs typecheck, lint and 778 Vitest cases (plus 34 marked todo) across 73 files against a Postgres service, and the hub's 16 tests separately (run 44223253932). The whole thing runs on free tiers: Cloudflare Workers and Durable Objects, Neon Free and GitHub Actions.
 
 <Flow
   n={4}
   caption="The two pipelines. The game-night runner keeps one live-state row per game current and pushes each change through the hub; everything derived is recomputed after each final, and nightly as a backup, incrementally."
-  source="Drawn from scripts/, app/api, workers/live-hub, .github/workflows and Docs/DB_SCHEMA.sql in the repository (main, e3e860a)."
+  source="Drawn from scripts/, app/api, workers/live-hub, .github/workflows and Docs/DB_SCHEMA.sql in the repository (main, 17 November 2026)."
   steps={[
     [
       { title: 'NBA CDN', detail: 'live scoreboard, box score, play-by-play; league-wide box scores and game ids' },
@@ -118,7 +120,9 @@ Separate scripts, one job each: sync the schedule and attach NBA game ids, sync 
 
 ## History
 
-The database holds box scores for every NBA game league-wide, not just the Clippers'. Six seasons are complete, 2020-21 through 2025-26, regular season and postseason; 2019-20 is partial and still loading.
+The database holds box scores for every NBA game league-wide, not just the Clippers'. Six seasons are complete, 2020-21 through 2025-26, regular season and postseason; 2019-20 is partial, 54 Clippers games.
+
+An import that reaches much further back is merged but has not run yet (PRs #40 and #41, 17 November). It reads a CC0 dataset built from NBA.com box scores and loads every Clippers game since 1970-71, when the franchise was the Buffalo Braves; every league game since 1996-97; the missing 2019-20 games; and team and player season totals from 1946-47. Old games carry the team names of their era, and a stat nobody recorded then shows as a dash, never a 0. Advanced stats are computed only for games whose box scores carry every possession input, so a 1970s game without turnovers gets none rather than made-up ones, and the record book starts each stat where it became reliable: points from 1970-71, rebounds and assists from 1973-74, 3-pointers from 1979-80, steals, blocks and turnovers from 1983-84. Until it runs, History starts at 2019-20.
 
 <Figure
   n={5}
@@ -142,4 +146,4 @@ The database holds box scores for every NBA game league-wide, not just the Clipp
 
 ## What it is not
 
-No accounts and no personalization. Odds are for display and insight context, not betting. Live mode has run through real games, but the fixes for the NBA CDN's refusals have not yet. And the engine can only prove what is in the database, so a batch claim is scoped to one stats season and the one before it, regular season only.
+No accounts and no personalization. Odds are for display and insight context, not betting. The NBA CDN has refused the runner on every game night since late October, so live data comes from ESPN's feed, translated. And the engine can only prove what is in the database, so a batch claim is scoped to one stats season and the one before it, regular season only.

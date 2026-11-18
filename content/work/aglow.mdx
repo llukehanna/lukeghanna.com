@@ -15,11 +15,11 @@ export const meta = {
     { label: 'Scenes', value: 'Six, Fireside to start' },
     { label: 'Light paths', value: 'Filament · Fairy · Neon · Neon bright' },
     { label: 'Wardrobe', value: '71 items, earned by 64 goals' },
-    { label: 'Tests', value: '1,664 unit · 230 e2e' },
+    { label: 'Tests', value: '1,761 unit · 261 e2e' },
   ],
 }
 
-Christmas Tree Light Up is an old browser puzzle: a tree-shaped board of wire tiles, a power source at the trunk, and one rule. Turn tiles until every wire connects and the whole tree is lit. Aglow keeps that puzzle exactly and rebuilds everything around it: the light, the sound, the scenes and the feel of a solve. There is no framework, only TypeScript and one Canvas 2D renderer. Around the game there is now a radio, a leaderboard whose times the server checks by replaying every run, and a Daily Tree that everyone plays.
+Christmas Tree Light Up is an old browser puzzle: a tree-shaped board of wire tiles, a power source at the trunk, and one rule. Turn tiles until every wire connects and the whole tree is lit. Aglow keeps that puzzle exactly and rebuilds everything around it: the light, the sound, the scenes and the feel of a solve. There is no framework, only TypeScript and one Canvas 2D renderer. Around the game there is now a radio, a leaderboard whose times the server checks by replaying every run, a Daily Tree that everyone plays, and a career page that tracks a player's own runs.
 
 <Figure
   n={1}
@@ -94,7 +94,7 @@ A new player starts in Fireside; the other five are earned. Midnight is a snowy 
 
 ## Smooth on a phone
 
-Everything is drawn in one Canvas 2D context, and the blur that makes the glow is the expensive part. A quality governor watches the frame interval: after about a second of frames over 22 ms it drops a tier (two bloom passes instead of three, then half the particles and snow, then no reflection or embers), and after about five seconds under 18 ms it climbs back. It tells a slow device from a phone in Low Power Mode, which caps the frame rate at 30 Hz but is not struggling. Where the browser has no canvas blur filter, as on older Safari, the same helper blurs by scaling the layer down and back up. On a phone the tree fits the screen width, and pinching zooms and pans without ever turning a tile.
+Everything is drawn in one Canvas 2D context, and the blur that makes the glow is the expensive part. A quality governor watches the frame interval: after about a second of frames over 22 ms it drops a tier (two bloom passes instead of three, then half the particles and snow, then no reflection or embers), and after about five seconds under 18 ms it climbs back. It tells a slow device from a phone in Low Power Mode, which caps the frame rate at 30 Hz but is not struggling. Where the browser has no canvas blur filter, as on older Safari, the same helper blurs by scaling the layer down and back up. The controls around the tree add no CSS backdrop blur of their own: the top bar is one cranberry-glass capsule, and the menu and panels are an opaque velvet. On a phone the tree fits the screen width, pinching zooms and pans without ever turning a tile, and the menu comes up from the bottom as a sheet with larger rows.
 
 <Figure
   n={6}
@@ -109,7 +109,7 @@ Everything is drawn in one Canvas 2D context, and the blur that makes the glow i
 
 ## Winning
 
-The win lands with the last turn: the light still travelling runs four times faster, the topper flares, a brightness wave sweeps the bulbs from the bottom up, the garland blazes, and gold flecks and snow fall over the tree. Half a second later a gift tag gives the time, a new-best badge, and the solved count, average time and daily streak. Share renders the player's own lit tree in their scene as a 1080×1350 image with the time on it, through the share sheet on a phone or the clipboard on a desktop. A game in progress is saved on every turn, so closing the tab and coming back resumes the same tree with a "Welcome back" and the clock where it was.
+The win lands with the last turn: the light still travelling runs four times faster, the topper flares, a brightness wave sweeps the bulbs from the bottom up, the garland blazes, and gold flecks and snow fall over the tree. Half a second later a gift tag gives the time, the run's turns as the server's replay counted them and how many were over the tree's par, a new-best badge, and the solved count, average time and daily streak. When there is somewhere to go next, one row under its buttons offers it: today's Daily Tree if a new day began during the session, or, from 1 to 24 December and signed in, the Advent doors still to catch up. Share renders the player's own lit tree in their scene as a 1080×1350 image with the time on it, through the share sheet on a phone or the clipboard on a desktop. A game in progress is saved on every turn, so closing the tab and coming back resumes the same tree with a "Welcome back" and the clock where it was.
 
 <Figure
   n={7}
@@ -117,7 +117,7 @@ The win lands with the last turn: the light still travelling runs four times fas
   width={2880}
   height={1800}
   alt="The solved tree on Fireside with the star lit and gold confetti falling, and a cream gift tag in front reading 'Lit in 0:26', 'Merry & bright', score 47,400, a New best badge, one solved, 0:26 average, one-day streak, and New tree and Share buttons"
-  caption="The gift tag after a win. 0:26 is not a real solve: the last tiles were finished by the test hook. The tag no longer shows a score."
+  caption="The gift tag after a win. 0:26 is not a real solve: the last tiles were finished by the test hook. The tag no longer shows a score, and now also gives the run's turns."
   source="Screenshot of aglow.lukeghanna.com at 1440×900, 1 October 2026, before the radio pill and the account chip were added."
 />
 
@@ -127,7 +127,9 @@ Playing never needs an account, but a time only ranks if the server can check it
 
 The time comes from the replay: the solve, minus pauses, minus the 900 ms reveal. It has to agree with the server's own clock to within three seconds, so a log cannot claim a faster solve than the server saw, and a made-up log takes as long to submit as the time it claims. A verified run still doesn't rank if it was paused for more than ten minutes or more than 20 times, took under five seconds, or had more than a tenth of its taps under 40 ms apart. A win played signed out is verified and kept for 90 days, and ranks once the player signs in on that browser and claims it.
 
-Sign-in is Google's OpenID Connect flow, done on the server with PKCE. The board shows the top 50 for the Daily Tree, Today, This week or All time, in the viewer's own calendar, and pins the player's best under the list when it is further down. Your games lists the account's recent runs with its solved count, average and streaks, which match on every device. One path skips the replay: an admin-only import that brings a device's history from before accounts existed onto my account, as runs with no log that rank like any other.
+Sign-in is Google's OpenID Connect flow, done on the server with PKCE. The board shows the top 50 for the Daily Tree, Today, This week or All time, in the viewer's own calendar, and pins the player's best under the list when it is further down. Signed in, the tag's solved count, average and streak come from the account, so they match on every device. One path skips the replay: an admin-only import that brings a device's history from before accounts existed onto my account, as runs with no log that rank like any other.
+
+Signed in, Career replaces the old Your games list of the last 30 runs with a full page of every finished run on the account. It counts averages the way speedcubers do: the mean of the last 5, 12, 50 or 100 runs after dropping the fastest and slowest 5 per cent, at least one of each. It also counts extra turns, the turns a run took beyond the tree's par. Par is the clockwise turns the tree needs, since most players only ever click one way and touch has no counter-clockwise turn, so a counter-clockwise player can finish under it. The turn counts come only from the server's replay of the log. The charts are hand-built SVG with no chart library: every run against its average of 50 and the best so far, time against extra turns with a least-squares line, a histogram in 2-second bins and the average by hour of day. Under them sit the personal bests, the first runs under 60, 50, 45, 40, 35 and 30 seconds, the six runs with the fewest extra turns, and a table of every game that filters, sorts, and plays any run that kept its log. The page loads as its own chunk and pauses a run in progress while it is open, and its averages and extra turns never appear on the board.
 
 ## A tree a day, replays and a wardrobe
 
@@ -135,7 +137,7 @@ The game opens on the Daily Tree, the same tree for everyone on a given date. It
 
 Every verified run keeps its log, so it can be watched: the server returns the seed and the log it checked at the finish, and the browser plays it through the same rules code at 1× or 2×, skipping pauses. Others can watch a named player's ranked runs, or a Daily run once its date has closed. On a Daily Tree you have lit before, your fastest run on it races you as a ghost: a pill showing the share of the tree it had lit at your clock, then its time.
 
-Looks are now earned. A new player gets Fireside, filament and a snowflake topper; 71 more items come from 64 goals: trees lit, times, turns close to a tree's minimum, feats read from the log, Daily streaks and a few secrets. Signed in, the server works them out from verified runs, trusting the browser only for the time zone, station and egg behind the holiday and secret goals; a guest earns the trees-lit goals alone. From 1 to 24 December each day's tree opens an Advent door, and a missed door opens by playing that day's tree later.
+Looks are now earned. A new player gets Fireside, filament and a snowflake topper; 71 more items come from 64 goals: trees lit, times, turns close to a tree's par, feats read from the log, Daily streaks and a few secrets. Signed in, the server works them out from verified runs, trusting the browser only for the time zone, station and egg behind the holiday and secret goals; a guest earns the trees-lit goals alone. From 1 to 24 December each day's tree opens an Advent door, and a missed door opens by playing that day's tree later.
 
 ## Radio, and a few eggs
 
@@ -143,4 +145,4 @@ The radio has two stations, Christmas Jazz and Christmas Classics, streamed from
 
 ## Status
 
-Live at aglow.lukeghanna.com, served as Cloudflare Workers static assets with a Worker on `/api/*` only, over D1 for accounts and games and R2 for the radio's music; every other path comes straight from the assets. Six scenes, four light paths, synthesized sound effects, saved games, stats and sharing; the radio added on 4 October 2026 and its admin on 5 October, accounts and the leaderboard from 7 October, the Today and This week boards on 14 October, and between 4 and 7 November right-click and pause keys, three new scenes, the wardrobe, the Daily Tree, Advent and replays. 1,664 Vitest tests across 156 files (six run only with a build or performance flag), including a generator property test over a thousand seeded trees and Worker tests against a real local D1, and 230 Playwright tests (200 desktop, 30 on a Pixel 7 profile) against the real Worker with a fake sign-in that only works on localhost.
+Live at aglow.lukeghanna.com, served as Cloudflare Workers static assets with a Worker on `/api/*` only, over D1 for accounts and games and R2 for the radio's music; every other path comes straight from the assets. Six scenes, four light paths, synthesized sound effects, saved games, stats and sharing; the radio added on 4 October 2026 and its admin on 5 October, accounts and the leaderboard from 7 October, the Today and This week boards on 14 October, and between 4 and 7 November right-click and pause keys, three new scenes, the wardrobe, the Daily Tree, Advent and replays; Career on 15 November; on 16 November par counted in clockwise turns, and a facelift that put the top bar in one capsule and everything you can do, Career, the leaderboard and the account included, in one menu; and on 17 November the gift tag's next step and the menu as a bottom sheet on phones. 1,761 Vitest tests across 163 files (seven run only with a build or performance flag), including a generator property test over a thousand seeded trees and Worker tests against a real local D1, and 261 Playwright tests (230 desktop, 31 on a Pixel 7 profile) against the real Worker with a fake sign-in that only works on localhost.

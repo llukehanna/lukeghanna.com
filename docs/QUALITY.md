@@ -194,3 +194,7 @@ GitHub: descriptions, homepages and topics brought in line (Circuit, Aglow, Soli
 - **Shedquarters:** local `main` fast-forwarded GitHub to `f0ea6cd`. CI's first run failed fetching a Google font during `next build`; the rerun passed with 835 tests across 60 files (run 42418592709), and the write-up now cites that.
 - **Aglow:** the `home-alone` branch was pushed and fast-forwarded onto `main` (`f4d2f90`). The write-up now covers the Daily Tree, replays and ghosts, the wardrobe and Advent, six scenes and four light paths, and no longer mentions a score. 1,664 Vitest tests across 156 files (run; six need a build or performance flag) and 230 Playwright tests (200 desktop, 30 phone; listed).
 - **BJS:** local `main`, with Step 7 merged, was merged with GitHub's two README commits and pushed (`df1854c`), with the README's status brought through Step 7. Seven of eight steps are merged; 292 engine tests (run with `swift test`), 264 app and 7 UI (from `docs/superpowers/progress.md`).
+
+## 2026-11-17 BJS card capture
+
+`public/shots/bjs.webp` is now `docs/app-store/screenshots/01-decision.png` from the BJS repo (branch `step-9-monetization`, 11 November 2026): the strategy trainer on soft 15 against a dealer 6, taken in the iPhone 17 Pro Max simulator on iOS 26.4 with the store demo fixture, unframed, 1320×2868 downsized to 660×1434 WebP at quality 82. It replaces the September capture described above.

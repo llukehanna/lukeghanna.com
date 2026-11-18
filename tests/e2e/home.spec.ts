@@ -11,7 +11,7 @@ test.describe('home', () => {
     await expect(page.locator('#projects a')).toHaveCount(slugs.length)
     // The status line describes the project, not the link: the live domain still shows for live sites.
     await expect(page.getByTestId('project-ccc')).toContainText('clippers.lukeghanna.com')
-    await expect(page.getByTestId('project-kwx')).toContainText('demo pending')
+    await expect(page.getByTestId('project-kwx')).toContainText('paper tests')
     await expect(page.locator('#projects h2')).toHaveText('Projects')
   })
 

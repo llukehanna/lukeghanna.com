@@ -1,7 +1,7 @@
 export const meta = {
   title: 'Kalshi Weather Edge',
   line: 'A forecast edge measured and found absent, and a market maker built to test the other side of the book.',
-  status: 'Forecast result in · market maker built, demo run pending',
+  status: 'Forecast result in · maker tests on paper, verdicts due 30 Nov',
   role: 'Design, build, operate',
   stack: 'Python 3.11, httpx, SQLite + JSONL journal, scikit-learn, launchd and systemd',
   source: 'Private. Engineering docs and results public.',
@@ -15,11 +15,11 @@ export const meta = {
     { label: 'Brier, model', value: '0.187' },
     { label: 'Brier, market', value: '0.120' },
     { label: 'Orders placed', value: '0' },
-    { label: 'Market maker', value: 'built, not yet run' },
+    { label: 'Market maker', value: 'paper only, verdict 30 Nov' },
   ],
 }
 
-Kalshi Weather Edge, called BT until September 2026, tested whether a 31-member GFS ensemble, read as a probability distribution, beats Kalshi's price on daily high-temperature contracts after fees. It ran unattended for four months, settled 7,440 signals against the official NWS climate record, and answered no. The same pipeline now carries a market maker for the other side of those books, built and gated but not yet run.
+Kalshi Weather Edge, called BT until September 2026, tested whether a 31-member GFS ensemble, read as a probability distribution, beats Kalshi's price on daily high-temperature contracts after fees. It ran unattended for four months, settled 7,440 signals against the official NWS climate record, and answered no. The other side of those books is the open question. A market maker for them was built in September and parked before it ran; in November I built three paper-only quoting tests, each with a pre-registered verdict, all due on 30 November.
 
 ## What it does
 
@@ -163,4 +163,20 @@ A tick runs every two minutes under launchd or systemd, and there is no daemon: 
 
 Two gates stand between this code and money. The first is plumbing, about two weeks on the demo exchange: clean reconciliation every tick, no orphan orders, caps never breached, expiry verified by killing a tick. It has no profit criterion. The second is the verdict, about four weeks live: at least a hundred fills with positive mean markout at both horizons and positive realized P&L per fill, or the experiment is inconclusive.
 
-As of 7 November 2026 the quoter is merged, off by default, and has placed zero orders on demo or live; it is not yet in the checkout the scanner runs from. The scanner itself never stopped: it has settled 10,817 signals through 6 November, 3,377 of them since 22 September, still with no orders and no fills. The study above covers the first 7,440. There are no market-making results, and there will be none on this page until the gates produce them.
+The quoter is merged, off by default, and has placed zero orders on demo or live; it is not in the checkout the scanner runs from, and in November it was parked before its demo run. The scanner kept going: through 6 November it had settled 10,817 signals, 3,377 of them since 22 September, still with no orders and no fills. The study above covers the first 7,440.
+
+## Paper tests
+
+In November I built three tests of the other side of the book: quoting for Kalshi's Liquidity Incentive Program, under which Kalshi pays makers for keeping two-sided depth in selected markets, and two maker arms, one on weather brackets and one on sports.
+
+All three are forward tests that place no orders anywhere, demo or live. Each ticks every two minutes on public Kalshi data, rests simulated orders that expire after six minutes as live ones would, fills them from the live trade tape, and settles them against Kalshi's results. Every portfolio runs twice: once with a queue model, where trades at our price fill the visible queue ahead of us first, and once with a pessimistic model that always puts us first in line. The two bracket the truth.
+
+| Test | Clock | What it simulates | Pre-registered pass |
+|---|---|---|---|
+| Incentive quoting | started 16 Nov | Joining the best bid on both sides of incentive markets, rewards scored with Kalshi's published rule; budgets of $2,000 to $10,000, with $5,000 on backtested series as the primary | Reward net of fill losses above zero with a 95% interval excluding zero, net over reward at least 0.5, positive under the pessimistic model, at least 100 fills, over 14 days at 90% uptime |
+| Weather long shots | built 17 Nov | No bids on KXHIGH brackets priced 2 to 15 cents, 18:00 the evening before to 10:00 on the day, 10 contracts each, seven cities, held to settlement | At least +0.5 cents per settled contract with the interval above zero, 100 settled contracts and 40 settled city-days |
+| Sports pregame | built 17 Nov | Joining the best bid on both sides of one market per game or match (NFL, NBA, NHL, college football and basketball, tennis), from 48 hours to 30 minutes before the scheduled start; $5,000 budget | Positive per contract under both fill models, interval above zero under the queue model, at least 30 settled games |
+
+Each test also has a written fail line and an inconclusive band. A change to a quoting policy restarts that test's clock; a bug fix in fills or accounting is replayed from the stored books and trades without restarting it. One such fix landed on 17 November: a trade through our price had filled the whole simulated order, when only the print's own size would have reached it. The weather design says in advance that thirteen days is too short to do more than rule that strategy out or keep it alive.
+
+This work is on unmerged branches, `feat/lip-paper-quoter` and `feat/maker-paper`, and all three verdicts are due on 30 November 2026. There are no market-making results, and there will be none on this page until the verdicts produce them.
