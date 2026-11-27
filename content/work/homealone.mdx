@@ -1,0 +1,74 @@
+export const meta = {
+  title: 'Home Alone House',
+  line: 'An unofficial, non-commercial fan tribute: a path-traced 360° tour of the film house on Christmas morning.',
+  status: 'Live · free, noindex · more rooms in progress',
+  role: 'Design, build, render',
+  stack: 'Blender 5.2, Cycles, Python, numpy, Pillow, TypeScript, three.js, Vite, Vitest, Playwright, Cloudflare Pages',
+  source: 'Private, no git remote.',
+  app: { label: 'homealone.lukeghanna.com', href: 'https://homealone.lukeghanna.com' },
+  links: [],
+  glance: [
+    { label: 'Viewpoints', value: '17 live' },
+    { label: 'Panorama', value: '8192 × 4096' },
+    { label: 'Samples', value: 'up to 2,048' },
+    { label: 'Per final', value: '63–80 min, RTX 3070' },
+    { label: 'Eggs', value: '11, 3 animated' },
+    { label: 'Tests', value: '713 unit · 36 e2e · 656 tools' },
+  ],
+}
+
+A walk through the house from the 1990 holiday film, as it was left on Christmas morning: you stand at a viewpoint, look all the way around, and step to the next. It is an unofficial, non-commercial fan tribute, free, with no ads, accounts or trackers, and no affiliation with the film or its studio. Nothing on screen is film footage. Every image is path-traced offline in Blender from a house built procedurally, room by room, and fitted to the film's frames.
+
+<Figure
+  n={1}
+  src="/work/homealone/foyer.webp"
+  width={2880}
+  height={1620}
+  alt="A rendered front hall looking up a red-carpeted staircase with a white rail, damask wallpaper hung with framed pictures, a ficus at the foot of the stair, a wall sconce, a gilt mirror and poinsettias on a side table, with a small label reading Ground floor · Front hall and buttons for Battle plan (0/11) and Menu"
+  caption="The front hall from its middle viewpoint. The rings on the floor and the stair are the next viewpoints you can step to."
+  source="Screenshot of homealone.lukeghanna.com/?start=foyer-center at 1440×810 at 2x, 27 November 2026, entered with sound off. Progress is kept on the device only, so nothing was written anywhere."
+/>
+
+## Every frame is path-traced
+
+The house is a Blender 5.2 build driven by data: a whole-house floor plan joins the film-set interiors to the exterior, and each room has a recipe that places its walls, furniture and dressing. The dimensions come from the film. A custom solver fits a camera to each reference frame, and the model is adjusted until it lines up: the exterior's roof deck, for one, was fitted to 8.56 m with every pick within 3 pixels.
+
+Each viewpoint is one equirectangular panorama rendered in Cycles at 8192 × 4096 from eye height, with adaptive sampling at a noise threshold of 0.01 up to 2,048 samples and OptiX denoising, plus a depth pass for moving between viewpoints. Previews render on a MacBook Air at 2048 × 1024 and 128 samples. Finals go to a gaming laptop with an RTX 3070 over Syncthing, where the latest batch took 3,765 to 4,791 seconds a viewpoint. The renders are then graded and cut into tiles for the viewer.
+
+At an hour or more a final, re-rendering is the cost to manage. Adding a room changes what its neighbours see through their doorways, so after each room the pipeline re-renders every existing viewpoint at preview quality and compares it with its baseline by PSNR. Only those below 45 dB are re-rendered at full quality. When the kitchen went in, that flagged 6 of 13 viewpoints and saved about five hours of GPU time. Five room plans are now being built at once on one laptop, with file locks, a shared texture library and one queue of finals for the GPU.
+
+## Walking between viewpoints
+
+A cut between two panoramas looks like a slideshow, so a step glides instead. Each viewpoint's depth map becomes a mesh of 512 × 256 segments, about 131,000 vertices, dense enough for the ficus leaves and the stair rail. During the glide every point on that mesh is coloured from both panoramas, each sampled from its own position, and a panorama only contributes where its own depth map says it can see the point. Without that test, a panorama would paint a near object's colour onto the wall behind it. Edges seen side-on are dropped, and a backdrop sphere fills the holes they leave.
+
+<Figure
+  n={2}
+  src="/work/homealone/hearth.webp"
+  width={2880}
+  height={1620}
+  alt="A rendered living room fireplace hung with a row of red-and-white stockings under a wreath, green lamps on the mantel, green drapes at two windows, rose-patterned wallpaper, a decorated tree in the corner and a plate of cookies on a side table"
+  caption="The living room from its viewpoint by the fireplace. The wallpapers, rugs and fabrics are original patterns drawn to evoke the film's, not copies."
+  source="Screenshot of homealone.lukeghanna.com/?start=living-hearth at 1440×810 at 2x, 27 November 2026, entered with sound off."
+/>
+
+## Where the film never looked
+
+The film shows most rooms from a few angles and some walls never. Those gaps are invented under one rule: dress the space as the film's designers would have if they had added a scene there, in the same palette, period and family as the room next door. A space that reads as a showroom, or a room that matches its frames but puts a window on the wrong side of its neighbour, counts as a failure even when everything renders. The exterior follows one more rule: nothing on the site identifies the real house's location or owners.
+
+## Eggs, games and the battle plan
+
+Eleven finds are hidden where the film's gags happened, three of them short animated clips. A clip renders only the patch of the panorama its object occupies, at 8K, and plays on a matching patch of the sphere with feathered edges. A crayon battle-plan journal tracks them by floor and room, with hints in three steps and a card for finding them all. Three original mini-games riff on the house's gags: Swing Shot, built on pendulum physics; Full House, a timing game about faking a party; and a 15-level Battle Plan puzzle. There is also a photo mode, a day and night look outside, and a rooms map drawn in crayon that fills in only as you explore.
+
+<Figure
+  n={3}
+  src="/work/homealone/night.webp"
+  width={2880}
+  height={1620}
+  alt="A rendered brick house at night across a snowy lawn, every window lit warm, white lights on the shrubs along the front, a large tree trunk in the right foreground, and small Day, Battle plan and Menu buttons"
+  caption="The front walk at night. Outside, a button switches between the day and night renders of the same viewpoint."
+  source="Screenshot of homealone.lukeghanna.com/?start=ext-walk&look=night at 1440×810 at 2x, 27 November 2026, entered with sound off."
+/>
+
+## Status
+
+Live and noindex, on Cloudflare Pages. Seventeen viewpoints are up: four outside, by day and night, then the front hall, the stair and the upstairs gallery, the living room, the dining room, and the kitchen and back hall, where three finals are still re-rendering. The den, the parents' bedroom and hall bathroom, Buzz's room and the sisters' rooms, the attic, an invented room, and the basement and furnace room are being built in parallel, and each joins the tour as its plan merges. A free-roam pilot of the front hall, a Gaussian splat trained from a 115-view capture, is in progress and not live. The viewer has 713 unit tests and 36 end-to-end tests, the Python tools 656, and the Blender build its own suite.

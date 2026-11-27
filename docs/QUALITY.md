@@ -197,3 +197,23 @@ GitHub: descriptions, homepages and topics brought in line (Circuit, Aglow, Soli
 ## 2026-11-17 BJS card capture
 
 `public/shots/bjs.webp` is now `docs/app-store/screenshots/01-decision.png` from the BJS repo (branch `step-9-monetization`, 11 November 2026): the strategy trainer on soft 15 against a dealer 6, taken in the iPhone 17 Pro Max simulator on iOS 26.4 with the store demo fixture, unframed, 1320×2868 downsized to 660×1434 WebP at quality 82. It replaces the September capture described above.
+
+## Home Alone House added (2026-11-27)
+
+**Home Alone House** (`/work/homealone`), first in the Also built index at Luke's call. Luke confirmed in this session both that the live site is linked as it is, film music, lines and stills included, and that captures of the project's own renders may include the exterior. No film still, gallery or Then and Now screen appears here. The write-up follows the project's limits: no affiliation, licence or clearance claims, nothing that identifies the real house's location or owners, no actor likenesses, and the repository stays without a remote.
+
+Facts come from the project's coordinator and site sessions and its repository at `6a95651`, the commit the coordinator reported as deployed:
+- the rendering numbers: 8192×4096, threshold 0.01 up to 2,048 samples, previews 2048×1024 at 128, finals at 3,765–4,791 s on the RTX 3070 in the latest batch;
+- the 8.56 m roof-deck fit within 3 px;
+- the knock-on check, `ce_tools.knockon` at min 45 dB, which flagged 6 of 13 viewpoints in plan 3c (`docs/reference/review-log.md`);
+- the glide mesh: `MESH_SEG_X = 512`, about 131k vertices, projective texturing gated by each panorama's depth, edge-on drop and backdrop sphere (`viewer/src/nav/Navigator.ts`);
+- 17 nodes, from the live `tour.json`;
+- 11 eggs and three mini-games, from the site session and the live HUD;
+- the invention and privacy rules (`docs/superpowers/specs/2026-11-10-milestone-3-whole-house-design.md`);
+- tests from the coordinator's latest runs: 713 Vitest, 36 Playwright and 656 pytest.
+
+The site session's run on its own branch gave 729 and 37, so the counts differ by branch.
+
+Three captures are from the live site on 27 November at 1440×810 at 2×, entered with "Enter quietly" through the viewer's own `?start=` links. Progress is kept on the device only, so nothing was written anywhere. The kitchen was not captured because three of its finals are still re-rendering.
+
+When work began, production briefly served the viewer's test fixture ("Fixture tour"). The site session was told, and the real 17-node tour was back before the captures were taken.

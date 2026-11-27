@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
 
-for (const path of ['/', '/work/pfc', '/work/beacon', '/work/ccc', '/work/kwx', '/work/circuit', '/work/onair', '/work/solitaire', '/work/mapped', '/work/aglow', '/work/shed', '/work/bjs']) {
+for (const path of ['/', '/work/pfc', '/work/beacon', '/work/ccc', '/work/kwx', '/work/circuit', '/work/onair', '/work/solitaire', '/work/mapped', '/work/aglow', '/work/shed', '/work/bjs', '/work/homealone']) {
   for (const theme of ['dark', 'light'] as const) {
     test(`${path} has no axe violations in ${theme}`, async ({ page }) => {
       await page.goto(path)

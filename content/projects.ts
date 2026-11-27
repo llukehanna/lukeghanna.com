@@ -1,5 +1,5 @@
 export type Project = {
-  slug: 'pfc' | 'beacon' | 'ccc' | 'kwx' | 'circuit' | 'onair' | 'solitaire' | 'mapped' | 'aglow' | 'shed' | 'bjs'
+  slug: 'pfc' | 'beacon' | 'ccc' | 'kwx' | 'circuit' | 'onair' | 'solitaire' | 'mapped' | 'aglow' | 'shed' | 'bjs' | 'homealone'
   title: string
   /** One or two words on the project's state: Live, Research, macOS, iOS. */
   statusLabel: string
@@ -100,6 +100,18 @@ export const projects: Project[] = [
     description: 'Skill ratings for a house beer-die and spikeball league, scored offline-first from a phone at the table.',
     stack: 'Next.js · Postgres · OpenSkill',
     screenshot: { src: '/shots/shed.webp', width: 1440, height: 810 },
+  },
+  {
+    slug: 'homealone',
+    title: 'Home Alone House',
+    statusLabel: 'Live',
+    live: true,
+    selected: false,
+    where: 'homealone.lukeghanna.com',
+    href: '/work/homealone',
+    description: 'A path-traced 360° tour of the film house on Christmas morning, rendered in Blender at 8K, with hidden eggs and mini-games.',
+    stack: 'Blender Cycles · three.js · TypeScript',
+    screenshot: { src: '/work/homealone/foyer.webp', width: 2880, height: 1620 },
   },
   {
     slug: 'solitaire',

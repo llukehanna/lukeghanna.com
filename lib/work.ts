@@ -15,7 +15,7 @@ export type WorkMeta = {
   glance: { label: string; value: string }[]
 }
 
-export const workSlugs = ['pfc', 'beacon', 'ccc', 'kwx', 'circuit', 'onair', 'solitaire', 'mapped', 'aglow', 'shed', 'bjs'] as const
+export const workSlugs = ['pfc', 'beacon', 'ccc', 'kwx', 'circuit', 'onair', 'solitaire', 'mapped', 'aglow', 'shed', 'bjs', 'homealone'] as const
 export type WorkSlug = (typeof workSlugs)[number]
 
 export function isWorkSlug(s: string): s is WorkSlug {
@@ -38,6 +38,7 @@ const loaders = {
   aglow: () => import('@/content/work/aglow.mdx'),
   shed: () => import('@/content/work/shed.mdx'),
   bjs: () => import('@/content/work/bjs.mdx'),
+  homealone: () => import('@/content/work/homealone.mdx'),
 } satisfies Record<WorkSlug, () => Promise<{ default: ComponentType; meta: WorkMeta }>>
 
 export function loadWork(slug: WorkSlug) {

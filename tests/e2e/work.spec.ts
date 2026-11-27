@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test'
 
 import type { Page } from '@playwright/test'
 
-const slugs = ['pfc', 'beacon', 'ccc', 'kwx', 'circuit', 'onair', 'solitaire', 'mapped', 'aglow', 'shed', 'bjs']
+const slugs = ['pfc', 'beacon', 'ccc', 'kwx', 'circuit', 'onair', 'solitaire', 'mapped', 'aglow', 'shed', 'bjs', 'homealone']
 
 // Below md the rail hides its link list and the same links close the article instead.
 const linksOf = (page: Page, isMobile: boolean) => (isMobile ? page.getByTestId('article-footer') : page.getByTestId('rail'))
@@ -47,9 +47,9 @@ test.describe('write-up', () => {
     let links = linksOf(page, isMobile)
     await expect(links.getByRole('link', { name: /Previous/ })).toHaveCount(0)
     await expect(links.getByRole('link', { name: /Next/ })).toHaveAttribute('href', '/work/beacon')
-    await page.goto('/work/bjs')
+    await page.goto('/work/homealone')
     links = linksOf(page, isMobile)
-    await expect(links.getByRole('link', { name: /Previous/ })).toHaveAttribute('href', '/work/shed')
+    await expect(links.getByRole('link', { name: /Previous/ })).toHaveAttribute('href', '/work/bjs')
     await expect(links.getByRole('link', { name: /Next/ })).toHaveCount(0)
   })
 
