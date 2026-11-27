@@ -107,7 +107,7 @@ export const projects: Project[] = [
     statusLabel: 'Live',
     live: true,
     selected: false,
-    where: 'homealone.lukeghanna.com',
+    where: 'homealone.lukeghanna.com · work in progress',
     href: '/work/homealone',
     description: 'A path-traced 360° tour of the film house on Christmas morning, rendered in Blender at 8K, with hidden eggs and mini-games.',
     stack: 'Blender Cycles · three.js · TypeScript',
