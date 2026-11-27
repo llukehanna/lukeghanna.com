@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
 
 test.describe('home', () => {
-  const slugs = ['beacon', 'kwx', 'pfc', 'ccc', 'circuit', 'shed', 'homealone', 'solitaire', 'onair', 'mapped', 'aglow', 'bjs']
+  const slugs = ['beacon', 'pfc', 'ccc', 'circuit', 'shed', 'kwx', 'homealone', 'solitaire', 'onair', 'mapped', 'aglow', 'bjs']
 
   test('about comes first, then every project, each linking to its write-up', async ({ page }) => {
     await page.goto('/')
@@ -24,7 +24,7 @@ test.describe('home', () => {
       await expect(page.getByTestId(`project-${slug}`).locator('img')).toHaveCount(0)
     }
     await expect(more).toContainText('12')
-    const [lastCard, index] = await Promise.all([page.getByTestId('project-shed').boundingBox(), more.boundingBox()])
+    const [lastCard, index] = await Promise.all([page.getByTestId('project-kwx').boundingBox(), more.boundingBox()])
     expect(index!.y).toBeGreaterThan(lastCard!.y + lastCard!.height - 1)
   })
 
@@ -50,7 +50,7 @@ test.describe('home', () => {
     const copy = page.getByTestId('copy-email')
     await expect(copy).toContainText('luke@zhannas.com')
     await expect(copy).toHaveAttribute('href', 'mailto:luke@zhannas.com')
-    await expect(contact).toContainText(/last updated [A-Z][a-z]+ \d{4}/)
+    await expect(contact).toContainText(/Last updated [A-Z][a-z]+ \d{4}/)
     test.skip(browserName !== 'chromium', 'clipboard permissions are Chromium-only here')
     await context.grantPermissions(['clipboard-read', 'clipboard-write'])
     await copy.click()

@@ -27,7 +27,7 @@ const liveSites = projects.filter((p) => p.where.includes('lukeghanna.com')).len
 
 const facts = [
   ['Studying', 'CS + Business Administration, USC', `Graduating ${graduation}`],
-  ['Looking for', 'Strategy · BizOps · Deployment', 'Full-time, at startups'],
+  ['Looking for', 'Strategy · Operations · Deployment', 'Full-time'],
   ['Shipped', `${projects.length} projects · ${liveSites} live sites`, null],
 ] as const
 
@@ -46,8 +46,7 @@ export default function Home() {
               I take a problem from question to running system:{' '}
               <span className="text-ink">who does the work and how, the data, the interface, and keeping it up once it ships.</span>{' '}
               Beacon began as my capstone in Palantir&apos;s American Tech Fellowship, a sourcing workbench built around how analysts
-              reject firms. Kalshi Weather Edge ran unattended for four months, settled 7,440 signals, and never placed an order, because
-              the market was better calibrated than the model. Every project here has a write-up that says exactly what state it&apos;s in.
+              reject firms. Every project here has a write-up that says exactly what state it&apos;s in.
             </p>
             <dl className="flex flex-col self-start border-b border-line">
               {facts.map(([k, v, sub]) => (
@@ -69,8 +68,7 @@ export default function Home() {
 
         <Section id="contact" title="Contact" index="03">
           <p className="text-[18px] leading-[1.6] text-mute max-md:text-[16px]">
-            I&apos;m looking for a full-time operator role at a startup after I graduate in {graduation}: strategy, BizOps, or
-            deployment. Email is the fastest way to reach me. I&apos;m also on GitHub and LinkedIn.
+            I&apos;m looking for a full-time role in strategy, operations or deployment after I graduate in {graduation}. Email is the fastest way to reach me. I&apos;m also on GitHub and LinkedIn.
           </p>
           <div className="mt-5 flex flex-wrap items-center gap-2 max-md:grid max-md:grid-cols-2">
             <CopyEmail className="max-md:col-span-2" />
@@ -82,7 +80,7 @@ export default function Home() {
             </a>
           </div>
           <p className="mt-16 border-t border-line pt-4 font-mono text-[11px] tracking-[0.03em] text-dim">
-            Built with Next.js, served by Cloudflare, last updated {built}.
+            Last updated {built}.
           </p>
         </Section>
       </main>

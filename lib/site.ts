@@ -2,7 +2,7 @@ export const siteName = 'Luke Hanna'
 export const siteUrl = 'https://lukeghanna.com'
 export const siteTagline = 'Senior at USC studying computer science and business administration.'
 export const siteDescription = 'Computer science and business administration at USC. Production systems, built and run end to end, each with a write-up that says what state it is in.'
-export const siteBio = 'Looking for full-time operator roles at startups.'
+export const siteBio = 'Looking for full-time roles in strategy, operations and deployment.'
 /** Shown in the About facts and the contact line. */
 export const graduation = 'May 2027'
 export const links = {

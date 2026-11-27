@@ -14,7 +14,7 @@ test.describe('mobile', () => {
 
   test('project cards stack in one column', async ({ page }) => {
     await page.goto('/')
-    const [a, b] = await Promise.all([page.getByTestId('project-beacon').boundingBox(), page.getByTestId('project-kwx').boundingBox()])
+    const [a, b] = await Promise.all([page.getByTestId('project-beacon').boundingBox(), page.getByTestId('project-pfc').boundingBox()])
     expect(Math.abs(a!.x - b!.x)).toBeLessThanOrEqual(1)
     expect(b!.y).toBeGreaterThan(a!.y + a!.height - 1)
   })
